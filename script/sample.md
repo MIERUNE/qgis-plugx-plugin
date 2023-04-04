@@ -25,7 +25,6 @@
         "type":"SymbolType.Fill",
         "legend":"614022",
         "fill_color":"(131, 152, 228, 255)",
-        "fill_style":"SolidPattern",
         "outline_color":"(35, 35, 35, 255)",
         "outline_width":0.26,
         "outline_unit":"Millimeters"
