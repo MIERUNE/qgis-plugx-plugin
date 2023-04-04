@@ -1,0 +1,18 @@
+name: Lint
+on:
+  pull_request:
+    types: [opened, synchronize, edited]
+jobs:
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+      - name: Install Dependencies
+        run: pip install flake8 black flake8-black
+      - name: Setup flake8 annotations
+        uses: rbialon/flake8-annotations@v1
+      - name: Lint with flake8
+        run: flake8 . --exclude=.venv --max-line-length=88
