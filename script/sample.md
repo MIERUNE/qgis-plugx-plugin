@@ -23,7 +23,7 @@
   ],
   "symbol": [
     {
-      "FeatureID": 0,
+      "feature_id": [0],
       "type": "SymbolType.Fill",
       "legend": "614022",
       "fill_color": "(131, 152, 228, 255)",

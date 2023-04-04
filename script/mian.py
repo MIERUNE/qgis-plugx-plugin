@@ -20,7 +20,9 @@ def get_polygon_symbol(layer: QgsVectorLayer):
 
     symbol_items = layer.renderer().legendSymbolItems()
     for symbol_item in symbol_items:
+        #TODO:generate feature id list
         result.append({
+            "feature_id": [],
             "type": symbol_item.symbol().symbolLayer(0).type(),
             "legend": symbol_item.label(),
             "fill_color": symbol_item.symbol().symbolLayer(0).fillColor().getRgb(),
