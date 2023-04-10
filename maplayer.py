@@ -71,30 +71,22 @@ class MapLayer:
 
     def export_shps_by_category(self, category: QgsRendererCategory):
         value = category.value()
-        feature_ids = self.get_featids_by_symbol(value)
+        features = self.get_feat_by_value(value)
         shp_path = os.path.join(self.directory, f"{self.layer.name()}_{category.label()}.shp")
+        output_layer = QgsVectorFileWriter(shp_path, 'UTF-8', QgsFields(), self.layer.wkbType(), self.layer.crs(),
+                                           'ESRI Shapefile')
+        output_layer.addFeatures(features)
+        del output_layer
 
-        print(f'@id = {" or ".join(feature_ids)}')
-        if feature_ids:
-            try:processing.run("native:extractbyexpression",
-                           {'INPUT': self.layer,
-                            'EXPRESSION': f'{" or ".join(feature_ids)}',
-                            'OUTPUT': shp_path})
-            except Exception as e:
-                print(e)
-
-    def get_featids_by_symbol(self, value: str) -> list:
+    def get_feat_by_value(self, value: str) -> list:
         result = []
         if self.renderer_type == "singleSymbol":
             pass
 
         if self.renderer_type == "categorizedSymbol":
             field = self.layer.renderer().classAttribute()
-            # values = [category.value() for category in self.renderer().categories()]
 
             for feature in self.layer.getFeatures():
                 if feature[field] == value:
-                    result.append(f"@id = {str(feature.id())}")
+                    result.append(feature)
         return result
-
-
