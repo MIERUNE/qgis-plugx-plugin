@@ -19,7 +19,39 @@ class MapLayer:
 
         self.symbols = []
 
-    def generate_symbol_files(self):
+    def generate_single_symbols(self):
+        symbol = self.layer.renderer().symbol()
+        symbol_type = symbol.symbolLayer(0).type()
+        symbol_dict = []
+        # point
+        if symbol_type == 0:
+            symbol_dict.append({
+                "type": symbol_type,
+                "color": symbol.color().name(),
+                "size": symbol.size(),
+            })
+
+        # line
+        if symbol_type == 1:
+            symbol_dict.append({
+                "type": symbol_type,
+                "color": symbol.symbolLayer(0).color().name(),
+                "width": symbol.symbolLayer(0).width(),
+            })
+
+        # polygon
+        if symbol_type == 2:
+            symbol_dict.append({
+                "type": symbol_type,
+                "fill_color": symbol.symbolLayer(0).fillColor().name(),
+                "outline_color": symbol.symbolLayer(0).strokeColor().name(),
+                "outline_width": symbol.symbolLayer(0).strokeWidth(),
+                "outline_unit": symbol.symbolLayer(0).strokeWidthUnit()
+            })
+
+        self.write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}.json"))
+
+    def generate_category_symbols(self):
         symbol_items = self.layer.renderer().legendSymbolItems()
         symbol_type = symbol_items[0].symbol().symbolLayer(0).type()
 
@@ -59,15 +91,7 @@ class MapLayer:
                     "outline_unit": symbol.symbolLayer(0).strokeWidthUnit()
                 })
 
-            def write_json(data: dict, filepath: str):
-                # Convert dictionary to JSON string
-                json_data = json.dumps(data)
-
-                # Write JSON string to file
-                with open(filepath, "w") as outfile:
-                    outfile.write(json_data)
-
-            write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}_{category.value()}.json"))
+            self.write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}_{category.value()}.json"))
 
     def export_shps_by_category(self, category: QgsRendererCategory):
         value = category.value()
@@ -90,3 +114,11 @@ class MapLayer:
                 if feature[field] == value:
                     result.append(feature)
         return result
+
+    def write_json(self, data: dict, filepath: str):
+        # Convert dictionary to JSON string
+        json_data = json.dumps(data)
+
+        # Write JSON string to file
+        with open(filepath, "w") as outfile:
+            outfile.write(json_data)

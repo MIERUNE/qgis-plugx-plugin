@@ -62,7 +62,10 @@ class QGIS2PlugX_dialog(QDialog):
             # シンボロジごとのSHPとjsonを出力
             for lyr in layers:
                 maplyr = MapLayer(lyr, directory)
-                maplyr.generate_symbol_files()
+                if maplyr.renderer_type == 'categorizedSymbol':
+                    maplyr.generate_category_symbols()
+                if maplyr.renderer_type == 'singleSymbol':
+                    maplyr.generate_single_symbols()
 
             print("done")
 
