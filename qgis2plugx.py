@@ -6,13 +6,12 @@ from PyQt5.QtWidgets import *
 from qgis.core import *
 from qgis.gui import *
 
-from sample_menu_01 import SampleMenu01
-from sample_menu_02 import SampleMenu02
+from QGIS2PlugX_dialog import QGIS2PlugX_dialog
 
-PLUGIN_NAME = "sample"
+PLUGIN_NAME = "QGIS2PlugX"
 
 
-class Sample:
+class QGIS2PlugX:
     def __init__(self, iface):
         self.iface = iface
         self.win = self.iface.mainWindow()
@@ -23,16 +22,16 @@ class Sample:
         self.toolbar.setObjectName(PLUGIN_NAME)
 
     def add_action(
-        self,
-        icon_path,
-        text,
-        callback,
-        enabled_flag=True,
-        add_to_menu=True,
-        add_to_toolbar=True,
-        status_tip=None,
-        whats_this=None,
-        parent=None,
+            self,
+            icon_path,
+            text,
+            callback,
+            enabled_flag=True,
+            add_to_menu=True,
+            add_to_toolbar=True,
+            status_tip=None,
+            whats_this=None,
+            parent=None,
     ):
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
@@ -52,10 +51,7 @@ class Sample:
     def initGui(self):
         # メニュー設定
         self.add_action(
-            icon_path=None, text="Menu01", callback=self.show_menu_01, parent=self.win
-        )
-        self.add_action(
-            icon_path=None, text="Menu02", callback=self.show_menu_02, parent=self.win
+            icon_path=None, text="QGIS2PlugX", callback=self.show_dialog, parent=self.win
         )
 
     def unload(self):
@@ -64,10 +60,6 @@ class Sample:
             self.iface.removeToolBarIcon(action)
         del self.toolbar
 
-    def show_menu_01(self):
-        self.sample_menu_01 = SampleMenu01()
+    def show_dialog(self):
+        self.sample_menu_01 = QGIS2PlugX_dialog()
         self.sample_menu_01.show()
-
-    def show_menu_02(self):
-        self.sample_menu_02 = SampleMenu02()
-        self.sample_menu_02.show()

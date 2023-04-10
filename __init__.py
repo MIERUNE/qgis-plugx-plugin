@@ -6,6 +6,6 @@ sys.path.append(os.path.dirname(__file__))
 
 
 def classFactory(iface):
-    from sample import Sample
+    from qgis2plugx import QGIS2PlugX
 
-    return Sample(iface)
+    return QGIS2PlugX(iface)
