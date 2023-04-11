@@ -84,10 +84,12 @@ class QGIS2PlugX_dialog(QDialog):
             with open(filepath, "w") as outfile:
                 outfile.write(json_data)
 
-        layer_order = {}
-        all_layers = QgsProject.instance().mapLayers()  # get dictionary of all layers in the project
-        for idx, layer in enumerate(all_layers.values()):  # loop over the layers in the dictionary
-            layer_order[layer.name()] = idx
-        write_json(layer_order, os.path.join(directory, 'project.json'))
+        project_json = {}
+
+        project_json["project_name"] = QgsProject.instance().title()
+        project_json["crs"] = QgsProject.instance().crs().authid()
+        project_json["layers"] = [layer.name() for layer in QgsProject.instance().mapLayers().values()]
+
+        write_json(project_json, os.path.join(directory, 'project.json'))
 
         print("done")
