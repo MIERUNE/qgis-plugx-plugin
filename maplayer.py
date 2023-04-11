@@ -7,7 +7,6 @@ from qgis.PyQt import uic
 from qgis.utils import iface
 
 import os
-import processing
 import json
 
 
@@ -123,3 +122,5 @@ class MapLayer:
                 if feature[field] == value:
                     result.append(feature)
         return result
+
+

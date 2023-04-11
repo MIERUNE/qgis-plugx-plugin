@@ -1,5 +1,6 @@
 import os
 import json
+import processing
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -59,13 +60,33 @@ class QGIS2PlugX_dialog(QDialog):
             with open(os.path.join(directory, 'project.json'), 'w') as f:
                 json.dump(project, f)
 
-            # シンボロジごとのSHPとjsonを出力
+            # ラベルSHPを出力する
+            canvas = iface.mapCanvas()
+
+            all_labels = processing.run("native:extractlabels",
+                                        {'EXTENT': canvas.extent(),
+                                         'SCALE': canvas.scale(),
+                                         'MAP_THEME': None,
+                                         'INCLUDE_UNPLACED': True,
+                                         'DPI': 96,
+                                         'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
+
             for lyr in layers:
                 maplyr = MapLayer(lyr, directory)
+
+                # シンボロジごとのSHPとjsonを出力
                 if maplyr.renderer_type == 'categorizedSymbol':
                     maplyr.generate_category_symbols()
                 if maplyr.renderer_type == 'singleSymbol':
                     maplyr.generate_single_symbols()
+
+                # レイヤ後ののラベルSHPを出力
+                processing.run("native:extractbyattribute", {
+                    'INPUT': all_labels,
+                    'FIELD': 'Layer',
+                    'OPERATOR': 0,  # '='
+                    'VALUE': maplyr.layer.name(),
+                    'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
 
             print("done")
 
