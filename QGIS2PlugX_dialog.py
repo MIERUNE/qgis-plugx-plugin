@@ -50,47 +50,53 @@ class QGIS2PlugX_dialog(QDialog):
 
         # 出力先のディレクトリを作成
         directory = os.path.join(prj_dir, prj_name)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-            # project.jsonを出力
-            project = {
-                "name": prj_name,
-                "layers": []
-            }
-            with open(os.path.join(directory, 'project.json'), 'w') as f:
-                json.dump(project, f)
-
-            # ラベルSHPを出力する
-            canvas = iface.mapCanvas()
-
-            all_labels = processing.run("native:extractlabels",
-                                        {'EXTENT': canvas.extent(),
-                                         'SCALE': canvas.scale(),
-                                         'MAP_THEME': None,
-                                         'INCLUDE_UNPLACED': True,
-                                         'DPI': 96,
-                                         'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
-
-            for lyr in layers:
-                maplyr = MapLayer(lyr, directory)
-
-                # シンボロジごとのSHPとjsonを出力
-                if maplyr.renderer_type == 'categorizedSymbol':
-                    maplyr.generate_category_symbols()
-                if maplyr.renderer_type == 'singleSymbol':
-                    maplyr.generate_single_symbols()
-
-                # レイヤ後ののラベルSHPを出力
-                processing.run("native:extractbyattribute", {
-                    'INPUT': all_labels,
-                    'FIELD': 'Layer',
-                    'OPERATOR': 0,  # '='
-                    'VALUE': maplyr.layer.name(),
-                    'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
-
-            print("done")
-
-
-
-        else:
+        if os.path.exists(directory):
             print(f"Directory {directory} already exists!")
+            return
+
+        os.makedirs(directory)
+
+        # ラベルSHPを出力する
+        canvas = iface.mapCanvas()
+
+        all_labels = processing.run("native:extractlabels",
+                                    {'EXTENT': canvas.extent(),
+                                     'SCALE': canvas.scale(),
+                                     'MAP_THEME': None,
+                                     'INCLUDE_UNPLACED': True,
+                                     'DPI': 96,
+                                     'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
+
+        for lyr in layers:
+            maplyr = MapLayer(lyr, directory)
+
+            # シンボロジごとのSHPとjsonを出力
+            if maplyr.renderer_type == 'categorizedSymbol':
+                maplyr.generate_category_symbols()
+            if maplyr.renderer_type == 'singleSymbol':
+                maplyr.generate_single_symbols()
+
+            # レイヤ後ののラベルSHPを出力
+            processing.run("native:extractbyattribute", {
+                'INPUT': all_labels,
+                'FIELD': 'Layer',
+                'OPERATOR': 0,  # '='
+                'VALUE': maplyr.layer.name(),
+                'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
+
+        # project.jsonにレイヤ順序情報を書き出し
+        def write_json(data: dict, filepath: str):
+            # Convert dictionary to JSON string
+            json_data = json.dumps(data)
+
+            # Write JSON string to file
+            with open(filepath, "w") as outfile:
+                outfile.write(json_data)
+
+        layer_order = {}
+        all_layers = QgsProject.instance().mapLayers()  # get dictionary of all layers in the project
+        for idx, layer in enumerate(all_layers.values()):  # loop over the layers in the dictionary
+            layer_order[layer.name()] = idx
+        write_json(layer_order, os.path.join(directory, 'project.json'))
+
+        print("done")
