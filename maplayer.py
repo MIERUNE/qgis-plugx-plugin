@@ -11,6 +11,15 @@ import processing
 import json
 
 
+def write_json(data: dict, filepath: str):
+    # Convert dictionary to JSON string
+    json_data = json.dumps(data)
+
+    # Write JSON string to file
+    with open(filepath, "w") as outfile:
+        outfile.write(json_data)
+
+
 class MapLayer:
     def __init__(self, layer: QgsVectorLayer, directory: str):
         self.layer = layer
@@ -49,7 +58,7 @@ class MapLayer:
                 "outline_unit": symbol.symbolLayer(0).strokeWidthUnit()
             })
 
-        self.write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}.json"))
+        write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}.json"))
 
     def generate_category_symbols(self):
         symbol_items = self.layer.renderer().legendSymbolItems()
@@ -91,13 +100,13 @@ class MapLayer:
                     "outline_unit": symbol.symbolLayer(0).strokeWidthUnit()
                 })
 
-            self.write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}_{category.value()}.json"))
+            write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}_{category.value()}.json"))
 
     def export_shps_by_category(self, category: QgsRendererCategory):
         value = category.value()
         features = self.get_feat_by_value(value)
         shp_path = os.path.join(self.directory, f"{self.layer.name()}_{category.label()}.shp")
-        output_layer = QgsVectorFileWriter(shp_path, 'UTF-8', QgsFields(), self.layer.wkbType(), self.layer.crs(),
+        output_layer = QgsVectorFileWriter(shp_path, 'UTF-8', self.layer.fields(), self.layer.wkbType(), self.layer.crs(),
                                            'ESRI Shapefile')
         output_layer.addFeatures(features)
         del output_layer
@@ -114,11 +123,3 @@ class MapLayer:
                 if feature[field] == value:
                     result.append(feature)
         return result
-
-    def write_json(self, data: dict, filepath: str):
-        # Convert dictionary to JSON string
-        json_data = json.dumps(data)
-
-        # Write JSON string to file
-        with open(filepath, "w") as outfile:
-            outfile.write(json_data)
