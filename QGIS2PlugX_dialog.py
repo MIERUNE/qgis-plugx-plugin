@@ -44,23 +44,19 @@ class QGIS2PlugX_dialog(QDialog):
             for lyr in QgsProject.instance().mapLayers().values()
         ]
 
-        # プロジェクトファイルのパスとファイル名を取得
-        prj_dir = QgsProject.instance().readPath('.')
-        prj_name = os.path.basename(QgsProject.instance().fileName()).split('.')[0]
-
         # 出力先のディレクトリを作成
         directory = self.ui.outputFileWidget.filePath()
 
         # ラベルSHPを出力する
-        canvas = iface.mapCanvas()
+        # canvas = iface.mapCanvas()
 
-        all_labels = processing.run("native:extractlabels",
-                                    {'EXTENT': canvas.extent(),
-                                     'SCALE': canvas.scale(),
-                                     'MAP_THEME': None,
-                                     'INCLUDE_UNPLACED': True,
-                                     'DPI': 96,
-                                     'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
+        # all_labels = processing.run("native:extractlabels",
+        #                             {'EXTENT': canvas.extent(),
+        #                              'SCALE': canvas.scale(),
+        #                              'MAP_THEME': None,
+        #                              'INCLUDE_UNPLACED': True,
+        #                              'DPI': 96,
+        #                              'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
 
         for lyr in layers:
             maplyr = MapLayer(lyr, directory)
@@ -71,13 +67,13 @@ class QGIS2PlugX_dialog(QDialog):
             if maplyr.renderer_type == 'singleSymbol':
                 maplyr.generate_single_symbols()
 
-            # レイヤ後ののラベルSHPを出力
-            processing.run("native:extractbyattribute", {
-                'INPUT': all_labels,
-                'FIELD': 'Layer',
-                'OPERATOR': 0,  # '='
-                'VALUE': maplyr.layer.name(),
-                'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
+            # レイヤごとのラベルSHPを出力
+            # processing.run("native:extractbyattribute", {
+            #     'INPUT': all_labels,
+            #     'FIELD': 'Layer',
+            #     'OPERATOR': 0,  # '='
+            #     'VALUE': maplyr.layer.name(),
+            #     'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
 
         # project.jsonにレイヤ順序情報を書き出し
         def write_json(data: dict, filepath: str):
