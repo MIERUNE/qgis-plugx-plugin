@@ -30,32 +30,32 @@ class MapLayer:
     def generate_single_symbols(self):
         symbol = self.layer.renderer().symbol()
         symbol_type = symbol.symbolLayer(0).type()
-        symbol_dict = []
+        symbol_dict = {}
         # point
         if symbol_type == 0:
-            symbol_dict.append({
+            symbol_dict = {
                 "type": symbol_type,
                 "color": symbol.color().name(),
                 "size": symbol.size(),
-            })
+            }
 
         # line
         if symbol_type == 1:
-            symbol_dict.append({
+            symbol_dict = {
                 "type": symbol_type,
                 "color": symbol.symbolLayer(0).color().name(),
                 "width": symbol.symbolLayer(0).width(),
-            })
+            }
 
         # polygon
         if symbol_type == 2:
-            symbol_dict.append({
+            symbol_dict = {
                 "type": symbol_type,
                 "fill_color": symbol.symbolLayer(0).fillColor().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
                 "outline_width": symbol.symbolLayer(0).strokeWidth(),
                 "outline_unit": symbol.symbolLayer(0).strokeWidthUnit()
-            })
+            }
 
         write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}.json"))
 
@@ -69,35 +69,35 @@ class MapLayer:
             self.export_shps_by_category(category)
 
             # スタイルJsonを作成
-            symbol_dict = []
+            symbol_dict = None
             # point
             if symbol_type == 0:
-                symbol_dict.append({
+                symbol_dict = {
                     "type": symbol_type,
                     "legend": category.label(),
                     "color": symbol.color().name(),
                     "size": symbol.size(),
-                })
+                }
 
             # line
             if symbol_type == 1:
-                symbol_dict.append({
+                symbol_dict = {
                     "type": symbol_type,
                     "legend": category.label(),
                     "color": symbol.symbolLayer(0).color().name(),
                     "width": symbol.symbolLayer(0).width(),
-                })
+                }
 
             # polygon
             if symbol_type == 2:
-                symbol_dict.append({
+                symbol_dict = {
                     "type": symbol_type,
                     "legend": category.label(),
                     "fill_color": symbol.symbolLayer(0).fillColor().name(),
                     "outline_color": symbol.symbolLayer(0).strokeColor().name(),
                     "outline_width": symbol.symbolLayer(0).strokeWidth(),
                     "outline_unit": symbol.symbolLayer(0).strokeWidthUnit()
-                })
+                }
 
             write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}_{category.value()}.json"))
 
@@ -105,7 +105,8 @@ class MapLayer:
         value = category.value()
         features = self.get_feat_by_value(value)
         shp_path = os.path.join(self.directory, f"{self.layer.name()}_{category.label()}.shp")
-        output_layer = QgsVectorFileWriter(shp_path, 'UTF-8', self.layer.fields(), self.layer.wkbType(), self.layer.crs(),
+        output_layer = QgsVectorFileWriter(shp_path, 'UTF-8', self.layer.fields(), self.layer.wkbType(),
+                                           self.layer.crs(),
                                            'ESRI Shapefile')
         output_layer.addFeatures(features)
         del output_layer
@@ -122,5 +123,3 @@ class MapLayer:
                 if feature[field] == value:
                     result.append(feature)
         return result
-
-
