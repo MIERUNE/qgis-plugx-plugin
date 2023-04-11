@@ -48,15 +48,15 @@ class QGIS2PlugX_dialog(QDialog):
         directory = self.ui.outputFileWidget.filePath()
 
         # ラベルSHPを出力する
-        # canvas = iface.mapCanvas()
+        canvas = iface.mapCanvas()
 
-        # all_labels = processing.run("native:extractlabels",
-        #                             {'EXTENT': canvas.extent(),
-        #                              'SCALE': canvas.scale(),
-        #                              'MAP_THEME': None,
-        #                              'INCLUDE_UNPLACED': True,
-        #                              'DPI': 96,
-        #                              'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
+        all_labels = processing.run("native:extractlabels",
+                                    {'EXTENT': canvas.extent(),
+                                     'SCALE': canvas.scale(),
+                                     'MAP_THEME': None,
+                                     'INCLUDE_UNPLACED': True,
+                                     'DPI': 96,
+                                     'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
 
         for lyr in layers:
             maplyr = MapLayer(lyr, directory)
@@ -68,12 +68,13 @@ class QGIS2PlugX_dialog(QDialog):
                 maplyr.generate_single_symbols()
 
             # レイヤごとのラベルSHPを出力
-            # processing.run("native:extractbyattribute", {
-            #     'INPUT': all_labels,
-            #     'FIELD': 'Layer',
-            #     'OPERATOR': 0,  # '='
-            #     'VALUE': maplyr.layer.name(),
-            #     'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
+            if maplyr.layer.labelsEnabled():
+                processing.run("native:extractbyattribute", {
+                    'INPUT': all_labels,
+                    'FIELD': 'Layer',
+                    'OPERATOR': 0,  # '='
+                    'VALUE': maplyr.layer.name(),
+                    'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
 
         # project.jsonにレイヤ順序情報を書き出し
         def write_json(data: dict, filepath: str):

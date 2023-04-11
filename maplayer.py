@@ -18,6 +18,11 @@ def write_json(data: dict, filepath: str):
     with open(filepath, "w") as outfile:
         outfile.write(json_data)
 
+symbol_types = {
+    0: "point",
+    1: "line",
+    2: "polygon",
+}
 
 class MapLayer:
     def __init__(self, layer: QgsVectorLayer, directory: str):
@@ -37,18 +42,17 @@ class MapLayer:
         # point
         if symbol_type == 0:
             symbol_dict = {
-                "type": symbol_type,
+                "type": symbol_types[symbol_type],
                 "size": symbol.size(),
                 "fill_color": symbol.color().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
                 "outline_width": symbol.symbolLayer(0).strokeWidth(),
-                "outline_unit": symbol.symbolLayer(0).strokeWidthUnit()
             }
 
         # line
         if symbol_type == 1:
             symbol_dict = {
-                "type": symbol_type,
+                "type": symbol_types[symbol_type],
                 "color": symbol.symbolLayer(0).color().name(),
                 "width": symbol.symbolLayer(0).width(),
             }
@@ -56,11 +60,10 @@ class MapLayer:
         # polygon
         if symbol_type == 2:
             symbol_dict = {
-                "type": symbol_type,
+                "type": symbol_types[symbol_type],
                 "fill_color": symbol.symbolLayer(0).fillColor().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
                 "outline_width": symbol.symbolLayer(0).strokeWidth(),
-                "outline_unit": symbol.symbolLayer(0).strokeWidthUnit()
             }
 
         write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}.json"))
@@ -79,7 +82,7 @@ class MapLayer:
             # point
             if symbol_type == 0:
                 symbol_dict = {
-                    "type": symbol_type,
+                    "type": symbol_types[symbol_type],
                     "legend": category.label(),
                     "color": symbol.color().name(),
                     "size": symbol.size(),
@@ -88,7 +91,7 @@ class MapLayer:
             # line
             if symbol_type == 1:
                 symbol_dict = {
-                    "type": symbol_type,
+                    "type": symbol_types[symbol_type],
                     "legend": category.label(),
                     "color": symbol.symbolLayer(0).color().name(),
                     "width": symbol.symbolLayer(0).width(),
@@ -97,7 +100,7 @@ class MapLayer:
             # polygon
             if symbol_type == 2:
                 symbol_dict = {
-                    "type": symbol_type,
+                    "type": symbol_types[symbol_type],
                     "legend": category.label(),
                     "fill_color": symbol.symbolLayer(0).fillColor().name(),
                     "outline_color": symbol.symbolLayer(0).strokeColor().name(),
