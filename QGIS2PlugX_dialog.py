@@ -49,12 +49,7 @@ class QGIS2PlugX_dialog(QDialog):
         prj_name = os.path.basename(QgsProject.instance().fileName()).split('.')[0]
 
         # 出力先のディレクトリを作成
-        directory = os.path.join(prj_dir, prj_name)
-        if os.path.exists(directory):
-            print(f"Directory {directory} already exists!")
-            return
-
-        os.makedirs(directory)
+        directory = self.ui.outputFileWidget.filePath()
 
         # ラベルSHPを出力する
         canvas = iface.mapCanvas()
