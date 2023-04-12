@@ -89,7 +89,7 @@ class QGIS2PlugX_dialog(QDialog):
 
         project_json["project_name"] = os.path.basename(QgsProject.instance().fileName()).split(".")[0]
         project_json["crs"] = QgsProject.instance().crs().authid()
-        project_json["layers"] = [layer.name() for layer in QgsProject.instance().mapLayers().values()]
+        project_json["layers"] = [layer.name() for layer in iface.mapCanvas().layers()]
 
         write_json(project_json, os.path.join(directory, 'project.json'))
 
