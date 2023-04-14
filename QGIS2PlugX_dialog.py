@@ -24,6 +24,8 @@ class QGIS2PlugX_dialog(QDialog):
         self.ui.pushButton_cancel.clicked.connect(self.close)
         self.add_layer_list()
 
+        self.layers = None
+
     def add_layer_list(self):
         self.layerListWidget.clear()
         alllayers = [
@@ -31,25 +33,27 @@ class QGIS2PlugX_dialog(QDialog):
             for lyr in QgsProject.instance().mapLayers().values()
             # if l.dataProvider().name() == "gdal"
         ]
-        items = [f"{i.name()} [{i.crs().authid()}]" for i in alllayers]
-        for s in items:
-            i = QListWidgetItem(s)
+        items = reversed([i.name() for i in alllayers])
+        for item in items:
+            i = QListWidgetItem(item)
             i.setFlags(i.flags() | Qt.ItemIsUserCheckable)
             i.setCheckState(Qt.Unchecked)
             self.layerListWidget.addItem(i)
 
     def run(self):
-        layers = [
-            lyr
-            for lyr in QgsProject.instance().mapLayers().values()
-        ]
+        # layers = [
+        #     lyr
+        #     for lyr in QgsProject.instance().mapLayers().values()
+        # ]
+        self.layers = self.get_checked_layers()
+        if len(self.layers) == 0:
+            return
 
         # 出力先のディレクトリを作成
         directory = self.ui.outputFileWidget.filePath()
 
         # ラベルSHPを出力する
         canvas = iface.mapCanvas()
-
         all_labels = processing.run("native:extractlabels",
                                     {'EXTENT': canvas.extent(),
                                      'SCALE': canvas.scale(),
@@ -58,7 +62,7 @@ class QGIS2PlugX_dialog(QDialog):
                                      'DPI': 96,
                                      'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
 
-        for lyr in layers:
+        for lyr in self.layers:
             maplyr = MapLayer(lyr, directory)
 
             # シンボロジごとのSHPとjsonを出力
@@ -89,8 +93,15 @@ class QGIS2PlugX_dialog(QDialog):
 
         project_json["project_name"] = os.path.basename(QgsProject.instance().fileName()).split(".")[0]
         project_json["crs"] = QgsProject.instance().crs().authid()
-        project_json["layers"] = [layer.name() for layer in iface.mapCanvas().layers()]
+        project_json["layers"] = [layer.name() for layer in self.layers]
 
         write_json(project_json, os.path.join(directory, 'project.json'))
 
         print("done")
+
+    def get_checked_layers(self):
+        layers = []
+        for i in range(self.layerListWidget.count()):
+            if self.layerListWidget.item(i).checkState() == Qt.Checked:
+                layers.append(QgsProject.instance().mapLayersByName(self.layerListWidget.item(i).text())[0])
+        return layers
