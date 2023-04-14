@@ -1,6 +1,6 @@
 import os
-import json
 import processing
+from utils import write_json
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -24,10 +24,12 @@ class QGIS2PlugX_dialog(QDialog):
         self.ui.pushButton_cancel.clicked.connect(self.close)
         self.ui.mExtentGroupBox.setCurrentExtent(iface.mapCanvas().extent(), QgsProject.instance().crs())
         self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
+        self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
 
         self.add_layer_list()
 
         self.layers = None
+        self.extent = None
 
     def add_layer_list(self):
         self.layerListWidget.clear()
@@ -44,15 +46,16 @@ class QGIS2PlugX_dialog(QDialog):
             self.layerListWidget.addItem(i)
 
     def run(self):
-        # layers = [
-        #     lyr
-        #     for lyr in QgsProject.instance().mapLayers().values()
-        # ]
+        # チェックしたレイヤをリストに取得する
         self.layers = self.get_checked_layers()
-        if len(self.layers) == 0:
+        if not self.layers:
+            return
+        # 処理範囲を取得する
+        self.extent = self.ui.mExtentGroupBox.outputExtent()
+        if not self.extent:
             return
 
-        # 出力先のディレクトリを作成
+        # 出力先のディレクトリを作成する
         directory = self.ui.outputFileWidget.filePath()
 
         # ラベルSHPを出力する
@@ -66,7 +69,22 @@ class QGIS2PlugX_dialog(QDialog):
                                      'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
 
         for lyr in self.layers:
-            maplyr = MapLayer(lyr, directory)
+            # 指定範囲内の地物を抽出し、元のスタイルを適用する
+            qml_path = os.path.join(directory, 'layer.qml')
+            lyr.saveNamedStyle(qml_path, categories=QgsMapLayer.Symbology | QgsMapLayer.Labeling)
+
+            lyr_intersected = processing.run("native:extractbyextent",
+                                             {'INPUT': lyr,
+                                              'EXTENT': self.extent,
+                                              'CLIP': True,
+                                              'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
+            lyr_intersected.setName(lyr.name())
+            lyr_intersected.loadNamedStyle(qml_path)
+            if os.path.exists(qml_path):
+                os.remove(qml_path)
+
+            # スタイル出力用のMapLayerインスランスを作成する
+            maplyr = MapLayer(lyr_intersected, directory)
 
             # シンボロジごとのSHPとjsonを出力
             if maplyr.renderer_type == 'categorizedSymbol':
@@ -84,14 +102,6 @@ class QGIS2PlugX_dialog(QDialog):
                     'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
 
         # project.jsonにレイヤ順序情報を書き出し
-        def write_json(data: dict, filepath: str):
-            # Convert dictionary to JSON string
-            json_data = json.dumps(data)
-
-            # Write JSON string to file
-            with open(filepath, "w") as outfile:
-                outfile.write(json_data)
-
         project_json = {}
 
         project_json["project_name"] = os.path.basename(QgsProject.instance().fileName()).split(".")[0]

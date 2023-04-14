@@ -7,22 +7,14 @@ from qgis.PyQt import uic
 from qgis.utils import iface
 
 import os
-import json
-
-
-def write_json(data: dict, filepath: str):
-    # Convert dictionary to JSON string
-    json_data = json.dumps(data)
-
-    # Write JSON string to file
-    with open(filepath, "w") as outfile:
-        outfile.write(json_data)
+from utils import write_json
 
 symbol_types = {
     0: "point",
     1: "line",
     2: "polygon",
 }
+
 
 class MapLayer:
     def __init__(self, layer: QgsVectorLayer, directory: str):
@@ -108,7 +100,8 @@ class MapLayer:
                     "outline_unit": symbol.symbolLayer(0).strokeWidthUnit()
                 }
 
-            write_json(symbol_dict, os.path.join(self.directory, f"layer_{self.layer.name()}_{category.value()}.json"))
+            write_json(symbol_dict,
+                             os.path.join(self.directory, f"layer_{self.layer.name()}_{category.value()}.json"))
 
     def export_shps_by_category(self, category: QgsRendererCategory):
         value = category.value()
