@@ -22,6 +22,9 @@ class QGIS2PlugX_dialog(QDialog):
 
         self.ui.pushButton_run.clicked.connect(self.run)
         self.ui.pushButton_cancel.clicked.connect(self.close)
+        self.ui.mExtentGroupBox.setCurrentExtent(iface.mapCanvas().extent(), QgsProject.instance().crs())
+        self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
+
         self.add_layer_list()
 
         self.layers = None
