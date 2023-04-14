@@ -58,6 +58,13 @@ class QGIS2PlugX_dialog(QDialog):
         # 出力先のディレクトリを作成する
         directory = self.ui.outputFileWidget.filePath()
 
+        # project.jsonにレイヤ順序情報を書き出し
+        project_json = {}
+
+        project_json["project_name"] = os.path.basename(QgsProject.instance().fileName()).split(".")[0]
+        project_json["crs"] = QgsProject.instance().crs().authid()
+        project_json["layers"] = []
+
         # ラベルSHPを出力する
         canvas = iface.mapCanvas()
         all_labels = processing.run("native:extractlabels",
@@ -78,10 +85,14 @@ class QGIS2PlugX_dialog(QDialog):
                                               'EXTENT': self.extent,
                                               'CLIP': True,
                                               'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
-            lyr_intersected.setName(lyr.name())
             lyr_intersected.loadNamedStyle(qml_path)
             if os.path.exists(qml_path):
                 os.remove(qml_path)
+
+            # レイヤ名をlayer_indexに変更する
+            lyr_intersected.setName(f"layer_{self.layers.index(lyr)}")
+            project_json["layers"].append(lyr_intersected.name())
+
 
             # スタイル出力用のMapLayerインスランスを作成する
             maplyr = MapLayer(lyr_intersected, directory)
@@ -101,12 +112,7 @@ class QGIS2PlugX_dialog(QDialog):
                     'VALUE': maplyr.layer.name(),
                     'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
 
-        # project.jsonにレイヤ順序情報を書き出し
-        project_json = {}
 
-        project_json["project_name"] = os.path.basename(QgsProject.instance().fileName()).split(".")[0]
-        project_json["crs"] = QgsProject.instance().crs().authid()
-        project_json["layers"] = [layer.name() for layer in self.layers]
 
         write_json(project_json, os.path.join(directory, 'project.json'))
 
