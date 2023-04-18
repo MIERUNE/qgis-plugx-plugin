@@ -63,6 +63,8 @@ class QGIS2PlugX_dialog(QDialog):
 
         project_json["project_name"] = os.path.basename(QgsProject.instance().fileName()).split(".")[0]
         project_json["crs"] = QgsProject.instance().crs().authid()
+        project_json["extent"]= [self.extent.xMinimum(), self.extent.yMinimum(), self.extent.xMaximum(), self.extent.yMaximum()]
+        project_json["scale"] = iface.mapCanvas().scale()
         project_json["layers"] = []
 
         # ラベルSHPを出力する
@@ -105,13 +107,6 @@ class QGIS2PlugX_dialog(QDialog):
             if maplyr.layer.labelsEnabled():
                 # レイヤごとのラベルSHPを出力
                 maplyr.generate_label_shp(all_labels, lyr.name())
-                # processing.run("native:extractbyattribute", {
-                #     'INPUT': all_labels,
-                #     'FIELD': 'Layer',
-                #     'OPERATOR': 0,  # '='
-                #     'VALUE': lyr.name(),
-                #     'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
-
                 # レイヤlabelのjsonを出力
                 maplyr.generate_label_json()
 
