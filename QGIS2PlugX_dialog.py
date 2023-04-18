@@ -68,7 +68,7 @@ class QGIS2PlugX_dialog(QDialog):
         # ラベルSHPを出力する
         canvas = iface.mapCanvas()
         all_labels = processing.run("native:extractlabels",
-                                    {'EXTENT': canvas.extent(),
+                                    {'EXTENT': self.extent,
                                      'SCALE': canvas.scale(),
                                      'MAP_THEME': None,
                                      'INCLUDE_UNPLACED': True,
@@ -93,7 +93,6 @@ class QGIS2PlugX_dialog(QDialog):
             lyr_intersected.setName(f"layer_{self.layers.index(lyr)}")
             project_json["layers"].append(lyr_intersected.name())
 
-
             # スタイル出力用のMapLayerインスランスを作成する
             maplyr = MapLayer(lyr_intersected, directory)
 
@@ -109,10 +108,8 @@ class QGIS2PlugX_dialog(QDialog):
                     'INPUT': all_labels,
                     'FIELD': 'Layer',
                     'OPERATOR': 0,  # '='
-                    'VALUE': maplyr.layer.name(),
+                    'VALUE': lyr.name(),
                     'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
-
-
 
         write_json(project_json, os.path.join(directory, 'project.json'))
 
