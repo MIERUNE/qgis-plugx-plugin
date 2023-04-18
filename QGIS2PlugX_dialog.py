@@ -102,15 +102,21 @@ class QGIS2PlugX_dialog(QDialog):
             if maplyr.renderer_type == 'singleSymbol':
                 maplyr.generate_single_symbols()
 
-            # レイヤごとのラベルSHPを出力
             if maplyr.layer.labelsEnabled():
-                processing.run("native:extractbyattribute", {
-                    'INPUT': all_labels,
-                    'FIELD': 'Layer',
-                    'OPERATOR': 0,  # '='
-                    'VALUE': lyr.name(),
-                    'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
+                # レイヤごとのラベルSHPを出力
+                maplyr.generate_label_shp(all_labels, lyr.name())
+                # processing.run("native:extractbyattribute", {
+                #     'INPUT': all_labels,
+                #     'FIELD': 'Layer',
+                #     'OPERATOR': 0,  # '='
+                #     'VALUE': lyr.name(),
+                #     'OUTPUT': os.path.join(directory, f"{maplyr.layer.name()}_label.shp")})
 
+                # レイヤlabelのjsonを出力
+                maplyr.generate_label_json()
+
+
+        # project.jsonを出力
         write_json(project_json, os.path.join(directory, 'project.json'))
 
         print("done")

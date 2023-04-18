@@ -1,5 +1,8 @@
 import json
-def write_json(data: dict, filepath: str):
+from typing import Union
+
+
+def write_json(data: Union[list, dict], filepath: str):
     # Convert dictionary to JSON string
     json_data = json.dumps(data)
 
