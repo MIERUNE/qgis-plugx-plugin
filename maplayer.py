@@ -141,11 +141,12 @@ class MapLayer:
             'FIELD': 'Layer',
             'OPERATOR': 0,  # '='
             'VALUE': layername,
-            'OUTPUT': os.path.join(self.directory, f"{self.layer.name()}_label.shp")})
+            'OUTPUT': os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.shp")})
 
     def generate_label_json(self):
         label_dict = {"labels": []}
-        label_layer = QgsVectorLayer(os.path.join(self.directory, f"{self.layer.name()}_label.shp"), "label", "ogr")
+        label_layer = QgsVectorLayer(os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.shp"),
+                                     "label", "ogr")
 
         for feature in label_layer.getFeatures():
             label_dict["labels"].append({
@@ -166,4 +167,4 @@ class MapLayer:
                 "buffer_opacity": feature['BufferOpac']
             })
 
-        write_json(label_dict, os.path.join(self.directory, f"{self.layer.name()}_label.json"))
+        write_json(label_dict, os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.json"))

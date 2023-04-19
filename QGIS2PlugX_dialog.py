@@ -63,7 +63,8 @@ class QGIS2PlugX_dialog(QDialog):
 
         project_json["project_name"] = os.path.basename(QgsProject.instance().fileName()).split(".")[0]
         project_json["crs"] = QgsProject.instance().crs().authid()
-        project_json["extent"]= [self.extent.xMinimum(), self.extent.yMinimum(), self.extent.xMaximum(), self.extent.yMaximum()]
+        project_json["extent"] = [self.extent.xMinimum(), self.extent.yMinimum(), self.extent.xMaximum(),
+                                  self.extent.yMaximum()]
         project_json["scale"] = iface.mapCanvas().scale()
         project_json["layers"] = []
 
@@ -110,11 +111,10 @@ class QGIS2PlugX_dialog(QDialog):
                 # レイヤlabelのjsonを出力
                 maplyr.generate_label_json()
 
-
         # project.jsonを出力
         write_json(project_json, os.path.join(directory, 'project.json'))
 
-        print("done")
+        QMessageBox.information(None, '完了', f"処理が完了しました。\n\n出力先:\n{directory}")
 
     def get_checked_layers(self):
         layers = []
