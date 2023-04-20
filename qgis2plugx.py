@@ -61,5 +61,6 @@ class QGIS2PlugX:
         del self.toolbar
 
     def show_dialog(self):
-        self.sample_menu_01 = QGIS2PlugX_dialog()
-        self.sample_menu_01.show()
+        self.qgis2plugx_dialog = QGIS2PlugX_dialog()
+
+        self.qgis2plugx_dialog.show()

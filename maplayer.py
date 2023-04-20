@@ -165,5 +165,5 @@ class MapLayer:
                     "buffer:color": buffer_color,
                     "buffer:opacity": feature['BufferOpacity'],
                 })
-
-        write_json(label_dict, os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.json"))
+        if label_dict["labels"]:
+            write_json(label_dict, os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.json"))

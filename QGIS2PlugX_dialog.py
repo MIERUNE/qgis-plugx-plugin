@@ -26,20 +26,15 @@ class QGIS2PlugX_dialog(QDialog):
         self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
         self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
 
-        self.add_layer_list()
+        self.load_layer_list()
 
         self.layers = None
         self.extent = None
 
-    def add_layer_list(self):
-        self.layerListWidget.clear()
-        alllayers = [
-            lyr
-            for lyr in QgsProject.instance().mapLayers().values()
-            # if l.dataProvider().name() == "gdal"
-        ]
-        items = reversed([i.name() for i in alllayers])
-        for item in items:
+    def load_layer_list(self):
+        vector_names = [l.layer().name() for l in QgsProject.instance().layerTreeRoot().children() if isinstance(l.layer(), QgsVectorLayer)]
+
+        for item in vector_names:
             i = QListWidgetItem(item)
             i.setFlags(i.flags() | Qt.ItemIsUserCheckable)
             i.setCheckState(Qt.Unchecked)
