@@ -135,36 +135,35 @@ class MapLayer:
                     result.append(feature)
         return result
 
-    def generate_label_shp(self, all_labels_layer: QgsVectorLayer, layername: str):
-        processing.run("native:extractbyattribute", {
+    def generate_label_json(self, all_labels_layer: QgsVectorLayer, layername: str):
+        label_layer = processing.run("native:extractbyattribute", {
             'INPUT': all_labels_layer,
             'FIELD': 'Layer',
             'OPERATOR': 0,  # '='
             'VALUE': layername,
-            'OUTPUT': os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.shp")})
+            'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
 
-    def generate_label_json(self):
         label_dict = {"labels": []}
-        label_layer = QgsVectorLayer(os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.shp"),
-                                     "label", "ogr")
 
         for feature in label_layer.getFeatures():
-            label_dict["labels"].append({
-                "feature_id": feature['FeatureId'],
-                "text": feature['LabelText'],
-                "rotation": feature['LabelRotat'],
-                "unplaced": feature['LabelUnpla'],
-                "size": feature['Size'],
-                "bold": feature['Bold'],
-                "underline": feature['Underline'],
-                "line_alignment": feature['MultiLineA'],
-                "line_height": feature['MultiLineH'],
-                "color": feature['Color'],
-                "opacity": feature['FontOpacit'],
-                "buffer_draw": feature['BufferDraw'],
-                "buffer_size": feature['BufferSize'],
-                "buffer_color": str(feature['BufferColo']),
-                "buffer_opacity": feature['BufferOpac']
-            })
+            if not feature['LabelUnplaced']:
+                # バッファーがない場合は色を#000000にする
+                buffer_color = "#000000" if not feature['BufferColor'] else str(feature['BufferColor'])
+
+                label_dict["labels"].append({
+                    "x": feature.geometry().asPoint().x(),
+                    "y": feature.geometry().asPoint().y(),
+                    "rotation": feature['LabelRotation'],
+                    "text": feature['LabelText'],
+                    "font": feature['Family'],
+                    "size": feature['Size'],
+                    "bold": feature['Bold'],
+                    "underline": feature['Underline'],
+                    "text:color": feature['Color'],
+                    "text:opacity": feature['FontOpacity'],
+                    "buffer:width": feature['BufferSize'],
+                    "buffer:color": buffer_color,
+                    "buffer:opacity": feature['BufferOpacity'],
+                })
 
         write_json(label_dict, os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.json"))

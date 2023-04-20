@@ -106,10 +106,8 @@ class QGIS2PlugX_dialog(QDialog):
                 maplyr.generate_single_symbols()
 
             if maplyr.layer.labelsEnabled():
-                # レイヤごとのラベルSHPを出力
-                maplyr.generate_label_shp(all_labels, lyr.name())
                 # レイヤlabelのjsonを出力
-                maplyr.generate_label_json()
+                maplyr.generate_label_json(all_labels, lyr.name())
 
         # project.jsonを出力
         write_json(project_json, os.path.join(directory, 'project.json'))
