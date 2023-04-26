@@ -65,10 +65,11 @@ class MapLayer:
         symbol_items = self.layer.renderer().legendSymbolItems()
         symbol_type = symbol_items[0].symbol().symbolLayer(0).type()
 
+        idx = 0
         for category in self.layer.renderer().categories():
             symbol = category.symbol()
             # LegendごとにSHPを作成
-            self.export_shps_by_category(category)
+            self.export_shps_by_category(category, idx)
 
             # スタイルJsonを作成
             symbol_dict = None
@@ -76,9 +77,11 @@ class MapLayer:
             if symbol_type == 0:
                 symbol_dict = {
                     "type": symbol_types[symbol_type],
-                    "legend": category.label(),
-                    "color": symbol.color().name(),
                     "size": symbol.size(),
+                    "legend": category.label(),
+                    "fill_color": symbol.color().name(),
+                    "outline_color": symbol.symbolLayer(0).strokeColor().name(),
+                    "outline_width": symbol.symbolLayer(0).strokeWidth(),
                 }
 
             # line
@@ -98,16 +101,17 @@ class MapLayer:
                     "fill_color": symbol.symbolLayer(0).fillColor().name(),
                     "outline_color": symbol.symbolLayer(0).strokeColor().name(),
                     "outline_width": symbol.symbolLayer(0).strokeWidth(),
-                    "outline_unit": symbol.symbolLayer(0).strokeWidthUnit()
                 }
 
             write_json(symbol_dict,
-                       os.path.join(self.directory, f"{self.layer.name()}_{category.value()}.json"))
+                       os.path.join(self.directory,
+                                    f"{self.layer.name()}_{idx}.json"))
+            idx += 1
 
-    def export_shps_by_category(self, category: QgsRendererCategory):
+    def export_shps_by_category(self, category: QgsRendererCategory, idx: int):
         value = category.value()
         features = self.get_feat_by_value(value)
-        shp_path = os.path.join(self.directory, f"{self.layer.name()}_{category.label()}.shp")
+        shp_path = os.path.join(self.directory, f"{self.layer.name()}_{idx}.shp")
         output_layer = QgsVectorFileWriter(shp_path, 'UTF-8', self.layer.fields(), self.layer.wkbType(),
                                            QgsProject.instance().crs(),
                                            'ESRI Shapefile')
@@ -167,3 +171,9 @@ class MapLayer:
                 })
         if label_dict["labels"]:
             write_json(label_dict, os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.json"))
+
+    def generate_symbols(self):
+        if self.renderer_type == 'categorizedSymbol':
+            self.generate_category_symbols()
+        if self.renderer_type == 'singleSymbol':
+            self.generate_single_symbols()

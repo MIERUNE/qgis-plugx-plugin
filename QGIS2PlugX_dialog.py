@@ -26,13 +26,16 @@ class QGIS2PlugX_dialog(QDialog):
         self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
         self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
 
+        self.ui.setUnitToPtButton.clicked.connect(self.set_unit_to_pt)
+
         self.load_layer_list()
 
         self.layers = None
         self.extent = None
 
     def load_layer_list(self):
-        vector_names = [l.layer().name() for l in QgsProject.instance().layerTreeRoot().children() if isinstance(l.layer(), QgsVectorLayer)]
+        vector_names = [l.layer().name() for l in QgsProject.instance().layerTreeRoot().children() if
+                        isinstance(l.layer(), QgsVectorLayer)]
 
         for item in vector_names:
             i = QListWidgetItem(item)
@@ -95,10 +98,11 @@ class QGIS2PlugX_dialog(QDialog):
             maplyr = MapLayer(lyr_intersected, directory)
 
             # シンボロジごとのSHPとjsonを出力
-            if maplyr.renderer_type == 'categorizedSymbol':
-                maplyr.generate_category_symbols()
-            if maplyr.renderer_type == 'singleSymbol':
-                maplyr.generate_single_symbols()
+            # if maplyr.renderer_type == 'categorizedSymbol':
+            #     maplyr.generate_category_symbols()
+            # if maplyr.renderer_type == 'singleSymbol':
+            #     maplyr.generate_single_symbols()
+            maplyr.generate_symbols()
 
             if maplyr.layer.labelsEnabled():
                 # レイヤlabelのjsonを出力
@@ -115,3 +119,46 @@ class QGIS2PlugX_dialog(QDialog):
             if self.layerListWidget.item(i).checkState() == Qt.Checked:
                 layers.append(QgsProject.instance().mapLayersByName(self.layerListWidget.item(i).text())[0])
         return layers
+
+    def set_unit_to_pt(self):
+        # シンボロジ
+        for layer in self.get_checked_layers():
+            renderer_type = layer.renderer().type()
+            if renderer_type == "singleSymbol":
+                symbol = layer.renderer().symbol()
+                symbol_type = symbol.symbolLayer(0).type()
+
+                # point
+                if symbol_type == 0:
+                    symbol.setSizeUnit(4)
+                    symbol.symbolLayer(0).setStrokeWidthUnit(4)
+
+                # line
+                if symbol_type == 1:
+                    symbol.symbolLayer(0).setWidthUnit(4)
+
+                # polygon
+                if symbol_type == 2:
+                    symbol.symbolLayer(0).setStrokeWidthUnit(4)
+
+            # if renderer_type == "categorizedSymbol":
+            #     symbol_items = layer.renderer().legendSymbolItems()
+            #     symbol_type = symbol_items[0].symbol().symbolLayer(0).type()
+            #     for category in layer.renderer().categories():
+            #         symbol = category.symbol()
+            #
+            #         # point
+            #         if symbol_type == 0:
+            #             symbol.setSizeUnit(4)
+            #             symbol.symbolLayer(0).setStrokeWidthUnit(4)
+            #
+            #         # line
+            #         if symbol_type == 1:
+            #             symbol.symbolLayer(0).setWidthUnit(4)
+            #
+            #         # polygon
+            #         if symbol_type == 2:
+            #             symbol.symbolLayer(0).setStrokeWidthUnit(4)
+
+            layer.triggerRepaint()
+        # ラベル
