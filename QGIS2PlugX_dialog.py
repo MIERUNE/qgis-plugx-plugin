@@ -98,10 +98,6 @@ class QGIS2PlugX_dialog(QDialog):
             maplyr = MapLayer(lyr_intersected, directory)
 
             # シンボロジごとのSHPとjsonを出力
-            # if maplyr.renderer_type == 'categorizedSymbol':
-            #     maplyr.generate_category_symbols()
-            # if maplyr.renderer_type == 'singleSymbol':
-            #     maplyr.generate_single_symbols()
             maplyr.generate_symbols()
 
             if maplyr.layer.labelsEnabled():
