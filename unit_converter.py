@@ -20,7 +20,9 @@ class UnitConverter:
             return self.value
 
         if self.unit == QgsUnitTypes.RenderPixels:
-            return self.value * self.dpi
+            render_context = QgsRenderContext()
+            to_pt = render_context.convertToPainterUnits(1, QgsUnitTypes.RenderUnit.RenderPoints)
+            return self.value * to_pt
 
         if self.unit == QgsUnitTypes.RenderMillimeters:
             return self.value * 2.8346456693
