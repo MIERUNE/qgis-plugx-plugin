@@ -9,6 +9,7 @@ from qgis.utils import iface
 import os
 import processing
 from utils import write_json
+from unit_converter import UnitConverter
 
 symbol_types = {
     0: "point",
@@ -34,9 +35,11 @@ class MapLayer:
         symbol_dict = {}
         # point
         if symbol_type == 0:
+            pt_size = UnitConverter(symbol.size(), symbol.sizeUnit())
             symbol_dict = {
                 "type": symbol_types[symbol_type],
-                "size": symbol.size(),
+                # "size": symbol.size(),
+                "size": pt_size.convert_to_point(),
                 "fill_color": symbol.color().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
                 "outline_width": symbol.symbolLayer(0).strokeWidth(),
@@ -44,19 +47,23 @@ class MapLayer:
 
         # line
         if symbol_type == 1:
+            line_size = UnitConverter(symbol.symbolLayer(0).width(), symbol.symbolLayer(0).widthUnit())
             symbol_dict = {
                 "type": symbol_types[symbol_type],
                 "color": symbol.symbolLayer(0).color().name(),
-                "width": symbol.symbolLayer(0).width(),
+                # "width": symbol.symbolLayer(0).width(),
+                "width": line_size.convert_to_point(),
             }
 
         # polygon
         if symbol_type == 2:
+            outline_size = UnitConverter(symbol.symbolLayer(0).strokeWidth(), symbol.symbolLayer(0).strokeWidthUnit())
             symbol_dict = {
                 "type": symbol_types[symbol_type],
                 "fill_color": symbol.symbolLayer(0).fillColor().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
-                "outline_width": symbol.symbolLayer(0).strokeWidth(),
+                # "outline_width": symbol.symbolLayer(0).strokeWidth(),
+                "outline_width": outline_size.convert_to_point(),
             }
 
         write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}.json"))
@@ -75,32 +82,39 @@ class MapLayer:
             symbol_dict = None
             # point
             if symbol_type == 0:
+                outline_size = UnitConverter(symbol.symbolLayer(0).strokeWidth(),
+                                             symbol.symbolLayer(0).strokeWidthUnit())
                 symbol_dict = {
                     "type": symbol_types[symbol_type],
                     "size": symbol.size(),
                     "legend": category.label(),
                     "fill_color": symbol.color().name(),
                     "outline_color": symbol.symbolLayer(0).strokeColor().name(),
-                    "outline_width": symbol.symbolLayer(0).strokeWidth(),
+                    "outline_width": outline_size.convert_to_point(),
+                    # "outline_width": symbol.symbolLayer(0).strokeWidth(),
                 }
 
             # line
             if symbol_type == 1:
+                line_size = UnitConverter(symbol.symbolLayer(0).width(), symbol.symbolLayer(0).widthUnit())
                 symbol_dict = {
                     "type": symbol_types[symbol_type],
                     "legend": category.label(),
                     "color": symbol.symbolLayer(0).color().name(),
-                    "width": symbol.symbolLayer(0).width(),
+                    "width": line_size.convert_to_point(),
                 }
 
             # polygon
             if symbol_type == 2:
+                outline_size = UnitConverter(symbol.symbolLayer(0).strokeWidth(),
+                                             symbol.symbolLayer(0).strokeWidthUnit())
                 symbol_dict = {
                     "type": symbol_types[symbol_type],
                     "legend": category.label(),
                     "fill_color": symbol.symbolLayer(0).fillColor().name(),
                     "outline_color": symbol.symbolLayer(0).strokeColor().name(),
-                    "outline_width": symbol.symbolLayer(0).strokeWidth(),
+                    # "outline_width": symbol.symbolLayer(0).strokeWidth(),
+                    "outline_width": outline_size.convert_to_point(),
                 }
 
             write_json(symbol_dict,
