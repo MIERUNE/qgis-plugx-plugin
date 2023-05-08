@@ -59,6 +59,7 @@ class QGIS2PlugX_dialog(QDialog):
 
         project_json["project_name"] = os.path.basename(QgsProject.instance().fileName()).split(".")[0]
         project_json["crs"] = QgsProject.instance().crs().authid()
+        project_json["crs_type"] = "地理座標系" if QgsProject.instance().crs().isGeographic() else "投影座標系"
         project_json["extent"] = [self.extent.xMinimum(), self.extent.yMinimum(), self.extent.xMaximum(),
                                   self.extent.yMaximum()]
         project_json["scale"] = iface.mapCanvas().scale()
