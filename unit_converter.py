@@ -31,7 +31,10 @@ class UnitConverter:
             return self.value / (self.scale / 2834.65)  # 1m = 2834.65pt
 
         if self.unit == QgsUnitTypes.RenderMapUnits:
-            return self.value / (self.scale / 2834.65)  # 1m = 2834.65pt
+            # MapUnitがメートルの場合のみ対応する
+            mapunit = iface.activeLayer().crs().mapUnits()
+            if mapunit == QgsUnitTypes.DistanceMeters:
+                return self.value / (self.scale / 2834.65)  # 1m = 2834.65pt
 
         if self.unit == QgsUnitTypes.RenderInches:
             return self.value * 72
