@@ -28,13 +28,10 @@ class UnitConverter:
             return self.value * 2.8346456693
 
         if self.unit == QgsUnitTypes.RenderMetersInMapUnits:
-            render_context = QgsRenderContext()
-            return render_context.convertFromMapUnits(self.value,
-                                                      QgsUnitTypes.RenderPoints) * self.scale / 2834.65  # 1m = 2834.65pt
+            return self.value / (self.scale / 2834.65)  # 1m = 2834.65pt
 
         if self.unit == QgsUnitTypes.RenderMapUnits:
-            render_context = QgsRenderContext()
-            return render_context.convertFromMapUnits(self.value, QgsUnitTypes.RenderPoints)
+            return self.value / (self.scale / 2834.65)  # 1m = 2834.65pt
 
         if self.unit == QgsUnitTypes.RenderInches:
             return self.value * 72
