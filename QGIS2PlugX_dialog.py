@@ -10,7 +10,7 @@ from qgis.gui import *
 from qgis.PyQt import uic
 from qgis.utils import iface
 
-from maplayer import MapLayer
+from vectorlayer import VectorLayer
 
 
 class QGIS2PlugX_dialog(QDialog):
@@ -54,12 +54,12 @@ class QGIS2PlugX_dialog(QDialog):
         # 出力先のディレクトリを作成する
         directory = self.ui.outputFileWidget.filePath()
 
-        # project.jsonにレイヤ順序情報を書き出し
+        # project.jsonにレイヤ順序情報を書き出す
         project_json = {}
 
         project_json["project_name"] = os.path.basename(QgsProject.instance().fileName()).split(".")[0]
         project_json["crs"] = QgsProject.instance().crs().authid()
-        project_json["crs_type"] = "地理座標系" if QgsProject.instance().crs().isGeographic() else "投影座標系"
+        project_json["crs_type"] = "geographic" if QgsProject.instance().crs().isGeographic() else "projected"
         project_json["extent"] = [self.extent.xMinimum(), self.extent.yMinimum(), self.extent.xMaximum(),
                                   self.extent.yMaximum()]
         project_json["scale"] = iface.mapCanvas().scale()
@@ -93,8 +93,8 @@ class QGIS2PlugX_dialog(QDialog):
             lyr_intersected.setName(f"layer_{self.layers.index(lyr)}")
             project_json["layers"].append(lyr_intersected.name())
 
-            # スタイル出力用のMapLayerインスランスを作成する
-            maplyr = MapLayer(lyr_intersected, directory)
+            # スタイル出力用のVectorLayerインスランスを作成する
+            maplyr = VectorLayer(lyr_intersected, directory)
 
             # シンボロジごとのSHPとjsonを出力
             maplyr.generate_symbols()

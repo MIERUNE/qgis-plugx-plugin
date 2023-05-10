@@ -18,7 +18,7 @@ symbol_types = {
 }
 
 
-class MapLayer:
+class VectorLayer:
     def __init__(self, layer: QgsVectorLayer, directory: str):
         self.layer = layer
         self.renderer_type = layer.renderer().type()
