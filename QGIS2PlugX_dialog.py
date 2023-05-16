@@ -11,8 +11,7 @@ from qgis.PyQt import uic
 from qgis.utils import iface
 
 from vectorlayer import VectorLayer
-
-# from rasterlayer import RasterLayer
+from rasterlayer import RasterLayer
 
 
 class QGIS2PlugX_dialog(QDialog):
@@ -141,6 +140,18 @@ class QGIS2PlugX_dialog(QDialog):
             if maplyr.layer.labelsEnabled():
                 # レイヤlabelのjsonを出力
                 maplyr.generate_label_json(all_labels, lyr.name())
+
+        for rlyr in self.raster_layers:
+            # 指定範囲内のラスターを抽出
+            png_path = os.path.join(directory, rlyr.name() + ".png")
+            dpi = self.ui.imgResolution.value()
+            image_width = self.ui.imgWidth.value()
+            image_height = self.ui.imgHeight.value()
+
+            rasterlayer = RasterLayer(rlyr, self.extent, dpi, image_width, image_height)
+            rasterlayer.xyz_to_png(rlyr, png_path)
+
+            project_json["layers"].append(rlyr.name())
 
         # project.jsonを出力
         write_json(project_json, os.path.join(directory, "project.json"))
