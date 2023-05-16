@@ -144,12 +144,10 @@ class QGIS2PlugX_dialog(QDialog):
         for rlyr in self.raster_layers:
             # 指定範囲内のラスターを抽出
             dpi = self.ui.imgResolution.value()
-            image_width = self.ui.imgWidth.value()
-            image_height = self.ui.imgHeight.value()
+            # image_width = self.ui.imgWidth.value()
+            # image_height = self.ui.imgHeight.value()
 
-            rasterlayer = RasterLayer(
-                rlyr, self.extent, dpi, image_width, image_height, directory
-            )
+            rasterlayer = RasterLayer(rlyr, self.extent, dpi, directory)
             rasterlayer.xyz_to_png()
 
             # summarize raster info json
