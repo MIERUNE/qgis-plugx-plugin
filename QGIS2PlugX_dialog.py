@@ -48,9 +48,9 @@ class QGIS2PlugX_dialog(QDialog):
             self.layerListWidget.addItem(i)
 
         raster_names = [
-            l.layer().name()
-            for l in QgsProject.instance().layerTreeRoot().children()
-            if isinstance(l.layer(), QgsRasterLayer)
+            r.layer().name()
+            for r in QgsProject.instance().layerTreeRoot().children()
+            if isinstance(r.layer(), QgsRasterLayer)
         ]
 
         for item in raster_names:
