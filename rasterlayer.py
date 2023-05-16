@@ -30,35 +30,27 @@ class RasterLayer:
             crs, QgsCoordinateReferenceSystem("EPSG:3857"), QgsProject.instance()
         )
         map_extent = transform.transformBoundingBox(self.extent)
+        # map_extent = self.extent
 
         # Calculate image size
         extent_width = map_extent.xMaximum() - map_extent.xMinimum()
         extent_height = map_extent.yMaximum() - map_extent.yMinimum()
+        QMessageBox.information(
+            None, "Info", str(extent_height) + " " + str(extent_width)
+        )
+
         image_width = int(extent_width / self.dpi / 0.0254)
         image_height = int(extent_height / self.dpi / 0.0254)
+
         QMessageBox.information(
             None, "Info", str(image_height) + " " + str(image_width)
         )
-        # Create empty image
-        image = QImage(image_width, image_height, QImage.Format_ARGB32_Premultiplied)
-        image.setDotsPerMeterX(self.dpi / 0.0254)
-        image.setDotsPerMeterY(self.dpi / 0.0254)
-        image.fill(0)
 
-        # Map extent and size settings
-        map_settings = QgsMapSettings()
-        map_settings.setExtent(map_extent)
-        map_settings.setOutputSize(QSize(image_width, image_height))
-        map_settings.setOutputDpi(self.dpi)
-
-        # Create image
-        map_settings.setLayers([self.layer])
-        render = QgsMapRendererParallelJob(map_settings)
-        render.start()
-        render.waitForFinished()
-        image = render.renderedImage()
-        format = QByteArray(b"PNG")
-        image.save(output_path, format, 100)
+        # Save file
+        file_writer = QgsRasterFileWriter(output_path)
+        pipe = QgsRasterPipe()
+        pipe.set(self.layer.dataProvider().clone())
+        file_writer.writeRaster(pipe, image_width, image_height, self.extent, crs)
 
     def generate_raster_info(self):
         raster_info = {
