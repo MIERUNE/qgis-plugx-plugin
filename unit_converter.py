@@ -1,9 +1,4 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from qgis.core import *
-from qgis.gui import *
-from qgis.PyQt import uic
+from qgis.core import QgsRenderContext, QgsUnitTypes
 from qgis.utils import iface
 
 

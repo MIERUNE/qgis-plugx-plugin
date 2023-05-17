@@ -1,11 +1,12 @@
 import os
 
 import processing
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from qgis.core import *
-from qgis.gui import *
+from qgis.core import (
+    QgsProject,
+    QgsRendererCategory,
+    QgsVectorFileWriter,
+    QgsVectorLayer,
+)
 
 from unit_converter import UnitConverter
 from utils import write_json

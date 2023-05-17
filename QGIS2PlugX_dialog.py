@@ -2,11 +2,9 @@ import json
 import os
 
 import processing
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from qgis.core import *
-from qgis.gui import *
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QDialog, QListWidgetItem, QMessageBox
+from qgis.core import QgsMapLayer, QgsProject, QgsRasterLayer, QgsVectorLayer
 from qgis.PyQt import uic
 from qgis.utils import iface
 
@@ -43,7 +41,7 @@ class QGIS2PlugX_dialog(QDialog):
 
         for name in vector_names:
             item = QListWidgetItem(name)
-            item.setFlags(i.flags() | Qt.ItemIsUserCheckable)
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Unchecked)
             self.layerListWidget.addItem(item)
 
