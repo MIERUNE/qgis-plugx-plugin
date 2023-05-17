@@ -4,7 +4,13 @@ import os
 import processing
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QListWidgetItem, QMessageBox
-from qgis.core import QgsMapLayer, QgsProject, QgsRasterLayer, QgsVectorLayer
+from qgis.core import (
+    QgsMapLayer,
+    QgsProject,
+    QgsMapLayerModel,
+    QgsRasterLayer,
+    QgsVectorLayer,
+)
 from qgis.PyQt import uic
 from qgis.utils import iface
 
@@ -27,32 +33,26 @@ class QGIS2PlugX_dialog(QDialog):
         self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
         self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
 
+        # レイヤー一覧を作成する
         self.load_layer_list()
+        # レイヤーの追加・削除に反応して一覧を更新する
+        QgsProject.instance().layerWasAdded.connect(self.load_layer_list)
+        QgsProject.instance().layerRemoved.connect(self.load_layer_list)
 
     def load_layer_list(self):
-        vector_names = [
-            child.layer().name()
-            for child in QgsProject.instance().layerTreeRoot().children()
-            if isinstance(child.layer(), QgsVectorLayer)
-        ]
-
-        for name in vector_names:
-            item = QListWidgetItem(name)
+        self.layerListWidget.clear()
+        for layer in QgsProject.instance().mapLayers().values():
+            if not isinstance(layer, QgsRasterLayer) and not isinstance(
+                layer, QgsVectorLayer
+            ):
+                # ラスター、ベクター以外はスキップ: PointCloudLayer, MeshLayer, ...
+                continue
+            icon = QgsMapLayerModel.iconForLayer(layer)
+            item = QListWidgetItem(icon, layer.name())
+            item.setData(Qt.UserRole, layer)
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Unchecked)
             self.layerListWidget.addItem(item)
-
-        raster_names = [
-            child.layer().name()
-            for child in QgsProject.instance().layerTreeRoot().children()
-            if isinstance(child.layer(), QgsRasterLayer)
-        ]
-
-        for name in raster_names:
-            item = QListWidgetItem(name)
-            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
-            item.setCheckState(Qt.Unchecked)
-            self.rasterLayerListWidget.addItem(item)
 
     def run(self):
         # チェックしたレイヤをリストに取得する
