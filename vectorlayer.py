@@ -5,7 +5,12 @@ import processing
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from qgis.core import *
+from qgis.core import (
+    QgsProject,
+    QgsRendererCategory,
+    QgsVectorFileWriter,
+    QgsVectorLayer,
+)
 from qgis.gui import *
 
 from unit_converter import UnitConverter
@@ -70,9 +75,8 @@ class VectorLayer:
                 "outline_width": outline_size.convert_to_point(),
             }
 
-        write_json(
-            symbol_dict, os.path.join(self.directory, f"{self.layer.name()}.json")
-        )
+        with open(os.path.join(self.directory, f"{self.layer.name()}.json"), mode='w') as f:
+            json.dump(symbol_dict, f, ensure_ascii=False)
 
     def generate_category_symbols(self):
         symbol_items = self.layer.renderer().legendSymbolItems()
