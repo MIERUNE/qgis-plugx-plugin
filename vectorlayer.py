@@ -24,8 +24,6 @@ class VectorLayer:
         self.renderer_type = layer.renderer().type()
         self.output_dir = output_dir
 
-        self.symbols = []
-
     def generate_single_symbols(self):
         # SHPを出力
         self.export_simple_symbol_shp()
