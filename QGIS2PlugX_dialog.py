@@ -57,7 +57,6 @@ class QGIS2PlugX_dialog(QDialog):
     def run(self):
         # チェックしたレイヤをリストに取得する
         layers = self.get_checked_layers()
-        raster_layers = self.get_checked_raster_layers()
 
         # 処理範囲を取得する
         extent = self.ui.mExtentGroupBox.outputExtent()
@@ -67,89 +66,61 @@ class QGIS2PlugX_dialog(QDialog):
         # 出力先のディレクトリを作成する
         output_dir = self.ui.outputFileWidget.filePath()
 
-        # project.jsonにレイヤ順序情報を書き出す
-        project_json = {}
-
-        project_json["project_name"] = os.path.basename(
-            QgsProject.instance().fileName()
-        ).split(".")[0]
-        project_json["crs"] = QgsProject.instance().crs().authid()
-        project_json["crs_type"] = (
-            "geographic" if QgsProject.instance().crs().isGeographic() else "projected"
-        )
-        project_json["extent"] = [
-            extent.xMinimum(),
-            extent.yMinimum(),
-            extent.xMaximum(),
-            extent.yMaximum(),
-        ]
-        project_json["scale"] = iface.mapCanvas().scale()
-        project_json["layers"] = []
-
         # ラベルSHPを出力する
-        canvas = iface.mapCanvas()
         all_labels = processing.run(
             "native:extractlabels",
             {
                 "EXTENT": extent,
-                "SCALE": canvas.scale(),
+                "SCALE": iface.mapCanvas().scale(),
                 "MAP_THEME": None,
                 "INCLUDE_UNPLACED": True,
-                "DPI": 96,
+                "DPI": 96,  # TODO: 縮尺から計算すべき
                 "OUTPUT": "TEMPORARY_OUTPUT",
             },
         )["OUTPUT"]
 
-        for lyr in layers:
-            # 指定範囲内の地物を抽出し、元のスタイルを適用する
-            qml_path = os.path.join(output_dir, "layer.qml")
-            lyr.saveNamedStyle(
-                qml_path, categories=QgsMapLayer.Symbology | QgsMapLayer.Labeling
-            )
+        output_layer_names = []
+        for layer in layers:
+            if isinstance(layer, QgsVectorLayer):
+                # 指定範囲内の地物を抽出し、元のスタイルを適用する
+                qml_path = os.path.join(output_dir, "layer.qml")
+                layer.saveNamedStyle(
+                    qml_path, categories=QgsMapLayer.Symbology | QgsMapLayer.Labeling
+                )
 
-            lyr_intersected = processing.run(
-                "native:extractbyextent",
-                {
-                    "INPUT": lyr,
-                    "EXTENT": extent,
-                    "CLIP": True,
-                    "OUTPUT": "TEMPORARY_OUTPUT",
-                },
-            )["OUTPUT"]
-            lyr_intersected.loadNamedStyle(qml_path)
-            if os.path.exists(qml_path):
-                os.remove(qml_path)
+                layer_intersected = processing.run(
+                    "native:extractbyextent",
+                    {
+                        "INPUT": layer,
+                        "EXTENT": extent,
+                        "CLIP": True,
+                        "OUTPUT": "TEMPORARY_OUTPUT",
+                    },
+                )["OUTPUT"]
+                layer_intersected.loadNamedStyle(qml_path)
+                if os.path.exists(qml_path):
+                    os.remove(qml_path)
 
-            # レイヤ名をlayer_indexに変更する
-            lyr_intersected.setName(f"layer_{layers.index(lyr)}")
-            project_json["layers"].append(lyr_intersected.name())
+                # レイヤ名をlayer_indexに変更する
+                layer_intersected.setName(f"layer_{layers.index(layer)}")
+                output_layer_names.append(layer_intersected.name())
 
-            # スタイル出力用のVectorLayerインスランスを作成する
-            maplyr = VectorLayer(lyr_intersected, output_dir)
+                # スタイル出力用のVectorLayerインスランスを作成する
+                vector_layer = VectorLayer(layer_intersected, output_dir)
 
-            # シンボロジごとのSHPとjsonを出力
-            maplyr.generate_symbols()
+                # シンボロジごとのSHPとjsonを出力
+                vector_layer.generate_symbols()
 
-            if maplyr.layer.labelsEnabled():
-                # レイヤlabelのjsonを出力
-                maplyr.generate_label_json(all_labels, lyr.name())
+                if vector_layer.layer.labelsEnabled():
+                    vector_layer.generate_label_json(all_labels, layer.name())
 
-        for rlyr in raster_layers:
-            # 指定範囲内のラスターを抽出
+            elif isinstance(layer, QgsRasterLayer):
+                rasterlayer = RasterLayer(layer, extent, output_dir)
+                rasterlayer.xyz_to_png()
+                rasterlayer.write_json()
+                output_layer_names.append(layer.name())
 
-            rasterlayer = RasterLayer(rlyr, extent, output_dir)
-            rasterlayer.xyz_to_png()
-
-            # summarize raster info json
-            rasterlayer.write_json()
-
-            # Add layer to project json
-            project_json["layers"].append(rlyr.name())
-
-        # project.jsonを出力
-        with open(os.path.join(output_dir, "project.json"), mode="w") as f:
-            json.dump(project_json, f, ensure_ascii=False)
-
+        self.write_project_json(output_layer_names)
         QMessageBox.information(
             None,
             "完了",
@@ -157,24 +128,35 @@ class QGIS2PlugX_dialog(QDialog):
             \n\n出力先:\n{output_dir}",
         )
 
+    def write_project_json(self, output_layer_names: list):
+        """project.jsonにレイヤ情報を書き出す"""
+
+        project_json = {
+            "project_name": os.path.basename(QgsProject.instance().fileName()),
+            "crs": QgsProject.instance().crs().authid(),
+            "crs_type": (
+                "geographic"
+                if QgsProject.instance().crs().isGeographic()
+                else "projected"
+            ),
+            "extent": [
+                self.ui.mExtentGroupBox.outputExtent().xMinimum(),
+                self.ui.mExtentGroupBox.outputExtent().yMinimum(),
+                self.ui.mExtentGroupBox.outputExtent().xMaximum(),
+                self.ui.mExtentGroupBox.outputExtent().yMaximum(),
+            ],
+            "scale": iface.mapCanvas().scale(),
+            "layers": output_layer_names,
+        }
+        # project.jsonを出力
+        with open(
+            os.path.join(self.ui.outputFileWidget.filePath(), "project.json"), mode="w"
+        ) as f:
+            json.dump(project_json, f, ensure_ascii=False)
+
     def get_checked_layers(self):
         layers = []
         for i in range(self.layerListWidget.count()):
             if self.layerListWidget.item(i).checkState() == Qt.Checked:
-                layers.append(
-                    QgsProject.instance().mapLayersByName(
-                        self.layerListWidget.item(i).text()
-                    )[0]
-                )
+                layers.append(self.layerListWidget.item(i).data(Qt.UserRole))
         return layers
-
-    def get_checked_raster_layers(self):
-        raster_layers = []
-        for i in range(self.rasterLayerListWidget.count()):
-            if self.rasterLayerListWidget.item(i).checkState() == Qt.Checked:
-                raster_layers.append(
-                    QgsProject.instance().mapLayersByName(
-                        self.rasterLayerListWidget.item(i).text()
-                    )[0]
-                )
-        return raster_layers
