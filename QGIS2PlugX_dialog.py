@@ -1,7 +1,7 @@
+import json
 import os
-import processing
-from utils import write_json
 
+import processing
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -10,8 +10,8 @@ from qgis.gui import *
 from qgis.PyQt import uic
 from qgis.utils import iface
 
-from vectorlayer import VectorLayer
 from rasterlayer import RasterLayer
+from vectorlayer import VectorLayer
 
 
 class QGIS2PlugX_dialog(QDialog):
@@ -148,15 +148,17 @@ class QGIS2PlugX_dialog(QDialog):
             rasterlayer.xyz_to_png()
 
             # summarize raster info json
-            rasterlayer.generate_raster_info()
+            rasterlayer.write_json()
 
             # Add layer to project json
             project_json["layers"].append(rlyr.name())
 
         # project.jsonを出力
-        write_json(project_json, os.path.join(directory, "project.json"))
+        with open(os.path.join(directory, "project.json"), mode="w") as f:
+            json.dump(project_json, f, ensure_ascii=False)
 
         QMessageBox.information(None, "完了", f"処理が完了しました。\n\n出力先:\n{directory}")
+
 
     def get_checked_layers(self):
         layers = []

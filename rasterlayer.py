@@ -1,15 +1,17 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from qgis.core import *
-from qgis.gui import *
-from qgis.PyQt import uic
-from qgis.utils import iface
-
 import json
 import os
+
 import processing
-from utils import write_json
+from qgis.core import (
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsProject,
+    QgsRasterFileWriter,
+    QgsRasterLayer,
+    QgsRasterPipe,
+    QgsRectangle,
+)
+from qgis.utils import iface
 
 
 class RasterLayer:
@@ -98,7 +100,7 @@ class RasterLayer:
         os.remove(clipped_tiff_path)
         os.remove(clipped_tiff_path + ".aux.xml")
 
-    def generate_raster_info(self):
+    def write_json(self):
         raster_info = {
             "type": "raster",
             "crs": self.layer.crs().authid(),

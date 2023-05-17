@@ -1,14 +1,13 @@
+import json
+import os
+
+import processing
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from qgis.core import *
 from qgis.gui import *
-from qgis.PyQt import uic
-from qgis.utils import iface
 
-import os
-import processing
-from utils import write_json
 from unit_converter import UnitConverter
 
 symbol_types = {
@@ -130,10 +129,9 @@ class VectorLayer:
                     "outline_width": outline_size.convert_to_point(),
                 }
 
-            write_json(
-                symbol_dict,
-                os.path.join(self.directory, f"{self.layer.name()}_{idx}.json"),
-            )
+            with open(os.path.join(self.directory, f"{self.layer.name()}_{idx}.json"), mode='w') as f:
+                json.dump(symbol_dict, f, ensure_ascii=False)
+            
             idx += 1
 
     def export_shps_by_category(self, category: QgsRendererCategory, idx: int):
@@ -217,13 +215,8 @@ class VectorLayer:
                         "buffer:opacity": feature["BufferOpacity"],
                     }
                 )
-        if label_dict["labels"]:
-            write_json(
-                label_dict,
-                os.path.join(
-                    self.directory, f"label_{self.layer.name().split('_')[1]}.json"
-                ),
-            )
+        with open(os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.json"), mode='w') as f:
+            json.dump(label_dict, f, ensure_ascii=False)
 
     def generate_symbols(self):
         if self.renderer_type == "categorizedSymbol":
