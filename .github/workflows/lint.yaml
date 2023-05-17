@@ -15,5 +15,4 @@ jobs:
             pip install poetry
             poetry install
       - name: Lint with Ruff
-        continue-on-error: true
         run: poetry run ruff --format=github .
