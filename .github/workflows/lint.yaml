@@ -11,7 +11,9 @@ jobs:
         with:
           python-version: '3.9'
       - name: Install Dependencies
-        run: pip install poetry
+        run: |
+            pip install poetry
+            poetry install
       - name: Lint with Ruff
         continue-on-error: true
         run: poetry run ruff --format=github .
