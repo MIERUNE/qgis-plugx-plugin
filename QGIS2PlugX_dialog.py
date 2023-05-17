@@ -155,7 +155,12 @@ class QGIS2PlugX_dialog(QDialog):
         with open(os.path.join(directory, "project.json"), mode="w") as f:
             json.dump(project_json, f, ensure_ascii=False)
 
-        QMessageBox.information(None, "完了", f"処理が完了しました。\n\n出力先:\n{directory}")
+        QMessageBox.information(
+            None,
+            "完了",
+            f"処理が完了しました。\
+            \n\n出力先:\n{directory}",
+        )
 
     def get_checked_layers(self):
         layers = []
