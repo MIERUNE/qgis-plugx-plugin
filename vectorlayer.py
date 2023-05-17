@@ -1,14 +1,14 @@
-import json
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from qgis.core import *
+from qgis.gui import *
+from qgis.PyQt import uic
+from qgis.utils import iface
+
 import os
-
 import processing
-from qgis.core import (
-    QgsProject,
-    QgsRendererCategory,
-    QgsVectorFileWriter,
-    QgsVectorLayer,
-)
-
+from utils import write_json
 from unit_converter import UnitConverter
 
 symbol_types = {
@@ -19,9 +19,12 @@ symbol_types = {
 
 
 class VectorLayer:
-    def __init__(self, layer: QgsVectorLayer, output_dir: str):
+    def __init__(self, layer: QgsVectorLayer, directory: str):
         self.layer = layer
-        self.output_dir = output_dir
+        self.renderer_type = layer.renderer().type()
+        self.directory = directory
+
+        self.symbols = []
 
     def generate_single_symbols(self):
         # SHPを出力
@@ -68,8 +71,9 @@ class VectorLayer:
                 "outline_width": outline_size.convert_to_point(),
             }
 
-        with open(os.path.join(self.output_dir, f"{self.layer.name()}.json"), mode='w') as f:
-            json.dump(symbol_dict, f, ensure_ascii=False)
+        write_json(
+            symbol_dict, os.path.join(self.directory, f"{self.layer.name()}.json")
+        )
 
     def generate_category_symbols(self):
         symbol_items = self.layer.renderer().legendSymbolItems()
@@ -126,15 +130,16 @@ class VectorLayer:
                     "outline_width": outline_size.convert_to_point(),
                 }
 
-            with open(os.path.join(self.output_dir, f"{self.layer.name()}_{idx}.json"), mode='w') as f:
-                json.dump(symbol_dict, f, ensure_ascii=False)
-            
+            write_json(
+                symbol_dict,
+                os.path.join(self.directory, f"{self.layer.name()}_{idx}.json"),
+            )
             idx += 1
 
     def export_shps_by_category(self, category: QgsRendererCategory, idx: int):
         value = category.value()
         features = self.get_feat_by_value(value)
-        shp_path = os.path.join(self.output_dir, f"{self.layer.name()}_{idx}.shp")
+        shp_path = os.path.join(self.directory, f"{self.layer.name()}_{idx}.shp")
         output_layer = QgsVectorFileWriter(
             shp_path,
             "UTF-8",
@@ -147,7 +152,7 @@ class VectorLayer:
         del output_layer
 
     def export_simple_symbol_shp(self):
-        shp_path = os.path.join(self.output_dir, f"{self.layer.name()}.shp")
+        shp_path = os.path.join(self.directory, f"{self.layer.name()}.shp")
         output_layer = QgsVectorFileWriter(
             shp_path,
             "UTF-8",
@@ -161,10 +166,10 @@ class VectorLayer:
 
     def get_feat_by_value(self, value: str) -> list:
         result = []
-        if self.layer.renderer().type() == "singleSymbol":
+        if self.renderer_type == "singleSymbol":
             pass
 
-        if self.layer.renderer().type() == "categorizedSymbol":
+        if self.renderer_type == "categorizedSymbol":
             field = self.layer.renderer().classAttribute()
 
             for feature in self.layer.getFeatures():
@@ -212,11 +217,16 @@ class VectorLayer:
                         "buffer:opacity": feature["BufferOpacity"],
                     }
                 )
-        with open(os.path.join(self.output_dir, f"label_{self.layer.name().split('_')[1]}.json"), mode='w') as f:
-            json.dump(label_dict, f, ensure_ascii=False)
+        if label_dict["labels"]:
+            write_json(
+                label_dict,
+                os.path.join(
+                    self.directory, f"label_{self.layer.name().split('_')[1]}.json"
+                ),
+            )
 
     def generate_symbols(self):
-        if self.layer.renderer().type() == "categorizedSymbol":
+        if self.renderer_type == "categorizedSymbol":
             self.generate_category_symbols()
-        if self.layer.renderer().type() == "singleSymbol":
+        if self.renderer_type == "singleSymbol":
             self.generate_single_symbols()
