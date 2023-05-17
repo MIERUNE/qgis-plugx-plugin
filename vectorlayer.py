@@ -2,16 +2,12 @@ import json
 import os
 
 import processing
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
 from qgis.core import (
     QgsProject,
     QgsRendererCategory,
     QgsVectorFileWriter,
     QgsVectorLayer,
 )
-from qgis.gui import *
 
 from unit_converter import UnitConverter
 
@@ -23,10 +19,10 @@ symbol_types = {
 
 
 class VectorLayer:
-    def __init__(self, layer: QgsVectorLayer, directory: str):
+    def __init__(self, layer: QgsVectorLayer, output_dir: str):
         self.layer = layer
         self.renderer_type = layer.renderer().type()
-        self.directory = directory
+        self.output_dir = output_dir
 
         self.symbols = []
 
@@ -75,7 +71,7 @@ class VectorLayer:
                 "outline_width": outline_size.convert_to_point(),
             }
 
-        with open(os.path.join(self.directory, f"{self.layer.name()}.json"), mode='w') as f:
+        with open(os.path.join(self.output_dir, f"{self.layer.name()}.json"), mode='w') as f:
             json.dump(symbol_dict, f, ensure_ascii=False)
 
     def generate_category_symbols(self):
@@ -133,7 +129,7 @@ class VectorLayer:
                     "outline_width": outline_size.convert_to_point(),
                 }
 
-            with open(os.path.join(self.directory, f"{self.layer.name()}_{idx}.json"), mode='w') as f:
+            with open(os.path.join(self.output_dir, f"{self.layer.name()}_{idx}.json"), mode='w') as f:
                 json.dump(symbol_dict, f, ensure_ascii=False)
             
             idx += 1
@@ -141,7 +137,7 @@ class VectorLayer:
     def export_shps_by_category(self, category: QgsRendererCategory, idx: int):
         value = category.value()
         features = self.get_feat_by_value(value)
-        shp_path = os.path.join(self.directory, f"{self.layer.name()}_{idx}.shp")
+        shp_path = os.path.join(self.output_dir, f"{self.layer.name()}_{idx}.shp")
         output_layer = QgsVectorFileWriter(
             shp_path,
             "UTF-8",
@@ -154,7 +150,7 @@ class VectorLayer:
         del output_layer
 
     def export_simple_symbol_shp(self):
-        shp_path = os.path.join(self.directory, f"{self.layer.name()}.shp")
+        shp_path = os.path.join(self.output_dir, f"{self.layer.name()}.shp")
         output_layer = QgsVectorFileWriter(
             shp_path,
             "UTF-8",
@@ -219,7 +215,7 @@ class VectorLayer:
                         "buffer:opacity": feature["BufferOpacity"],
                     }
                 )
-        with open(os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.json"), mode='w') as f:
+        with open(os.path.join(self.output_dir, f"label_{self.layer.name().split('_')[1]}.json"), mode='w') as f:
             json.dump(label_dict, f, ensure_ascii=False)
 
     def generate_symbols(self):
