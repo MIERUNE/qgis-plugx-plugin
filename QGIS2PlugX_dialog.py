@@ -143,7 +143,38 @@ class QGIS2PlugX_dialog(QDialog):
             # 指定範囲内のラスターを抽出
 
             rasterlayer = RasterLayer(rlyr, self.extent, directory)
-            rasterlayer.xyz_to_png()
+
+            if rlyr.rasterType() == 3:
+                # XYZ tile
+                rasterlayer.xyz_to_png()
+
+            elif rlyr.rasterType() == 2:
+                # RGB image
+
+                text = (
+                    "RGB image\n"
+                    + rlyr.name()
+                    + "\ntype "
+                    + str(rlyr.rasterType())
+                    + "\nbands "
+                    + str(rlyr.bandCount())
+                    + "\nlegend "
+                    + str(rlyr.legendSymbologyItems())
+                )
+
+                QMessageBox.information(None, "info", text)
+            else:
+                text = (
+                    rlyr.name()
+                    + "\ntype "
+                    + str(rlyr.rasterType())
+                    + "\nbands "
+                    + str(rlyr.bandCount())
+                    + "\nlegend "
+                    + str(rlyr.legendSymbologyItems())
+                )
+
+                QMessageBox.information(None, "info", text)
 
             # summarize raster info json
             rasterlayer.write_json()
