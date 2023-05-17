@@ -1,10 +1,8 @@
 import os
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from qgis.core import *
-from qgis.gui import *
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QAction
+from qgis.gui import QgisInterface
 
 from QGIS2PlugX_dialog import QGIS2PlugX_dialog
 
@@ -12,7 +10,7 @@ PLUGIN_NAME = "QGIS2PlugX"
 
 
 class QGIS2PlugX:
-    def __init__(self, iface):
+    def __init__(self, iface: QgisInterface):
         self.iface = iface
         self.win = self.iface.mainWindow()
         self.plugin_dir = os.path.dirname(__file__)

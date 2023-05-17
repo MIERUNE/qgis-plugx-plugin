@@ -1,17 +1,15 @@
+import json
 import os
-import processing
-from utils import write_json
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from qgis.core import *
-from qgis.gui import *
+import processing
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QDialog, QListWidgetItem, QMessageBox
+from qgis.core import QgsMapLayer, QgsProject, QgsRasterLayer, QgsVectorLayer
 from qgis.PyQt import uic
 from qgis.utils import iface
 
-from vectorlayer import VectorLayer
 from rasterlayer import RasterLayer
+from vectorlayer import VectorLayer
 
 
 class QGIS2PlugX_dialog(QDialog):
@@ -36,28 +34,28 @@ class QGIS2PlugX_dialog(QDialog):
 
     def load_layer_list(self):
         vector_names = [
-            l.layer().name()
-            for l in QgsProject.instance().layerTreeRoot().children()
-            if isinstance(l.layer(), QgsVectorLayer)
+            child.layer().name()
+            for child in QgsProject.instance().layerTreeRoot().children()
+            if isinstance(child.layer(), QgsVectorLayer)
         ]
 
-        for item in vector_names:
-            i = QListWidgetItem(item)
-            i.setFlags(i.flags() | Qt.ItemIsUserCheckable)
-            i.setCheckState(Qt.Unchecked)
-            self.layerListWidget.addItem(i)
+        for name in vector_names:
+            item = QListWidgetItem(name)
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+            item.setCheckState(Qt.Unchecked)
+            self.layerListWidget.addItem(item)
 
         raster_names = [
-            r.layer().name()
-            for r in QgsProject.instance().layerTreeRoot().children()
-            if isinstance(r.layer(), QgsRasterLayer)
+            child.layer().name()
+            for child in QgsProject.instance().layerTreeRoot().children()
+            if isinstance(child.layer(), QgsRasterLayer)
         ]
 
-        for item in raster_names:
-            i = QListWidgetItem(item)
-            i.setFlags(i.flags() | Qt.ItemIsUserCheckable)
-            i.setCheckState(Qt.Unchecked)
-            self.rasterLayerListWidget.addItem(i)
+        for name in raster_names:
+            item = QListWidgetItem(name)
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+            item.setCheckState(Qt.Unchecked)
+            self.rasterLayerListWidget.addItem(item)
 
     def run(self):
         # チェックしたレイヤをリストに取得する
@@ -148,15 +146,21 @@ class QGIS2PlugX_dialog(QDialog):
             rasterlayer.xyz_to_png()
 
             # summarize raster info json
-            rasterlayer.generate_raster_info()
+            rasterlayer.write_json()
 
             # Add layer to project json
             project_json["layers"].append(rlyr.name())
 
         # project.jsonを出力
-        write_json(project_json, os.path.join(directory, "project.json"))
+        with open(os.path.join(directory, "project.json"), mode="w") as f:
+            json.dump(project_json, f, ensure_ascii=False)
 
-        QMessageBox.information(None, "完了", f"処理が完了しました。\n\n出力先:\n{directory}")
+        QMessageBox.information(
+            None,
+            "完了",
+            f"処理が完了しました。\
+            \n\n出力先:\n{directory}",
+        )
 
     def get_checked_layers(self):
         layers = []

@@ -1,6 +1,6 @@
 name: Lint
 on:
-  workflow_dispatch:
+  pull_request:
 
 jobs:
   Lint:
@@ -11,8 +11,8 @@ jobs:
         with:
           python-version: '3.9'
       - name: Install Dependencies
-        run: pip install flake8 black flake8-black
-      - name: Setup flake8 annotations
-        uses: rbialon/flake8-annotations@v1
-      - name: Lint with flake8
-        run: flake8 . --exclude=.venv --max-line-length=88
+        run: |
+            pip install poetry
+            poetry install
+      - name: Lint with Ruff
+        run: poetry run ruff --format=github .

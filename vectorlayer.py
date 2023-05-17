@@ -1,15 +1,15 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from qgis.core import *
-from qgis.gui import *
-from qgis.PyQt import uic
-from qgis.utils import iface
-
 import os
+
 import processing
-from utils import write_json
+from qgis.core import (
+    QgsProject,
+    QgsRendererCategory,
+    QgsVectorFileWriter,
+    QgsVectorLayer,
+)
+
 from unit_converter import UnitConverter
+from utils import write_json
 
 symbol_types = {
     0: "point",
