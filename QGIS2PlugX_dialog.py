@@ -36,28 +36,28 @@ class QGIS2PlugX_dialog(QDialog):
 
     def load_layer_list(self):
         vector_names = [
-            l.layer().name()
-            for l in QgsProject.instance().layerTreeRoot().children()
-            if isinstance(l.layer(), QgsVectorLayer)
+            child.layer().name()
+            for child in QgsProject.instance().layerTreeRoot().children()
+            if isinstance(child.layer(), QgsVectorLayer)
         ]
 
-        for item in vector_names:
-            i = QListWidgetItem(item)
-            i.setFlags(i.flags() | Qt.ItemIsUserCheckable)
-            i.setCheckState(Qt.Unchecked)
-            self.layerListWidget.addItem(i)
+        for name in vector_names:
+            item = QListWidgetItem(name)
+            item.setFlags(i.flags() | Qt.ItemIsUserCheckable)
+            item.setCheckState(Qt.Unchecked)
+            self.layerListWidget.addItem(item)
 
         raster_names = [
-            r.layer().name()
-            for r in QgsProject.instance().layerTreeRoot().children()
-            if isinstance(r.layer(), QgsRasterLayer)
+            child.layer().name()
+            for child in QgsProject.instance().layerTreeRoot().children()
+            if isinstance(child.layer(), QgsRasterLayer)
         ]
 
-        for item in raster_names:
-            i = QListWidgetItem(item)
-            i.setFlags(i.flags() | Qt.ItemIsUserCheckable)
-            i.setCheckState(Qt.Unchecked)
-            self.rasterLayerListWidget.addItem(i)
+        for name in raster_names:
+            item = QListWidgetItem(name)
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+            item.setCheckState(Qt.Unchecked)
+            self.rasterLayerListWidget.addItem(item)
 
     def run(self):
         # チェックしたレイヤをリストに取得する
