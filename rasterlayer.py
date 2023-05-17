@@ -80,8 +80,12 @@ class RasterLayer:
         )["OUTPUT"]
 
         # Create clip PNG file in Project CRS
-        clip_extent = f"{self.extent.xMinimum()}, {self.extent.xMaximum()}, {self.extent.yMinimum()}, {self.extent.yMaximum()}  [{QgsProject.instance().crs().authid()}]"
-        # QMessageBox.information(None, "Info", str(clip_extent))
+        clip_extent = f"{self.extent.xMinimum()}, \
+                        {self.extent.xMaximum()}, \
+                        {self.extent.yMinimum()}, \
+                        {self.extent.yMaximum()}  \
+                        [{QgsProject.instance().crs().authid()}]"
+        
         processing.run(
             "gdal:cliprasterbyextent",
             {
