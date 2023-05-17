@@ -159,7 +159,6 @@ class QGIS2PlugX_dialog(QDialog):
 
         QMessageBox.information(None, "完了", f"処理が完了しました。\n\n出力先:\n{directory}")
 
-
     def get_checked_layers(self):
         layers = []
         for i in range(self.layerListWidget.count()):
