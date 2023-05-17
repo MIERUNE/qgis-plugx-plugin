@@ -22,16 +22,16 @@ class QGIS2PlugX:
         self.toolbar.setObjectName(PLUGIN_NAME)
 
     def add_action(
-            self,
-            icon_path,
-            text,
-            callback,
-            enabled_flag=True,
-            add_to_menu=True,
-            add_to_toolbar=True,
-            status_tip=None,
-            whats_this=None,
-            parent=None,
+        self,
+        icon_path,
+        text,
+        callback,
+        enabled_flag=True,
+        add_to_menu=True,
+        add_to_toolbar=True,
+        status_tip=None,
+        whats_this=None,
+        parent=None,
     ):
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
@@ -51,7 +51,10 @@ class QGIS2PlugX:
     def initGui(self):
         # メニュー設定
         self.add_action(
-            icon_path=None, text="QGIS2PlugX", callback=self.show_dialog, parent=self.win
+            icon_path=None,
+            text="QGIS2PlugX",
+            callback=self.show_dialog,
+            parent=self.win,
         )
 
     def unload(self):

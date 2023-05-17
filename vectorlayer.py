@@ -47,7 +47,9 @@ class VectorLayer:
 
         # line
         if symbol_type == 1:
-            line_size = UnitConverter(symbol.symbolLayer(0).width(), symbol.symbolLayer(0).widthUnit())
+            line_size = UnitConverter(
+                symbol.symbolLayer(0).width(), symbol.symbolLayer(0).widthUnit()
+            )
             symbol_dict = {
                 "type": symbol_types[symbol_type],
                 "color": symbol.symbolLayer(0).color().name(),
@@ -57,7 +59,10 @@ class VectorLayer:
 
         # polygon
         if symbol_type == 2:
-            outline_size = UnitConverter(symbol.symbolLayer(0).strokeWidth(), symbol.symbolLayer(0).strokeWidthUnit())
+            outline_size = UnitConverter(
+                symbol.symbolLayer(0).strokeWidth(),
+                symbol.symbolLayer(0).strokeWidthUnit(),
+            )
             symbol_dict = {
                 "type": symbol_types[symbol_type],
                 "fill_color": symbol.symbolLayer(0).fillColor().name(),
@@ -66,7 +71,9 @@ class VectorLayer:
                 "outline_width": outline_size.convert_to_point(),
             }
 
-        write_json(symbol_dict, os.path.join(self.directory, f"{self.layer.name()}.json"))
+        write_json(
+            symbol_dict, os.path.join(self.directory, f"{self.layer.name()}.json")
+        )
 
     def generate_category_symbols(self):
         symbol_items = self.layer.renderer().legendSymbolItems()
@@ -82,8 +89,10 @@ class VectorLayer:
             symbol_dict = None
             # point
             if symbol_type == 0:
-                outline_size = UnitConverter(symbol.symbolLayer(0).strokeWidth(),
-                                             symbol.symbolLayer(0).strokeWidthUnit())
+                outline_size = UnitConverter(
+                    symbol.symbolLayer(0).strokeWidth(),
+                    symbol.symbolLayer(0).strokeWidthUnit(),
+                )
                 symbol_dict = {
                     "type": symbol_types[symbol_type],
                     "size": symbol.size(),
@@ -96,7 +105,9 @@ class VectorLayer:
 
             # line
             if symbol_type == 1:
-                line_size = UnitConverter(symbol.symbolLayer(0).width(), symbol.symbolLayer(0).widthUnit())
+                line_size = UnitConverter(
+                    symbol.symbolLayer(0).width(), symbol.symbolLayer(0).widthUnit()
+                )
                 symbol_dict = {
                     "type": symbol_types[symbol_type],
                     "legend": category.label(),
@@ -106,8 +117,10 @@ class VectorLayer:
 
             # polygon
             if symbol_type == 2:
-                outline_size = UnitConverter(symbol.symbolLayer(0).strokeWidth(),
-                                             symbol.symbolLayer(0).strokeWidthUnit())
+                outline_size = UnitConverter(
+                    symbol.symbolLayer(0).strokeWidth(),
+                    symbol.symbolLayer(0).strokeWidthUnit(),
+                )
                 symbol_dict = {
                     "type": symbol_types[symbol_type],
                     "legend": category.label(),
@@ -117,26 +130,37 @@ class VectorLayer:
                     "outline_width": outline_size.convert_to_point(),
                 }
 
-            write_json(symbol_dict,
-                       os.path.join(self.directory,
-                                    f"{self.layer.name()}_{idx}.json"))
+            write_json(
+                symbol_dict,
+                os.path.join(self.directory, f"{self.layer.name()}_{idx}.json"),
+            )
             idx += 1
 
     def export_shps_by_category(self, category: QgsRendererCategory, idx: int):
         value = category.value()
         features = self.get_feat_by_value(value)
         shp_path = os.path.join(self.directory, f"{self.layer.name()}_{idx}.shp")
-        output_layer = QgsVectorFileWriter(shp_path, 'UTF-8', self.layer.fields(), self.layer.wkbType(),
-                                           QgsProject.instance().crs(),
-                                           'ESRI Shapefile')
+        output_layer = QgsVectorFileWriter(
+            shp_path,
+            "UTF-8",
+            self.layer.fields(),
+            self.layer.wkbType(),
+            QgsProject.instance().crs(),
+            "ESRI Shapefile",
+        )
         output_layer.addFeatures(features)
         del output_layer
 
     def export_simple_symbol_shp(self):
         shp_path = os.path.join(self.directory, f"{self.layer.name()}.shp")
-        output_layer = QgsVectorFileWriter(shp_path, 'UTF-8', self.layer.fields(), self.layer.wkbType(),
-                                           QgsProject.instance().crs(),
-                                           'ESRI Shapefile')
+        output_layer = QgsVectorFileWriter(
+            shp_path,
+            "UTF-8",
+            self.layer.fields(),
+            self.layer.wkbType(),
+            QgsProject.instance().crs(),
+            "ESRI Shapefile",
+        )
         output_layer.addFeatures(self.layer.getFeatures())
         del output_layer
 
@@ -154,40 +178,55 @@ class VectorLayer:
         return result
 
     def generate_label_json(self, all_labels_layer: QgsVectorLayer, layername: str):
-        label_layer = processing.run("native:extractbyattribute", {
-            'INPUT': all_labels_layer,
-            'FIELD': 'Layer',
-            'OPERATOR': 0,  # '='
-            'VALUE': layername,
-            'OUTPUT': 'TEMPORARY_OUTPUT'})['OUTPUT']
+        label_layer = processing.run(
+            "native:extractbyattribute",
+            {
+                "INPUT": all_labels_layer,
+                "FIELD": "Layer",
+                "OPERATOR": 0,  # '='
+                "VALUE": layername,
+                "OUTPUT": "TEMPORARY_OUTPUT",
+            },
+        )["OUTPUT"]
 
         label_dict = {"labels": []}
 
         for feature in label_layer.getFeatures():
-            if not feature['LabelUnplaced']:
+            if not feature["LabelUnplaced"]:
                 # バッファーがない場合は色を#000000にする
-                buffer_color = "#000000" if not feature['BufferColor'] else str(feature['BufferColor'])
+                buffer_color = (
+                    "#000000"
+                    if not feature["BufferColor"]
+                    else str(feature["BufferColor"])
+                )
 
-                label_dict["labels"].append({
-                    "x": feature.geometry().asPoint().x(),
-                    "y": feature.geometry().asPoint().y(),
-                    "rotation": feature['LabelRotation'],
-                    "text": feature['LabelText'],
-                    "font": feature['Family'],
-                    "size": feature['Size'],
-                    "bold": feature['Bold'],
-                    "underline": feature['Underline'],
-                    "text:color": feature['Color'],
-                    "text:opacity": feature['FontOpacity'],
-                    "buffer:width": feature['BufferSize'],
-                    "buffer:color": buffer_color,
-                    "buffer:opacity": feature['BufferOpacity'],
-                })
+                label_dict["labels"].append(
+                    {
+                        "x": feature.geometry().asPoint().x(),
+                        "y": feature.geometry().asPoint().y(),
+                        "rotation": feature["LabelRotation"],
+                        "text": feature["LabelText"],
+                        "font": feature["Family"],
+                        "size": feature["Size"],
+                        "bold": feature["Bold"],
+                        "underline": feature["Underline"],
+                        "text:color": feature["Color"],
+                        "text:opacity": feature["FontOpacity"],
+                        "buffer:width": feature["BufferSize"],
+                        "buffer:color": buffer_color,
+                        "buffer:opacity": feature["BufferOpacity"],
+                    }
+                )
         if label_dict["labels"]:
-            write_json(label_dict, os.path.join(self.directory, f"label_{self.layer.name().split('_')[1]}.json"))
+            write_json(
+                label_dict,
+                os.path.join(
+                    self.directory, f"label_{self.layer.name().split('_')[1]}.json"
+                ),
+            )
 
     def generate_symbols(self):
-        if self.renderer_type == 'categorizedSymbol':
+        if self.renderer_type == "categorizedSymbol":
             self.generate_category_symbols()
-        if self.renderer_type == 'singleSymbol':
+        if self.renderer_type == "singleSymbol":
             self.generate_single_symbols()

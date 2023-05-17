@@ -21,7 +21,9 @@ class UnitConverter:
 
         if self.unit == QgsUnitTypes.RenderPixels:
             render_context = QgsRenderContext()
-            to_pt = render_context.convertToPainterUnits(1, QgsUnitTypes.RenderUnit.RenderPoints)
+            to_pt = render_context.convertToPainterUnits(
+                1, QgsUnitTypes.RenderUnit.RenderPoints
+            )
             return self.value * to_pt
 
         if self.unit == QgsUnitTypes.RenderMillimeters:

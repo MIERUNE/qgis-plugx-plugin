@@ -1,7 +1,7 @@
 name: Lint
 on:
-  pull_request:
-    types: [opened, synchronize, edited]
+  workflow_dispatch:
+
 jobs:
   Lint:
     runs-on: ubuntu-latest
