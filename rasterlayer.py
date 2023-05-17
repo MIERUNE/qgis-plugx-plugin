@@ -6,61 +6,84 @@ from qgis.gui import *
 from qgis.PyQt import uic
 from qgis.utils import iface
 
+import json
 import os
 import processing
 from utils import write_json
 
 
 class RasterLayer:
-    def __init__(self, layer: QgsRasterLayer, extent, directory, project_crs):
+    def __init__(
+        self,
+        layer: QgsRasterLayer,
+        extent: QgsRectangle,
+        output_dir: str,
+    ):
         self.layer = layer
         self.extent = extent
-        self.dpi = iface.mapCanvas().mapSettings().outputDpi()
-        self.scale = iface.mapCanvas().scale()
-        self.directory = directory
-        self.project_crs = project_crs
+        """ user defined extent to clip, in project crs """
+        self.output_dir = output_dir
 
     def xyz_to_png(self):
-        output_tiff_path = os.path.join(self.directory, self.layer.name() + ".tiff")
-        output_png_path = os.path.join(self.directory, self.layer.name() + ".png")
+        clipped_tiff_path = os.path.join(
+            self.output_dir, self.layer.name() + "_clipped.tif"
+        )
+        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
 
         # Convert Bbox to EPSG:3857
-        new_crs = QgsCoordinateReferenceSystem("EPSG:3857")
-
         transform = QgsCoordinateTransform(
-            self.project_crs, new_crs, QgsProject.instance()
+            QgsProject.instance().crs(),
+            QgsCoordinateReferenceSystem("EPSG:3857"),
+            QgsProject.instance(),
         )
-        map_extent = transform.transformBoundingBox(self.extent)
+        extent_3857 = transform.transformBoundingBox(self.extent)
+        extent_to_clip = QgsRectangle(
+            extent_3857.xMinimum(),
+            extent_3857.yMinimum(),
+            extent_3857.xMaximum(),
+            extent_3857.yMaximum(),
+        )
 
-        # QMessageBox.information(None, "Info", str(self.dpi))
+        # Calculate extent in EPSG:3857
+        extent_width = extent_to_clip.xMaximum() - extent_to_clip.xMinimum()
+        extent_height = extent_to_clip.yMaximum() - extent_to_clip.yMinimum()
 
-        # Calculate image size in EPSG:3857
-        extent_width = map_extent.xMaximum() - map_extent.xMinimum()
-        extent_height = map_extent.yMaximum() - map_extent.yMinimum()
-        # QMessageBox.information(
-        #     None, "Info", str(extent_height) + " " + str(extent_width)
-        # )
-
-        image_width = int(extent_width / self.scale * self.dpi / 0.0254)
-        image_height = int(extent_height / self.scale * self.dpi / 0.0254)
-
-        # QMessageBox.information(
-        #     None, "Info", str(image_height) + " " + str(image_width)
-        # )
+        dpi = iface.mapCanvas().mapSettings().outputDpi()
+        scale = iface.mapCanvas().scale()
+        inch_to_meter = 0.0254
+        image_width = int(extent_width / scale * dpi / inch_to_meter)
+        image_height = int(extent_height / scale * dpi / inch_to_meter)
 
         # Save TIFF file in EPSG:3857
-        file_writer = QgsRasterFileWriter(output_tiff_path)
+        file_writer = QgsRasterFileWriter(clipped_tiff_path)
         pipe = QgsRasterPipe()
         pipe.set(self.layer.dataProvider().clone())
-        file_writer.writeRaster(pipe, image_width, image_height, map_extent, new_crs)
+        file_writer.writeRaster(
+            pipe,
+            image_width,
+            image_height,
+            extent_to_clip,
+            QgsCoordinateReferenceSystem("EPSG:3857"),
+        )
+
+        # Convert to Project CRS
+        warped = processing.run(
+            "gdal:warpreproject",
+            {
+                "INPUT": clipped_tiff_path,
+                "SOURCE_CRS": QgsCoordinateReferenceSystem("EPSG:3857"),
+                "TARGET_CRS": QgsProject.instance().crs(),
+                "OUTPUT": "TEMPORARY_OUTPUT",
+            },
+        )["OUTPUT"]
 
         # Create clip PNG file in Project CRS
-        clip_extent = f"{self.extent.xMinimum()}, {self.extent.xMaximum()}, {self.extent.yMinimum()}, {self.extent.yMaximum()}  [{self.project_crs.authid()}]"
+        clip_extent = f"{self.extent.xMinimum()}, {self.extent.xMaximum()}, {self.extent.yMinimum()}, {self.extent.yMaximum()}  [{QgsProject.instance().crs().authid()}]"
         # QMessageBox.information(None, "Info", str(clip_extent))
         processing.run(
             "gdal:cliprasterbyextent",
             {
-                "INPUT": output_tiff_path,
+                "INPUT": warped,
                 "PROJWIN": clip_extent,
                 "OVERCRS": False,
                 "NODATA": None,
@@ -70,13 +93,15 @@ class RasterLayer:
                 "OUTPUT": output_png_path,
             },
         )
-        os.remove(output_tiff_path)
-        os.remove(output_tiff_path + ".aux.xml")
+
+        # clean up
+        os.remove(clipped_tiff_path)
+        os.remove(clipped_tiff_path + ".aux.xml")
 
     def generate_raster_info(self):
         raster_info = {
             "type": "raster",
-            "crs": self.project_crs.authid(),
+            "crs": self.layer.crs().authid(),
             "extent": [
                 self.extent.xMinimum(),
                 self.extent.yMinimum(),
@@ -84,6 +109,7 @@ class RasterLayer:
                 self.extent.yMaximum(),
             ],
         }
-        write_json(
-            raster_info, os.path.join(self.directory, f"{self.layer.name()}.json")
-        )
+        with open(
+            os.path.join(self.output_dir, f"{self.layer.name()}.json"), mode="w"
+        ) as f:
+            json.dump(raster_info, f)
