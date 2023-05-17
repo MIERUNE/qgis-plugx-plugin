@@ -29,9 +29,6 @@ class QGIS2PlugX_dialog(QDialog):
 
         self.load_layer_list()
 
-        self.layers = None
-        self.extent = None
-
     def load_layer_list(self):
         vector_names = [
             child.layer().name()
@@ -59,18 +56,16 @@ class QGIS2PlugX_dialog(QDialog):
 
     def run(self):
         # チェックしたレイヤをリストに取得する
-        self.layers = self.get_checked_layers()
-        self.raster_layers = self.get_checked_raster_layers()
+        layers = self.get_checked_layers()
+        raster_layers = self.get_checked_raster_layers()
 
-        if not self.layers and not self.raster_layers:
-            return
         # 処理範囲を取得する
-        self.extent = self.ui.mExtentGroupBox.outputExtent()
-        if not self.extent:
+        extent = self.ui.mExtentGroupBox.outputExtent()
+        if not extent:
             return
 
         # 出力先のディレクトリを作成する
-        directory = self.ui.outputFileWidget.filePath()
+        output_dir = self.ui.outputFileWidget.filePath()
 
         # project.jsonにレイヤ順序情報を書き出す
         project_json = {}
@@ -83,10 +78,10 @@ class QGIS2PlugX_dialog(QDialog):
             "geographic" if QgsProject.instance().crs().isGeographic() else "projected"
         )
         project_json["extent"] = [
-            self.extent.xMinimum(),
-            self.extent.yMinimum(),
-            self.extent.xMaximum(),
-            self.extent.yMaximum(),
+            extent.xMinimum(),
+            extent.yMinimum(),
+            extent.xMaximum(),
+            extent.yMaximum(),
         ]
         project_json["scale"] = iface.mapCanvas().scale()
         project_json["layers"] = []
@@ -96,7 +91,7 @@ class QGIS2PlugX_dialog(QDialog):
         all_labels = processing.run(
             "native:extractlabels",
             {
-                "EXTENT": self.extent,
+                "EXTENT": extent,
                 "SCALE": canvas.scale(),
                 "MAP_THEME": None,
                 "INCLUDE_UNPLACED": True,
@@ -105,9 +100,9 @@ class QGIS2PlugX_dialog(QDialog):
             },
         )["OUTPUT"]
 
-        for lyr in self.layers:
+        for lyr in layers:
             # 指定範囲内の地物を抽出し、元のスタイルを適用する
-            qml_path = os.path.join(directory, "layer.qml")
+            qml_path = os.path.join(output_dir, "layer.qml")
             lyr.saveNamedStyle(
                 qml_path, categories=QgsMapLayer.Symbology | QgsMapLayer.Labeling
             )
@@ -116,7 +111,7 @@ class QGIS2PlugX_dialog(QDialog):
                 "native:extractbyextent",
                 {
                     "INPUT": lyr,
-                    "EXTENT": self.extent,
+                    "EXTENT": extent,
                     "CLIP": True,
                     "OUTPUT": "TEMPORARY_OUTPUT",
                 },
@@ -126,11 +121,11 @@ class QGIS2PlugX_dialog(QDialog):
                 os.remove(qml_path)
 
             # レイヤ名をlayer_indexに変更する
-            lyr_intersected.setName(f"layer_{self.layers.index(lyr)}")
+            lyr_intersected.setName(f"layer_{layers.index(lyr)}")
             project_json["layers"].append(lyr_intersected.name())
 
             # スタイル出力用のVectorLayerインスランスを作成する
-            maplyr = VectorLayer(lyr_intersected, directory)
+            maplyr = VectorLayer(lyr_intersected, output_dir)
 
             # シンボロジごとのSHPとjsonを出力
             maplyr.generate_symbols()
@@ -139,10 +134,10 @@ class QGIS2PlugX_dialog(QDialog):
                 # レイヤlabelのjsonを出力
                 maplyr.generate_label_json(all_labels, lyr.name())
 
-        for rlyr in self.raster_layers:
+        for rlyr in raster_layers:
             # 指定範囲内のラスターを抽出
 
-            rasterlayer = RasterLayer(rlyr, self.extent, directory)
+            rasterlayer = RasterLayer(rlyr, extent, output_dir)
             rasterlayer.xyz_to_png()
 
             # summarize raster info json
@@ -152,14 +147,14 @@ class QGIS2PlugX_dialog(QDialog):
             project_json["layers"].append(rlyr.name())
 
         # project.jsonを出力
-        with open(os.path.join(directory, "project.json"), mode="w") as f:
+        with open(os.path.join(output_dir, "project.json"), mode="w") as f:
             json.dump(project_json, f, ensure_ascii=False)
 
         QMessageBox.information(
             None,
             "完了",
             f"処理が完了しました。\
-            \n\n出力先:\n{directory}",
+            \n\n出力先:\n{output_dir}",
         )
 
     def get_checked_layers(self):
