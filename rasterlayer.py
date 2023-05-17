@@ -12,10 +12,11 @@ from utils import write_json
 
 
 class RasterLayer:
-    def __init__(self, layer: QgsRasterLayer, extent, dpi, directory, project_crs):
+    def __init__(self, layer: QgsRasterLayer, extent, directory, project_crs):
         self.layer = layer
         self.extent = extent
-        self.dpi = dpi
+        self.dpi = iface.mapCanvas().mapSettings().outputDpi()
+        self.scale = iface.mapCanvas().scale()
         self.directory = directory
         self.project_crs = project_crs
 
@@ -31,6 +32,8 @@ class RasterLayer:
         )
         map_extent = transform.transformBoundingBox(self.extent)
 
+        # QMessageBox.information(None, "Info", str(self.dpi))
+
         # Calculate image size in EPSG:3857
         extent_width = map_extent.xMaximum() - map_extent.xMinimum()
         extent_height = map_extent.yMaximum() - map_extent.yMinimum()
@@ -38,8 +41,8 @@ class RasterLayer:
         #     None, "Info", str(extent_height) + " " + str(extent_width)
         # )
 
-        image_width = int(extent_width / self.dpi / 0.0254)
-        image_height = int(extent_height / self.dpi / 0.0254)
+        image_width = int(extent_width / self.scale * self.dpi / 0.0254)
+        image_height = int(extent_height / self.scale * self.dpi / 0.0254)
 
         # QMessageBox.information(
         #     None, "Info", str(image_height) + " " + str(image_width)
