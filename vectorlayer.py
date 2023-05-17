@@ -21,7 +21,6 @@ symbol_types = {
 class VectorLayer:
     def __init__(self, layer: QgsVectorLayer, output_dir: str):
         self.layer = layer
-        self.renderer_type = layer.renderer().type()
         self.output_dir = output_dir
 
     def generate_single_symbols(self):
@@ -162,10 +161,10 @@ class VectorLayer:
 
     def get_feat_by_value(self, value: str) -> list:
         result = []
-        if self.renderer_type == "singleSymbol":
+        if self.layer.renderer().type() == "singleSymbol":
             pass
 
-        if self.renderer_type == "categorizedSymbol":
+        if self.layer.renderer().type() == "categorizedSymbol":
             field = self.layer.renderer().classAttribute()
 
             for feature in self.layer.getFeatures():
@@ -217,7 +216,7 @@ class VectorLayer:
             json.dump(label_dict, f, ensure_ascii=False)
 
     def generate_symbols(self):
-        if self.renderer_type == "categorizedSymbol":
+        if self.layer.renderer().type() == "categorizedSymbol":
             self.generate_category_symbols()
-        if self.renderer_type == "singleSymbol":
+        if self.layer.renderer().type() == "singleSymbol":
             self.generate_single_symbols()
