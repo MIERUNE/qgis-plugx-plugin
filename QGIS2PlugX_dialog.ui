@@ -17,22 +17,12 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>出力ベクターレイヤ</string>
+      <string>レイヤー一覧</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QListWidget" name="layerListWidget"/>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_raster">
-     <property name="text">
-      <string>出力ラスターレイヤ</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QListWidget" name="rasterLayerListWidget"/>
    </item>
    <item>
     <widget class="QgsExtentGroupBox" name="mExtentGroupBox"/>
