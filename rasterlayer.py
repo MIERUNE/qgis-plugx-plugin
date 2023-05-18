@@ -85,7 +85,7 @@ class RasterLayer:
                         {self.extent.yMinimum()}, \
                         {self.extent.yMaximum()}  \
                         [{QgsProject.instance().crs().authid()}]"
-        
+
         processing.run(
             "gdal:cliprasterbyextent",
             {
@@ -103,6 +103,22 @@ class RasterLayer:
         # clean up
         os.remove(clipped_tiff_path)
         os.remove(clipped_tiff_path + ".aux.xml")
+
+    def rgb_raster_to_png(self):
+        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
+        processing.run(
+            "gdal:cliprasterbyextent",
+            {
+                "INPUT": self.layer,
+                "PROJWIN": self.extent,
+                "OVERCRS": False,
+                "NODATA": None,
+                "OPTIONS": "",
+                "DATA_TYPE": 0,
+                "EXTRA": "",
+                "OUTPUT": output_png_path,
+            },
+        )
 
     def write_json(self):
         raster_info = {
