@@ -26,11 +26,20 @@ class RasterLayer:
         """ user defined extent to clip, in project crs """
         self.output_dir = output_dir
 
+    def raster_to_png(self):
+        if self.layer.providerType() == "wms":
+            # WMS, WMTS or XYZ tile
+            self.xyz_to_png()
+
+        if self.layer.rasterType() == QgsRasterLayer.LayerType.Multiband:
+            # RGB image
+            self.rgb_file_to_png()
+
     def xyz_to_png(self):
+        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
         clipped_tiff_path = os.path.join(
             self.output_dir, self.layer.name() + "_clipped.tif"
         )
-        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
 
         # Convert Bbox to EPSG:3857
         transform = QgsCoordinateTransform(
@@ -85,7 +94,7 @@ class RasterLayer:
                         {self.extent.yMinimum()}, \
                         {self.extent.yMaximum()}  \
                         [{QgsProject.instance().crs().authid()}]"
-        
+
         processing.run(
             "gdal:cliprasterbyextent",
             {
@@ -103,6 +112,41 @@ class RasterLayer:
         # clean up
         os.remove(clipped_tiff_path)
         os.remove(clipped_tiff_path + ".aux.xml")
+
+    def rgb_file_to_png(self):
+        # Create clip PNG file in Project CRS
+        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
+
+        # Convert to Project CRS
+        warped = processing.run(
+            "gdal:warpreproject",
+            {
+                "INPUT": self.layer,
+                "SOURCE_CRS": self.layer.crs(),
+                "TARGET_CRS": QgsProject.instance().crs(),
+                "OUTPUT": "TEMPORARY_OUTPUT",
+            },
+        )["OUTPUT"]
+
+        clip_extent = f"{self.extent.xMinimum()}, \
+                        {self.extent.xMaximum()}, \
+                        {self.extent.yMinimum()}, \
+                        {self.extent.yMaximum()}  \
+                        [{QgsProject.instance().crs().authid()}]"
+
+        processing.run(
+            "gdal:cliprasterbyextent",
+            {
+                "INPUT": warped,
+                "PROJWIN": clip_extent,
+                "OVERCRS": False,
+                "NODATA": None,
+                "OPTIONS": "",
+                "DATA_TYPE": 0,
+                "EXTRA": "",
+                "OUTPUT": output_png_path,
+            },
+        )
 
     def write_json(self):
         raster_info = {
