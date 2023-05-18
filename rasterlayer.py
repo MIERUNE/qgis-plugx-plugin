@@ -31,38 +31,13 @@ class RasterLayer:
         if self.layer.providerType() == "wms":
             # WMS, WMTS or XYZ tile
             self.xyz_to_png()
-        elif self.layer.providerType() == "gdal":
-            # raster file
 
-            if self.layer.rasterType() == QgsRasterLayer.LayerType.Multiband:
-                # RGB image
-                self.clip_raster_to_png(self.layer)
-            elif self.layer.rasterType() == QgsRasterLayer.LayerType.GrayOrUndefined:
-                # other one TO DO later
-                QMessageBox.information(
-                    None,
-                    "info",
-                    self.layer.name() + "\nSingleBand raster process is coming soon",
-                )
-            elif self.layer.rasterType() == QgsRasterLayer.LayerType.Palette:
-                QMessageBox.information(
-                    None, "info", self.layer.name() + "\nPalette raster is not proceed"
-                )
-            elif self.layer.rasterType() == QgsRasterLayer.LayerType.ColorLayer:
-                QMessageBox.information(
-                    None,
-                    "info",
-                    self.layer.name()
-                    + r"\nSingle band Color layer file is not proceed",
-                )
-        else:
-            QMessageBox.information(
-                None,
-                "info",
-                self.layer.name() + "\nSingle band Color layer file is not proceed",
-            )
+        if self.layer.rasterType() == QgsRasterLayer.LayerType.Multiband:
+            # RGB image
+            self.rgb_file_to_png()
 
     def xyz_to_png(self):
+        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
         clipped_tiff_path = os.path.join(
             self.output_dir, self.layer.name() + "_clipped.tif"
         )
@@ -115,13 +90,31 @@ class RasterLayer:
         )["OUTPUT"]
 
         # Create clip PNG file in Project CRS
-        self.clip_raster_to_png(warped)
+        clip_extent = f"{self.extent.xMinimum()}, \
+                        {self.extent.xMaximum()}, \
+                        {self.extent.yMinimum()}, \
+                        {self.extent.yMaximum()}  \
+                        [{QgsProject.instance().crs().authid()}]"
+
+        processing.run(
+            "gdal:cliprasterbyextent",
+            {
+                "INPUT": warped,
+                "PROJWIN": clip_extent,
+                "OVERCRS": False,
+                "NODATA": None,
+                "OPTIONS": "",
+                "DATA_TYPE": 0,
+                "EXTRA": "",
+                "OUTPUT": output_png_path,
+            },
+        )
 
         # clean up
         os.remove(clipped_tiff_path)
         os.remove(clipped_tiff_path + ".aux.xml")
 
-    def clip_raster_to_png(self, input_raster):
+    def rgb_file_to_png(self):
         # Create clip PNG file in Project CRS
         output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
 
@@ -134,7 +127,7 @@ class RasterLayer:
         processing.run(
             "gdal:cliprasterbyextent",
             {
-                "INPUT": input_raster,
+                "INPUT": self.layer,
                 "PROJWIN": clip_extent,
                 "OVERCRS": False,
                 "NODATA": None,
