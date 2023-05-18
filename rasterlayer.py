@@ -28,17 +28,20 @@ class RasterLayer:
         self.output_dir = output_dir
 
     def raster_to_png(self):
-        if self.layer.rasterType() == 3:
+        if self.layer.rasterType() == QgsRasterLayer.LayerType.ColorLayer:
             # XYZ tile
             self.xyz_to_png()
 
-        elif self.layer.rasterType() == 2:
+        elif self.layer.rasterType() == QgsRasterLayer.LayerType.Multiband:
             # RGB image
             self.clip_raster_to_png(self.layer)
-
-        else:
+        elif self.layer.rasterType() == QgsRasterLayer.LayerType.GrayOrUndefined:
             # other one TO DO later
-            QMessageBox.information(None, "info", "other raster type")
+            QMessageBox.information(
+                None, "info", "SingleBand raster process is coming soon"
+            )
+        elif self.layer.rasterType() == QgsRasterLayer.LayerType.Palette:
+            QMessageBox.information(None, "info", "Palette raster is not proceed")
 
     def xyz_to_png(self):
         clipped_tiff_path = os.path.join(
