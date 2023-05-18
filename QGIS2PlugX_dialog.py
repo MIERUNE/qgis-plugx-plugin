@@ -116,18 +116,7 @@ class QGIS2PlugX_dialog(QDialog):
 
             elif isinstance(layer, QgsRasterLayer):
                 rasterlayer = RasterLayer(layer, extent, output_dir)
-                if layer.rasterType() == 3:
-                    # XYZ tile
-                    rasterlayer.xyz_to_png()
-
-                elif layer.rasterType() == 2:
-                    # RGB image
-                    rasterlayer.clip_raster_to_png(layer)
-
-                else:
-                    # other one TO DO later
-                    continue
-
+                rasterlayer.raster_to_png()
                 rasterlayer.write_json()
                 output_layer_names.append(layer.name())
 

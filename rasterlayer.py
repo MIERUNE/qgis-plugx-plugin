@@ -11,6 +11,7 @@ from qgis.core import (
     QgsRasterPipe,
     QgsRectangle,
 )
+from PyQt5.QtWidgets import QMessageBox
 from qgis.utils import iface
 
 
@@ -25,6 +26,19 @@ class RasterLayer:
         self.extent = extent
         """ user defined extent to clip, in project crs """
         self.output_dir = output_dir
+
+    def raster_to_png(self):
+        if self.layer.rasterType() == 3:
+            # XYZ tile
+            self.xyz_to_png()
+
+        elif self.layer.rasterType() == 2:
+            # RGB image
+            self.clip_raster_to_png(self.layer)
+
+        else:
+            # other one TO DO later
+            QMessageBox.information(None, "info", "other raster type")
 
     def xyz_to_png(self):
         clipped_tiff_path = os.path.join(
