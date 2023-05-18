@@ -117,6 +117,17 @@ class RasterLayer:
         # Create clip PNG file in Project CRS
         output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
 
+        # Convert to Project CRS
+        warped = processing.run(
+            "gdal:warpreproject",
+            {
+                "INPUT": self.layer,
+                "SOURCE_CRS": self.layer.crs(),
+                "TARGET_CRS": QgsProject.instance().crs(),
+                "OUTPUT": "TEMPORARY_OUTPUT",
+            },
+        )["OUTPUT"]
+
         clip_extent = f"{self.extent.xMinimum()}, \
                         {self.extent.xMaximum()}, \
                         {self.extent.yMinimum()}, \
@@ -126,7 +137,7 @@ class RasterLayer:
         processing.run(
             "gdal:cliprasterbyextent",
             {
-                "INPUT": self.layer,
+                "INPUT": warped,
                 "PROJWIN": clip_extent,
                 "OVERCRS": False,
                 "NODATA": None,
