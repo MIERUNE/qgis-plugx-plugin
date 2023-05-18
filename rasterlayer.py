@@ -30,7 +30,6 @@ class RasterLayer:
         clipped_tiff_path = os.path.join(
             self.output_dir, self.layer.name() + "_clipped.tif"
         )
-        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
 
         # Convert Bbox to EPSG:3857
         transform = QgsCoordinateTransform(
