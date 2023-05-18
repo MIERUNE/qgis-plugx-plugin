@@ -80,6 +80,16 @@ class RasterLayer:
         )["OUTPUT"]
 
         # Create clip PNG file in Project CRS
+        self.clip_raster_to_png(warped)
+
+        # clean up
+        os.remove(clipped_tiff_path)
+        os.remove(clipped_tiff_path + ".aux.xml")
+
+    def clip_raster_to_png(self, input_raster):
+        # Create clip PNG file in Project CRS
+        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
+
         clip_extent = f"{self.extent.xMinimum()}, \
                         {self.extent.xMaximum()}, \
                         {self.extent.yMinimum()}, \
@@ -89,28 +99,8 @@ class RasterLayer:
         processing.run(
             "gdal:cliprasterbyextent",
             {
-                "INPUT": warped,
+                "INPUT": input_raster,
                 "PROJWIN": clip_extent,
-                "OVERCRS": False,
-                "NODATA": None,
-                "OPTIONS": "",
-                "DATA_TYPE": 0,
-                "EXTRA": "",
-                "OUTPUT": output_png_path,
-            },
-        )
-
-        # clean up
-        os.remove(clipped_tiff_path)
-        os.remove(clipped_tiff_path + ".aux.xml")
-
-    def rgb_raster_to_png(self):
-        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
-        processing.run(
-            "gdal:cliprasterbyextent",
-            {
-                "INPUT": self.layer,
-                "PROJWIN": self.extent,
                 "OVERCRS": False,
                 "NODATA": None,
                 "OPTIONS": "",

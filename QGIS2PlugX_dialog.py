@@ -122,7 +122,7 @@ class QGIS2PlugX_dialog(QDialog):
 
                 elif layer.rasterType() == 2:
                     # RGB image
-                    rasterlayer.rgb_raster_to_png()
+                    rasterlayer.clip_raster_to_png(layer)
 
                 else:
                     # other one TO DO later
