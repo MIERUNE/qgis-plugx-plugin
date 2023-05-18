@@ -11,7 +11,6 @@ from qgis.core import (
     QgsRasterPipe,
     QgsRectangle,
 )
-from PyQt5.QtWidgets import QMessageBox
 from qgis.utils import iface
 
 
