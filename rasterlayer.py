@@ -160,22 +160,21 @@ class RasterLayer:
         )
 
     def singleband_file_to_png(self):
-        # Reproject input raster to 4326
-
+        # Reproject input raster to 2451
         reprojeted = processing.run(
             "gdal:warpreproject",
             {
                 "INPUT": self.layer,
                 "SOURCE_CRS": self.layer.crs(),
-                "TARGET_CRS": QgsCoordinateReferenceSystem("EPSG:4326"),
+                "TARGET_CRS": QgsCoordinateReferenceSystem("EPSG:2451"),
                 "OUTPUT": "TEMPORARY_OUTPUT",
             },
         )["OUTPUT"]
 
         layer_geographic = QgsRasterLayer(reprojeted, "Raster Layer")
+
         # set style to layer geographic from input raster
         layer_geographic.setRenderer(self.layer.renderer().clone())
-        extent = layer_geographic.extent()
 
         # Create empty image
 
@@ -192,7 +191,7 @@ class RasterLayer:
 
         # Set map to export image
         map_settings = QgsMapSettings()
-        map_settings.setExtent(extent)
+        map_settings.setExtent(layer_geographic.extent())
         map_settings.setOutputSize(QSize(image_width, image_height))
         map_settings.setOutputDpi(dpi)
 
@@ -232,9 +231,6 @@ class RasterLayer:
         wld_file = os.path.join(self.output_dir, self.layer.name() + "_canvas.wld")
         os.rename(wld_file, pgw_file)
 
-        # Clip converted PNG file
-        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
-
         # Convert to Project CRS
         warped = processing.run(
             "gdal:warpreproject",
@@ -245,6 +241,9 @@ class RasterLayer:
                 "OUTPUT": "TEMPORARY_OUTPUT",
             },
         )["OUTPUT"]
+
+        # Clip converted PNG file
+        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
 
         clip_extent = f"{self.extent.xMinimum()}, \
                         {self.extent.xMaximum()}, \
