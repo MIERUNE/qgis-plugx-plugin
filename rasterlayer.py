@@ -10,8 +10,12 @@ from qgis.core import (
     QgsRasterLayer,
     QgsRasterPipe,
     QgsRectangle,
+    QgsMapSettings,
+    QgsMapRendererParallelJob,
 )
 from qgis.utils import iface
+from PyQt5.QtCore import QSize
+from qgis.PyQt.QtGui import QImage, QColor
 
 
 class RasterLayer:
@@ -34,6 +38,13 @@ class RasterLayer:
         if self.layer.rasterType() == QgsRasterLayer.LayerType.Multiband:
             # RGB image
             self.rgb_file_to_png()
+
+        elif (
+            self.layer.rasterType() == QgsRasterLayer.LayerType.GrayOrUndefined
+            and self.layer.bandCount() == 1
+        ):
+            # single band raster with 1 band
+            self.singleband_file_to_png()
 
     def xyz_to_png(self):
         output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
@@ -147,6 +158,119 @@ class RasterLayer:
                 "OUTPUT": output_png_path,
             },
         )
+
+    def singleband_file_to_png(self):
+        extent = self.layer.extent()
+
+        # Create empty image
+
+        image_width = self.layer.width()
+        image_height = self.layer.height()
+        dpi = iface.mapCanvas().mapSettings().outputDpi()
+
+        image = QImage(image_width, image_height, QImage.Format_ARGB32_Premultiplied)
+
+        inch_to_meter = 0.0254
+        image.setDotsPerMeterX(dpi / inch_to_meter)
+        image.setDotsPerMeterY(dpi / inch_to_meter)
+        image.fill(0)
+
+        # Set map to export image
+        map_settings = QgsMapSettings()
+        map_settings.setExtent(extent)
+        map_settings.setOutputSize(QSize(image_width, image_height))
+        map_settings.setOutputDpi(dpi)
+
+        map_settings.setLayers([self.layer])
+        map_settings.setBackgroundColor(QColor(0, 0, 0, 0))
+
+        # Render the map with symbology
+        render = QgsMapRendererParallelJob(map_settings)
+        render.start()
+        render.waitForFinished()
+
+        # Get the rendered image
+        image = render.renderedImage()
+        output_symbolized_png_path = os.path.join(
+            self.output_dir, self.layer.name() + "_symbolized.png"
+        )
+        image.save(output_symbolized_png_path, "png")
+
+        # # Generate input raster world file
+        pgw_file = output_symbolized_png_path.replace(".png", ".pgw")
+
+        # raster_canvas = os.path.join(self.output_dir, self.layer.name() + "_canvas.png")
+        # processing.run(
+        #     "gdal:translate",
+        #     {
+        #         "INPUT": self.layer,
+        #         "TARGET_CRS": None,
+        #         "NODATA": None,
+        #         "COPY_SUBDATASETS": False,
+        #         "OPTIONS": "",
+        #         "EXTRA": "-co worldfile=yes",
+        #         "DATA_TYPE": 0,
+        #         "OUTPUT": raster_canvas,
+        #     },
+        # )
+
+        # wld_file = os.path.join(
+        #     self.output_dir, self.layer.name() + "_for_worldfile.wld"
+        # )
+        # # os.rename(wld_file, pgw_file)
+
+        pixel_size_x = self.layer.rasterUnitsPerPixelX()
+        pixel_size_y = self.layer.rasterUnitsPerPixelY()
+
+        with open(pgw_file, "w") as f:
+            f.write(f"{pixel_size_x}\n")
+            f.write("0.0\n")
+            f.write("0.0\n")
+            f.write(f"-{pixel_size_y}\n")
+            f.write(f"{extent.xMinimum()}\n")
+            f.write(f"{extent.yMaximum()}\n")
+
+        ########### Here after clip process #############
+
+        # Clip converted PNG file
+        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
+
+        # Convert to Project CRS
+        warped = processing.run(
+            "gdal:warpreproject",
+            {
+                "INPUT": output_symbolized_png_path,
+                "SOURCE_CRS": self.layer.crs(),
+                "TARGET_CRS": QgsProject.instance().crs(),
+                "OUTPUT": "TEMPORARY_OUTPUT",
+            },
+        )["OUTPUT"]
+
+        clip_extent = f"{self.extent.xMinimum()}, \
+                        {self.extent.xMaximum()}, \
+                        {self.extent.yMinimum()}, \
+                        {self.extent.yMaximum()}  \
+                        [{QgsProject.instance().crs().authid()}]"
+
+        processing.run(
+            "gdal:cliprasterbyextent",
+            {
+                "INPUT": warped,
+                "PROJWIN": clip_extent,
+                "OVERCRS": False,
+                "NODATA": None,
+                "OPTIONS": "",
+                "DATA_TYPE": 0,
+                "EXTRA": "",
+                "OUTPUT": output_png_path,
+            },
+        )
+
+        # clean up
+        # os.remove(output_symbolized_png_path)
+        # os.remove(output_symbolized_png_path + ".aux.xml")
+        # os.remove(pgw_file)
+        # os.remove(tmpforpgw)
 
     def write_json(self):
         raster_info = {
