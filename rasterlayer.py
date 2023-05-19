@@ -174,7 +174,7 @@ class RasterLayer:
 
         layer_geographic = QgsRasterLayer(reprojeted, "Raster Layer")
         # set style to layer geographic from input raster
-        layer_geographic.setRenderer(self.layer.renderer())
+        layer_geographic.setRenderer(self.layer.renderer().clone())
         extent = layer_geographic.extent()
 
         # Create empty image
@@ -211,7 +211,7 @@ class RasterLayer:
         )
         image.save(output_symbolized_png_path, "png")
 
-        # # Generate input raster world file
+        # Generate input raster world file
         pgw_file = output_symbolized_png_path.replace(".png", ".pgw")
 
         raster_canvas = os.path.join(self.output_dir, self.layer.name() + "_canvas.png")
