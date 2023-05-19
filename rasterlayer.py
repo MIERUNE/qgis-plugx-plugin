@@ -160,12 +160,27 @@ class RasterLayer:
         )
 
     def singleband_file_to_png(self):
-        extent = self.layer.extent()
+        # Reproject input raster to 4326
+
+        reprojeted = processing.run(
+            "gdal:warpreproject",
+            {
+                "INPUT": self.layer,
+                "SOURCE_CRS": self.layer.crs(),
+                "TARGET_CRS": QgsCoordinateReferenceSystem("EPSG:4326"),
+                "OUTPUT": "TEMPORARY_OUTPUT",
+            },
+        )["OUTPUT"]
+
+        layer_geographic = QgsRasterLayer(reprojeted, "Raster Layer")
+        # set style to layer geographic from input raster
+        layer_geographic.setRenderer(self.layer.renderer())
+        extent = layer_geographic.extent()
 
         # Create empty image
 
-        image_width = self.layer.width()
-        image_height = self.layer.height()
+        image_width = layer_geographic.width()
+        image_height = layer_geographic.height()
         dpi = iface.mapCanvas().mapSettings().outputDpi()
 
         image = QImage(image_width, image_height, QImage.Format_ARGB32_Premultiplied)
@@ -181,7 +196,7 @@ class RasterLayer:
         map_settings.setOutputSize(QSize(image_width, image_height))
         map_settings.setOutputDpi(dpi)
 
-        map_settings.setLayers([self.layer])
+        map_settings.setLayers([layer_geographic])
         map_settings.setBackgroundColor(QColor(0, 0, 0, 0))
 
         # Render the map with symbology
@@ -199,38 +214,23 @@ class RasterLayer:
         # # Generate input raster world file
         pgw_file = output_symbolized_png_path.replace(".png", ".pgw")
 
-        # raster_canvas = os.path.join(self.output_dir, self.layer.name() + "_canvas.png")
-        # processing.run(
-        #     "gdal:translate",
-        #     {
-        #         "INPUT": self.layer,
-        #         "TARGET_CRS": None,
-        #         "NODATA": None,
-        #         "COPY_SUBDATASETS": False,
-        #         "OPTIONS": "",
-        #         "EXTRA": "-co worldfile=yes",
-        #         "DATA_TYPE": 0,
-        #         "OUTPUT": raster_canvas,
-        #     },
-        # )
+        raster_canvas = os.path.join(self.output_dir, self.layer.name() + "_canvas.png")
+        processing.run(
+            "gdal:translate",
+            {
+                "INPUT": layer_geographic,
+                "TARGET_CRS": None,
+                "NODATA": None,
+                "COPY_SUBDATASETS": False,
+                "OPTIONS": "",
+                "EXTRA": "-co worldfile=yes",
+                "DATA_TYPE": 0,
+                "OUTPUT": raster_canvas,
+            },
+        )
 
-        # wld_file = os.path.join(
-        #     self.output_dir, self.layer.name() + "_for_worldfile.wld"
-        # )
-        # # os.rename(wld_file, pgw_file)
-
-        pixel_size_x = self.layer.rasterUnitsPerPixelX()
-        pixel_size_y = self.layer.rasterUnitsPerPixelY()
-
-        with open(pgw_file, "w") as f:
-            f.write(f"{pixel_size_x}\n")
-            f.write("0.0\n")
-            f.write("0.0\n")
-            f.write(f"-{pixel_size_y}\n")
-            f.write(f"{extent.xMinimum()}\n")
-            f.write(f"{extent.yMaximum()}\n")
-
-        ########### Here after clip process #############
+        wld_file = os.path.join(self.output_dir, self.layer.name() + "_canvas.wld")
+        os.rename(wld_file, pgw_file)
 
         # Clip converted PNG file
         output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
@@ -240,7 +240,7 @@ class RasterLayer:
             "gdal:warpreproject",
             {
                 "INPUT": output_symbolized_png_path,
-                "SOURCE_CRS": self.layer.crs(),
+                "SOURCE_CRS": layer_geographic.crs(),
                 "TARGET_CRS": QgsProject.instance().crs(),
                 "OUTPUT": "TEMPORARY_OUTPUT",
             },
@@ -267,10 +267,11 @@ class RasterLayer:
         )
 
         # clean up
-        # os.remove(output_symbolized_png_path)
-        # os.remove(output_symbolized_png_path + ".aux.xml")
-        # os.remove(pgw_file)
-        # os.remove(tmpforpgw)
+        os.remove(output_symbolized_png_path)
+        os.remove(output_symbolized_png_path + ".aux.xml")
+        os.remove(pgw_file)
+        os.remove(raster_canvas)
+        os.remove(raster_canvas + ".aux.xml")
 
     def write_json(self):
         raster_info = {
