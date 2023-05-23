@@ -115,10 +115,11 @@ class QGIS2PlugX_dialog(QDialog):
                     vector_layer.generate_label_json(all_labels, layer.name())
 
             elif isinstance(layer, QgsRasterLayer):
-                rasterlayer = RasterLayer(layer, extent, output_dir)
+                output_layer_name = f"layer_{layers.index(layer)}"
+                rasterlayer = RasterLayer(layer, output_layer_name, extent, output_dir)
                 rasterlayer.raster_to_png()
                 rasterlayer.write_json()
-                output_layer_names.append(layer.name())
+                output_layer_names.append(output_layer_name)
 
         self.write_project_json(output_layer_names)
         QMessageBox.information(
