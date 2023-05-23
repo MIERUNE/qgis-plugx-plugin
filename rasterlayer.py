@@ -22,10 +22,12 @@ class RasterLayer:
     def __init__(
         self,
         layer: QgsRasterLayer,
+        output_layer_name: str,
         extent: QgsRectangle,
         output_dir: str,
     ):
         self.layer = layer
+        self.output_layer_name = output_layer_name
         self.extent = extent
         """ user defined extent to clip, in project crs """
         self.output_dir = output_dir
@@ -47,7 +49,7 @@ class RasterLayer:
             self.singleband_file_to_png()
 
     def xyz_to_png(self):
-        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
+        output_png_path = os.path.join(self.output_dir, self.output_layer_name + ".png")
         clipped_tiff_path = os.path.join(
             self.output_dir, self.layer.name() + "_clipped.tif"
         )
@@ -126,7 +128,7 @@ class RasterLayer:
 
     def rgb_file_to_png(self):
         # Create clip PNG file in Project CRS
-        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
+        output_png_path = os.path.join(self.output_dir, self.output_layer_name + ".png")
 
         # Convert to Project CRS
         warped = processing.run(
@@ -243,7 +245,7 @@ class RasterLayer:
         )["OUTPUT"]
 
         # Clip converted PNG file
-        output_png_path = os.path.join(self.output_dir, self.layer.name() + ".png")
+        output_png_path = os.path.join(self.output_dir, self.output_layer_name + ".png")
 
         clip_extent = f"{self.extent.xMinimum()}, \
                         {self.extent.xMaximum()}, \
@@ -284,6 +286,6 @@ class RasterLayer:
             ],
         }
         with open(
-            os.path.join(self.output_dir, f"{self.layer.name()}.json"), mode="w"
+            os.path.join(self.output_dir, f"{self.output_layer_name}.json"), mode="w"
         ) as f:
             json.dump(raster_info, f)
