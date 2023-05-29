@@ -74,7 +74,7 @@ class QGIS2PlugX_dialog(QDialog):
                 "SCALE": iface.mapCanvas().scale(),
                 "MAP_THEME": None,
                 "INCLUDE_UNPLACED": True,
-                "DPI": 96,  # TODO: 縮尺から計算すべき
+                "DPI": iface.mapCanvas().mapSettings().outputDpi(),
                 "OUTPUT": "TEMPORARY_OUTPUT",
             },
         )["OUTPUT"]
