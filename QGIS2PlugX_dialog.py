@@ -41,7 +41,7 @@ class QGIS2PlugX_dialog(QDialog):
 
     def load_layer_list(self):
         self.layerListWidget.clear()
-        for layer in QgsProject.instance().mapLayers().values():
+        for layer in QgsProject().instance().layerTreeRoot().layerOrder():
             if not isinstance(layer, QgsRasterLayer) and not isinstance(
                 layer, QgsVectorLayer
             ):
