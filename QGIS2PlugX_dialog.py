@@ -36,12 +36,13 @@ class QGIS2PlugX_dialog(QDialog):
         # レイヤー一覧を作成する
         self.load_layer_list()
         # レイヤーの追加・削除に反応して一覧を更新する
-        QgsProject.instance().layerWasAdded.connect(self.load_layer_list)
-        QgsProject.instance().layerRemoved.connect(self.load_layer_list)
+        QgsProject().instance().layerTreeRoot().layerOrderChanged.connect(
+            self.load_layer_list
+        )
 
     def load_layer_list(self):
         self.layerListWidget.clear()
-        for layer in QgsProject.instance().mapLayers().values():
+        for layer in QgsProject().instance().layerTreeRoot().layerOrder():
             if not isinstance(layer, QgsRasterLayer) and not isinstance(
                 layer, QgsVectorLayer
             ):
@@ -74,7 +75,7 @@ class QGIS2PlugX_dialog(QDialog):
                 "SCALE": iface.mapCanvas().scale(),
                 "MAP_THEME": None,
                 "INCLUDE_UNPLACED": True,
-                "DPI": 96,  # TODO: 縮尺から計算すべき
+                "DPI": iface.mapCanvas().mapSettings().outputDpi(),
                 "OUTPUT": "TEMPORARY_OUTPUT",
             },
         )["OUTPUT"]
