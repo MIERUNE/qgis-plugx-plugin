@@ -19,11 +19,11 @@ symbol_types = {
 
 
 class VectorLayer:
-    def __init__(self, layer: QgsVectorLayer, directory: str):
+    def __init__(self, layer: QgsVectorLayer, directory: str, layer_original_name: str):
         self.layer = layer
         self.renderer_type = layer.renderer().type()
         self.directory = directory
-
+        self.layer_original_name = layer_original_name
         self.symbols = []
 
     def generate_single_symbols(self):
@@ -37,6 +37,7 @@ class VectorLayer:
         if symbol_type == 0:
             pt_size = UnitConverter(symbol.size(), symbol.sizeUnit())
             symbol_dict = {
+                "layer": self.layer_original_name,
                 "type": symbol_types[symbol_type],
                 # "size": symbol.size(),
                 "size": pt_size.convert_to_point(),
@@ -51,6 +52,7 @@ class VectorLayer:
                 symbol.symbolLayer(0).width(), symbol.symbolLayer(0).widthUnit()
             )
             symbol_dict = {
+                "layer": self.layer_original_name,
                 "type": symbol_types[symbol_type],
                 "color": symbol.symbolLayer(0).color().name(),
                 # "width": symbol.symbolLayer(0).width(),
@@ -64,6 +66,7 @@ class VectorLayer:
                 symbol.symbolLayer(0).strokeWidthUnit(),
             )
             symbol_dict = {
+                "layer": self.layer_original_name,
                 "type": symbol_types[symbol_type],
                 "fill_color": symbol.symbolLayer(0).fillColor().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
@@ -94,6 +97,7 @@ class VectorLayer:
                     symbol.symbolLayer(0).strokeWidthUnit(),
                 )
                 symbol_dict = {
+                    "layer": self.layer_original_name,
                     "type": symbol_types[symbol_type],
                     "size": symbol.size(),
                     "legend": category.label(),
@@ -109,6 +113,7 @@ class VectorLayer:
                     symbol.symbolLayer(0).width(), symbol.symbolLayer(0).widthUnit()
                 )
                 symbol_dict = {
+                    "layer": self.layer_original_name,
                     "type": symbol_types[symbol_type],
                     "legend": category.label(),
                     "color": symbol.symbolLayer(0).color().name(),
@@ -122,6 +127,7 @@ class VectorLayer:
                     symbol.symbolLayer(0).strokeWidthUnit(),
                 )
                 symbol_dict = {
+                    "layer": self.layer_original_name,
                     "type": symbol_types[symbol_type],
                     "legend": category.label(),
                     "fill_color": symbol.symbolLayer(0).fillColor().name(),
@@ -189,7 +195,7 @@ class VectorLayer:
             },
         )["OUTPUT"]
 
-        label_dict = {"labels": []}
+        label_dict = {"layer": self.layer_original_name, "labels": []}
 
         for feature in label_layer.getFeatures():
             if not feature["LabelUnplaced"]:
