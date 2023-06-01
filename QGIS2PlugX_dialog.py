@@ -107,7 +107,7 @@ class QGIS2PlugX_dialog(QDialog):
                 output_layer_names.append(layer_intersected.name())
 
                 # スタイル出力用のVectorLayerインスランスを作成する
-                vector_layer = VectorLayer(layer_intersected, output_dir)
+                vector_layer = VectorLayer(layer_intersected, output_dir, layer.name())
 
                 # シンボロジごとのSHPとjsonを出力
                 vector_layer.generate_symbols()
