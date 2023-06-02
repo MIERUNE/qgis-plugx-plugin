@@ -50,7 +50,8 @@ class VectorLayer:
                 "outline_width": symbol.symbolLayer(0).strokeWidth(),
                 "symbol_layer_type": symbol.symbolLayer(0)
                 .layerType()
-                .split("Marker")[0],
+                .split("Marker")[0]
+                .lower(),
                 "svg": "",
             }
             if symbol.symbolLayer(0).layerType() == "SvgMarker":
@@ -132,7 +133,8 @@ class VectorLayer:
                     # "outline_width": symbol.symbolLayer(0).strokeWidth(),
                     "symbol_layer_type": symbol.symbolLayer(0)
                     .layerType()
-                    .split("Marker")[0],
+                    .split("Marker")[0]
+                    .lower(),
                     "svg": "",
                 }
 
