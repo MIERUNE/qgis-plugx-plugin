@@ -45,14 +45,17 @@ class VectorLayer:
                 "fill_color": symbol.color().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
                 "outline_width": symbol.symbolLayer(0).strokeWidth(),
-                "graphic_type": symbol.symbolLayer(0).layerType().split("Marker")[0],
+                "symbol_layer_type": symbol.symbolLayer(0)
+                .layerType()
+                .split("Marker")[0],
+                "svg": "",
             }
             if symbol.symbolLayer(0).layerType() == "SvgMarker":
                 shutil.copy(
                     symbol.symbolLayer(0).path(),
                     os.path.join(self.directory, f"{self.layer.name()}.svg"),
                 )
-                symbol_dict["graphic_file"] = f"{self.layer.name()}.svg"
+                symbol_dict["svg"] = f"{self.layer.name()}.svg"
 
         # line
         if symbol_type == 1:
@@ -113,16 +116,17 @@ class VectorLayer:
                     "outline_color": symbol.symbolLayer(0).strokeColor().name(),
                     "outline_width": outline_size.convert_to_point(),
                     # "outline_width": symbol.symbolLayer(0).strokeWidth(),
-                    "graphic_type": symbol.symbolLayer(0)
+                    "symbol_layer_type": symbol.symbolLayer(0)
                     .layerType()
                     .split("Marker")[0],
+                    "svg": "",
                 }
                 if symbol.symbolLayer(0).layerType() == "SvgMarker":
                     shutil.copy(
                         symbol.symbolLayer(0).path(),
                         os.path.join(self.directory, f"{self.layer.name()}_{idx}.svg"),
                     )
-                    symbol_dict["graphic_file"] = f"{self.layer.name()}_{idx}.svg"
+                    symbol_dict["svg"] = f"{self.layer.name()}_{idx}.svg"
 
             # line
             if symbol_type == 1:
