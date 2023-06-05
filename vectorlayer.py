@@ -10,6 +10,7 @@ from qgis.core import (
 
 from unit_converter import UnitConverter
 from utils import write_json
+import shutil
 
 symbol_types = {
     0: "point",
@@ -17,14 +18,24 @@ symbol_types = {
     2: "polygon",
 }
 
+# svgs = []
+
 
 class VectorLayer:
-    def __init__(self, layer: QgsVectorLayer, directory: str, layer_original_name: str):
+    def __init__(
+        self,
+        layer: QgsVectorLayer,
+        directory: str,
+        layer_original_name: str,
+        svgs: list,
+    ):
         self.layer = layer
         self.renderer_type = layer.renderer().type()
         self.directory = directory
         self.layer_original_name = layer_original_name
         self.symbols = []
+        self.svgs_path = os.path.join(directory, "svg")
+        self.svgs = svgs
 
     def generate_single_symbols(self):
         # SHPを出力
@@ -44,7 +55,14 @@ class VectorLayer:
                 "fill_color": symbol.color().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
                 "outline_width": symbol.symbolLayer(0).strokeWidth(),
+                "symbol_layer_type": symbol.symbolLayer(0)
+                .layerType()
+                .split("Marker")[0]
+                .lower(),
+                "svg": "",
             }
+            if symbol.symbolLayer(0).layerType() == "SvgMarker":
+                symbol_dict["svg"] = self.export_svg_symbol(symbol)
 
         # line
         if symbol_type == 1:
@@ -105,7 +123,15 @@ class VectorLayer:
                     "outline_color": symbol.symbolLayer(0).strokeColor().name(),
                     "outline_width": outline_size.convert_to_point(),
                     # "outline_width": symbol.symbolLayer(0).strokeWidth(),
+                    "symbol_layer_type": symbol.symbolLayer(0)
+                    .layerType()
+                    .split("Marker")[0]
+                    .lower(),
+                    "svg": "",
                 }
+
+                if symbol.symbolLayer(0).layerType() == "SvgMarker":
+                    symbol_dict["svg"] = self.export_svg_symbol(symbol)
 
             # line
             if symbol_type == 1:
@@ -230,6 +256,27 @@ class VectorLayer:
                     self.directory, f"label_{self.layer.name().split('_')[1]}.json"
                 ),
             )
+
+    def export_svg_symbol(self, symbol):
+        # create svg folder if not exists
+        if not os.path.exists(self.svgs_path):
+            os.makedirs(self.svgs_path)
+        # make svg file name as 0.svg, 1.svg etc.
+        if symbol.symbolLayer(0).path() in self.svgs:
+            # svg already exists in svgs folder
+            svg_index = self.svgs.index(symbol.symbolLayer(0).path())
+        else:
+            # svg not exists in svgs folder
+            self.svgs.append(symbol.symbolLayer(0).path())
+            svg_index = self.svgs.index(symbol.symbolLayer(0).path())
+            shutil.copy(
+                symbol.symbolLayer(0).path(),
+                os.path.join(self.svgs_path, f"{svg_index}.svg"),
+            )
+        return f"{svg_index}.svg"
+
+    def update_svgs_list(self):
+        return self.svgs
 
     def generate_symbols(self):
         if self.renderer_type == "categorizedSymbol":

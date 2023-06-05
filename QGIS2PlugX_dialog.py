@@ -81,6 +81,8 @@ class QGIS2PlugX_dialog(QDialog):
         )["OUTPUT"]
 
         output_layer_names = []
+        svgs = []
+
         for layer in layers:
             if isinstance(layer, QgsVectorLayer):
                 # 指定範囲内の地物を抽出し、元のスタイルを適用する
@@ -107,10 +109,13 @@ class QGIS2PlugX_dialog(QDialog):
                 output_layer_names.append(layer_intersected.name())
 
                 # スタイル出力用のVectorLayerインスランスを作成する
-                vector_layer = VectorLayer(layer_intersected, output_dir, layer.name())
+                vector_layer = VectorLayer(
+                    layer_intersected, output_dir, layer.name(), svgs
+                )
 
                 # シンボロジごとのSHPとjsonを出力
                 vector_layer.generate_symbols()
+                svgs = vector_layer.update_svgs_list()
 
                 if vector_layer.layer.labelsEnabled():
                     vector_layer.generate_label_json(all_labels, layer.name())
