@@ -18,17 +18,24 @@ symbol_types = {
     2: "polygon",
 }
 
-svgs = []
+# svgs = []
 
 
 class VectorLayer:
-    def __init__(self, layer: QgsVectorLayer, directory: str, layer_original_name: str):
+    def __init__(
+        self,
+        layer: QgsVectorLayer,
+        directory: str,
+        layer_original_name: str,
+        svgs: list,
+    ):
         self.layer = layer
         self.renderer_type = layer.renderer().type()
         self.directory = directory
         self.layer_original_name = layer_original_name
         self.symbols = []
         self.svgs_path = os.path.join(directory, "svg")
+        self.svgs = svgs
 
     def generate_single_symbols(self):
         # SHPを出力
@@ -255,21 +262,23 @@ class VectorLayer:
         if not os.path.exists(self.svgs_path):
             os.makedirs(self.svgs_path)
         # make svg file name as 0.svg, 1.svg etc.
-        if symbol.symbolLayer(0).path() in svgs:
+        if symbol.symbolLayer(0).path() in self.svgs:
             # svg already exists in svgs folder
-            svg_index = svgs.index(symbol.symbolLayer(0).path())
+            svg_index = self.svgs.index(symbol.symbolLayer(0).path())
         else:
             # svg not exists in svgs folder
-            svgs.append(symbol.symbolLayer(0).path())
-            svg_index = svgs.index(symbol.symbolLayer(0).path())
+            self.svgs.append(symbol.symbolLayer(0).path())
+            svg_index = self.svgs.index(symbol.symbolLayer(0).path())
             shutil.copy(
                 symbol.symbolLayer(0).path(),
                 os.path.join(self.svgs_path, f"{svg_index}.svg"),
             )
-            return f"{svg_index}.svg"
+        return f"{svg_index}.svg"
+
+    def update_svgs_list(self):
+        return self.svgs
 
     def generate_symbols(self):
-        print(svgs)
         if self.renderer_type == "categorizedSymbol":
             self.generate_category_symbols()
         if self.renderer_type == "singleSymbol":
