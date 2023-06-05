@@ -55,22 +55,7 @@ class VectorLayer:
                 "svg": "",
             }
             if symbol.symbolLayer(0).layerType() == "SvgMarker":
-                # create svg folder if not exists
-                if not os.path.exists(self.svgs_path):
-                    os.makedirs(self.svgs_path)
-                # make svg file name as 0.svg, 1.svg etc.
-                if symbol.symbolLayer(0).path() in svgs:
-                    # svg already exists in svgs folder
-                    svg_index = svgs.index(symbol.symbolLayer(0).path())
-                else:
-                    # svg not exists in svgs folder
-                    svgs.append(symbol.symbolLayer(0).path())
-                    svg_index = svgs.index(symbol.symbolLayer(0).path())
-                    shutil.copy(
-                        symbol.symbolLayer(0).path(),
-                        os.path.join(self.svgs_path, f"{svg_index}.svg"),
-                    )
-                symbol_dict["svg"] = f"{svg_index}.svg"
+                symbol_dict["svg"] = self.export_svg_symbol(symbol)
 
         # line
         if symbol_type == 1:
@@ -139,22 +124,7 @@ class VectorLayer:
                 }
 
                 if symbol.symbolLayer(0).layerType() == "SvgMarker":
-                    # create svg folder if not exists
-                    if not os.path.exists(self.svgs_path):
-                        os.makedirs(self.svgs_path)
-                    # make svg file name as 0.svg, 1.svg etc.
-                    if symbol.symbolLayer(0).path() in svgs:
-                        # svg already exists in svgs folder
-                        svg_index = svgs.index(symbol.symbolLayer(0).path())
-                    else:
-                        # svg not exists in svgs folder
-                        svgs.append(symbol.symbolLayer(0).path())
-                        svg_index = svgs.index(symbol.symbolLayer(0).path())
-                        shutil.copy(
-                            symbol.symbolLayer(0).path(),
-                            os.path.join(self.svgs_path, f"{svg_index}.svg"),
-                        )
-                    symbol_dict["svg"] = f"{svg_index}.svg"
+                    symbol_dict["svg"] = self.export_svg_symbol(symbol)
 
             # line
             if symbol_type == 1:
@@ -280,7 +250,26 @@ class VectorLayer:
                 ),
             )
 
+    def export_svg_symbol(self, symbol):
+        # create svg folder if not exists
+        if not os.path.exists(self.svgs_path):
+            os.makedirs(self.svgs_path)
+        # make svg file name as 0.svg, 1.svg etc.
+        if symbol.symbolLayer(0).path() in svgs:
+            # svg already exists in svgs folder
+            svg_index = svgs.index(symbol.symbolLayer(0).path())
+        else:
+            # svg not exists in svgs folder
+            svgs.append(symbol.symbolLayer(0).path())
+            svg_index = svgs.index(symbol.symbolLayer(0).path())
+            shutil.copy(
+                symbol.symbolLayer(0).path(),
+                os.path.join(self.svgs_path, f"{svg_index}.svg"),
+            )
+            return f"{svg_index}.svg"
+
     def generate_symbols(self):
+        print(svgs)
         if self.renderer_type == "categorizedSymbol":
             self.generate_category_symbols()
         if self.renderer_type == "singleSymbol":
