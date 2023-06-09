@@ -33,8 +33,8 @@ class VectorLayer:
         self.directory = directory
         self.layer_original_name = layer_original_name
         self.symbols = []
-        self.svgs_path = os.path.join(directory, "svg")
-        self.rasters_path = os.path.join(directory, "img")
+        self.svgs_path = os.path.join(directory, "assets", "symbol_svg")
+        self.rasters_path = os.path.join(directory, "assets", "symbol_raster")
         self.svgs = svgs
         self.rasters = rasters
 
@@ -58,12 +58,14 @@ class VectorLayer:
                 .layerType()
                 .split("Marker")[0]
                 .lower(),
-                "svg": "",
+                "symbol_path": "",
             }
 
             if symbol.symbolLayer(0).layerType() == "RasterMarker":
                 symbol_dict["outline_width"] = None
-                symbol_dict["svg"] = "img" + "/" + self.export_raster_symbol(symbol)
+                symbol_dict[
+                    "symbol_path"
+                ] = "assets/symbol_raster/" + self.export_raster_symbol(symbol)
 
             else:
                 outline_size = UnitConverter(
@@ -73,7 +75,9 @@ class VectorLayer:
                 symbol_dict["outline_width"] = outline_size.convert_to_point()
 
             if symbol.symbolLayer(0).layerType() == "SvgMarker":
-                symbol_dict["svg"] = "svg" + "/" + self.export_svg_symbol(symbol)
+                symbol_dict[
+                    "symbol_path"
+                ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol)
 
         # line
         if symbol_type == 1:
@@ -132,12 +136,14 @@ class VectorLayer:
                     .layerType()
                     .split("Marker")[0]
                     .lower(),
-                    "svg": "",
+                    "symbol_path": "",
                 }
 
                 if symbol.symbolLayer(0).layerType() == "RasterMarker":
                     symbol_dict["outline_width"] = None
-                    symbol_dict["svg"] = "img" + "/" + self.export_raster_symbol(symbol)
+                    symbol_dict[
+                        "symbol_path"
+                    ] = "assets/symbol_raster/" + self.export_raster_symbol(symbol)
 
                 else:
                     outline_size = UnitConverter(
@@ -147,7 +153,9 @@ class VectorLayer:
                     symbol_dict["outline_width"] = outline_size.convert_to_point()
 
                 if symbol.symbolLayer(0).layerType() == "SvgMarker":
-                    symbol_dict["svg"] = "svg" + "/" + self.export_svg_symbol(symbol)
+                    symbol_dict[
+                        "symbol_path"
+                    ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol)
 
             # line
             if symbol_type == 1:
