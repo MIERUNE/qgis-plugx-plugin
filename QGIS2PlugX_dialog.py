@@ -82,6 +82,7 @@ class QGIS2PlugX_dialog(QDialog):
 
         output_layer_names = []
         svgs = []
+        rasters = []
 
         for layer in layers:
             if isinstance(layer, QgsVectorLayer):
@@ -110,12 +111,13 @@ class QGIS2PlugX_dialog(QDialog):
 
                 # スタイル出力用のVectorLayerインスランスを作成する
                 vector_layer = VectorLayer(
-                    layer_intersected, output_dir, layer.name(), svgs
+                    layer_intersected, output_dir, layer.name(), svgs, rasters
                 )
 
                 # シンボロジごとのSHPとjsonを出力
                 vector_layer.generate_symbols()
                 svgs = vector_layer.update_svgs_list()
+                rasters = vector_layer.update_rasters_list()
 
                 if vector_layer.layer.labelsEnabled():
                     vector_layer.generate_label_json(all_labels, layer.name())

@@ -18,8 +18,6 @@ symbol_types = {
     2: "polygon",
 }
 
-# svgs = []
-
 
 class VectorLayer:
     def __init__(
@@ -28,14 +26,17 @@ class VectorLayer:
         directory: str,
         layer_original_name: str,
         svgs: list,
+        rasters: list,
     ):
         self.layer = layer
         self.renderer_type = layer.renderer().type()
         self.directory = directory
         self.layer_original_name = layer_original_name
         self.symbols = []
-        self.svgs_path = os.path.join(directory, "svg")
+        self.svgs_path = os.path.join(directory, "assets", "symbol_svg")
+        self.rasters_path = os.path.join(directory, "assets", "symbol_raster")
         self.svgs = svgs
+        self.rasters = rasters
 
     def generate_single_symbols(self):
         # SHPを出力
@@ -50,19 +51,33 @@ class VectorLayer:
             symbol_dict = {
                 "layer": self.layer_original_name,
                 "type": symbol_types[symbol_type],
-                # "size": symbol.size(),
                 "size": pt_size.convert_to_point(),
                 "fill_color": symbol.color().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
-                "outline_width": symbol.symbolLayer(0).strokeWidth(),
                 "symbol_layer_type": symbol.symbolLayer(0)
                 .layerType()
                 .split("Marker")[0]
                 .lower(),
-                "svg": "",
+                "symbol_path": "",
             }
+
+            if symbol.symbolLayer(0).layerType() == "RasterMarker":
+                symbol_dict["outline_width"] = None
+                symbol_dict[
+                    "symbol_path"
+                ] = "assets/symbol_raster/" + self.export_raster_symbol(symbol)
+
+            else:
+                outline_size = UnitConverter(
+                    symbol.symbolLayer(0).strokeWidth(),
+                    symbol.symbolLayer(0).strokeWidthUnit(),
+                )
+                symbol_dict["outline_width"] = outline_size.convert_to_point()
+
             if symbol.symbolLayer(0).layerType() == "SvgMarker":
-                symbol_dict["svg"] = self.export_svg_symbol(symbol)
+                symbol_dict[
+                    "symbol_path"
+                ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol)
 
         # line
         if symbol_type == 1:
@@ -73,7 +88,6 @@ class VectorLayer:
                 "layer": self.layer_original_name,
                 "type": symbol_types[symbol_type],
                 "color": symbol.symbolLayer(0).color().name(),
-                # "width": symbol.symbolLayer(0).width(),
                 "width": line_size.convert_to_point(),
             }
 
@@ -88,7 +102,6 @@ class VectorLayer:
                 "type": symbol_types[symbol_type],
                 "fill_color": symbol.symbolLayer(0).fillColor().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
-                # "outline_width": symbol.symbolLayer(0).strokeWidth(),
                 "outline_width": outline_size.convert_to_point(),
             }
 
@@ -110,28 +123,39 @@ class VectorLayer:
             symbol_dict = None
             # point
             if symbol_type == 0:
-                outline_size = UnitConverter(
-                    symbol.symbolLayer(0).strokeWidth(),
-                    symbol.symbolLayer(0).strokeWidthUnit(),
-                )
+                pt_size = UnitConverter(symbol.size(), symbol.sizeUnit())
                 symbol_dict = {
                     "layer": self.layer_original_name,
                     "type": symbol_types[symbol_type],
-                    "size": symbol.size(),
+                    # "size": symbol.size(),
+                    "size": pt_size.convert_to_point(),
                     "legend": category.label(),
                     "fill_color": symbol.color().name(),
                     "outline_color": symbol.symbolLayer(0).strokeColor().name(),
-                    "outline_width": outline_size.convert_to_point(),
-                    # "outline_width": symbol.symbolLayer(0).strokeWidth(),
                     "symbol_layer_type": symbol.symbolLayer(0)
                     .layerType()
                     .split("Marker")[0]
                     .lower(),
-                    "svg": "",
+                    "symbol_path": "",
                 }
 
+                if symbol.symbolLayer(0).layerType() == "RasterMarker":
+                    symbol_dict["outline_width"] = None
+                    symbol_dict[
+                        "symbol_path"
+                    ] = "assets/symbol_raster/" + self.export_raster_symbol(symbol)
+
+                else:
+                    outline_size = UnitConverter(
+                        symbol.symbolLayer(0).strokeWidth(),
+                        symbol.symbolLayer(0).strokeWidthUnit(),
+                    )
+                    symbol_dict["outline_width"] = outline_size.convert_to_point()
+
                 if symbol.symbolLayer(0).layerType() == "SvgMarker":
-                    symbol_dict["svg"] = self.export_svg_symbol(symbol)
+                    symbol_dict[
+                        "symbol_path"
+                    ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol)
 
             # line
             if symbol_type == 1:
@@ -158,7 +182,6 @@ class VectorLayer:
                     "legend": category.label(),
                     "fill_color": symbol.symbolLayer(0).fillColor().name(),
                     "outline_color": symbol.symbolLayer(0).strokeColor().name(),
-                    # "outline_width": symbol.symbolLayer(0).strokeWidth(),
                     "outline_width": outline_size.convert_to_point(),
                 }
 
@@ -275,8 +298,32 @@ class VectorLayer:
             )
         return f"{svg_index}.svg"
 
+    def export_raster_symbol(self, symbol):
+        # create raster folder if not exists
+        if not os.path.exists(self.rasters_path):
+            os.makedirs(self.rasters_path)
+        # make rster file name as 0.jpg, 1.png etc.
+        if symbol.symbolLayer(0).path() in self.rasters:
+            # raster already exists in rasters folder
+            raster_index = self.rasters.index(symbol.symbolLayer(0).path())
+        else:
+            # raster not exists in rasters folder
+            self.rasters.append(symbol.symbolLayer(0).path())
+            raster_index = self.rasters.index(symbol.symbolLayer(0).path())
+            shutil.copy(
+                symbol.symbolLayer(0).path(),
+                os.path.join(
+                    self.rasters_path,
+                    f"{raster_index}{os.path.splitext(symbol.symbolLayer(0).path())[1]}",
+                ),
+            )
+        return f"{raster_index}{os.path.splitext(symbol.symbolLayer(0).path())[1]}"
+
     def update_svgs_list(self):
         return self.svgs
+
+    def update_rasters_list(self):
+        return self.rasters
 
     def generate_symbols(self):
         if self.renderer_type == "categorizedSymbol":
