@@ -51,6 +51,7 @@ class VectorLayer:
             symbol_dict = {
                 "layer": self.layer_original_name,
                 "type": symbol_types[symbol_type],
+                # "size": symbol.size(),
                 "size": pt_size.convert_to_point(),
                 "fill_color": symbol.color().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
@@ -102,6 +103,7 @@ class VectorLayer:
                 "type": symbol_types[symbol_type],
                 "fill_color": symbol.symbolLayer(0).fillColor().name(),
                 "outline_color": symbol.symbolLayer(0).strokeColor().name(),
+                # "outline_width": symbol.symbolLayer(0).strokeWidth(),
                 "outline_width": outline_size.convert_to_point(),
             }
 
@@ -132,6 +134,8 @@ class VectorLayer:
                     "legend": category.label(),
                     "fill_color": symbol.color().name(),
                     "outline_color": symbol.symbolLayer(0).strokeColor().name(),
+                    "outline_width": outline_size.convert_to_point(),
+                    # "outline_width": symbol.symbolLayer(0).strokeWidth(),
                     "symbol_layer_type": symbol.symbolLayer(0)
                     .layerType()
                     .split("Marker")[0]
@@ -182,6 +186,7 @@ class VectorLayer:
                     "legend": category.label(),
                     "fill_color": symbol.symbolLayer(0).fillColor().name(),
                     "outline_color": symbol.symbolLayer(0).strokeColor().name(),
+                    # "outline_width": symbol.symbolLayer(0).strokeWidth(),
                     "outline_width": outline_size.convert_to_point(),
                 }
 
