@@ -161,6 +161,7 @@ class VectorLayer:
     def generate_symbol_dict(self, symbol):
         symbol_dict = {
             "layer": self.layer_original_name,
+            "type": symbol_types[symbol.type()],
         }
         symbol_list = []
         for symbol_layer in symbol:
@@ -170,7 +171,6 @@ class VectorLayer:
             if symbol_type == 0:
                 pt_size = UnitConverter(symbol_layer.size(), symbol_layer.sizeUnit())
                 symbol_layer_dict = {
-                    "type": symbol_types[symbol_type],
                     "size": pt_size.convert_to_point(),
                     "fill_color": symbol_layer.color().name(),
                     "outline_color": symbol_layer.strokeColor().name(),
@@ -206,7 +206,6 @@ class VectorLayer:
                     symbol_layer.width(), symbol_layer.widthUnit()
                 )
                 symbol_layer_dict = {
-                    "type": symbol_types[symbol_type],
                     "color": symbol_layer.color().name(),
                     "width": line_size.convert_to_point(),
                 }
@@ -218,7 +217,6 @@ class VectorLayer:
                     symbol_layer.strokeWidthUnit(),
                 )
                 symbol_layer_dict = {
-                    "type": symbol_types[symbol_type],
                     "fill_color": symbol_layer.fillColor().name(),
                     "outline_color": symbol_layer.strokeColor().name(),
                     "outline_width": outline_size.convert_to_point(),
