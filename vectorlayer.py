@@ -44,19 +44,11 @@ class VectorLayer:
         # symbol layerごとにスタイルJsonを作成
         symbol = self.layer.renderer().symbol()
 
-        symbol_layer_idx = 0
-        for symbol_layer in symbol:
-            symbol_dict = self.generate_symbol_dict(symbol, symbol_layer)
+        symbol_dict = self.generate_symbol_dict(symbol)
 
-            if len(symbol) == 1:
-                json_path = os.path.join(self.directory, f"{self.layer.name()}.json")
-            else:
-                json_path = os.path.join(
-                    self.directory,
-                    f"{self.layer.name()}_symbol_{symbol_layer_idx}.json",
-                )
-            write_json(symbol_dict, json_path)
-            symbol_layer_idx += 1
+        write_json(
+            symbol_dict, os.path.join(self.directory, f"{self.layer.name()}.json")
+        )
 
     def generate_category_symbols(self):
         # category id
@@ -66,22 +58,15 @@ class VectorLayer:
             self.export_shps_by_category(category, idx)
             # スタイルJsonを作成
             symbol = category.symbol()
-            symbol_layer_idx = 0
-            for symbol_layer in symbol:
-                symbol_dict = self.generate_symbol_dict(symbol, symbol_layer)
-                symbol_dict["legend"] = category.label()
 
-                if len(symbol) == 1:
-                    json_path = os.path.join(
-                        self.directory, f"{self.layer.name()}_{idx}.json"
-                    )
-                else:
-                    json_path = os.path.join(
-                        self.directory,
-                        f"{self.layer.name()}_{idx}_symbol_{symbol_layer_idx}.json",
-                    )
-                write_json(symbol_dict, json_path)
-                symbol_layer_idx += 1
+            symbol_dict = self.generate_symbol_dict(symbol)
+            symbol_dict["legend"] = category.label()
+
+            write_json(
+                symbol_dict,
+                os.path.join(self.directory, f"{self.layer.name()}_{idx}.json"),
+            )
+
             idx += 1
 
     def export_shps_by_category(self, category: QgsRendererCategory, idx: int):
@@ -173,65 +158,73 @@ class VectorLayer:
                 ),
             )
 
-    def generate_symbol_dict(self, symbol, symbol_layer):
-        symbol_type = symbol_layer.type()
-        symbol_dict = {}
-        # point
-        if symbol_type == 0:
-            pt_size = UnitConverter(symbol.size(), symbol.sizeUnit())
-            symbol_dict = {
-                "layer": self.layer_original_name,
-                "type": symbol_types[symbol_type],
-                "size": pt_size.convert_to_point(),
-                "fill_color": symbol.color().name(),
-                "outline_color": symbol_layer.strokeColor().name(),
-                "symbol_layer_type": symbol_layer.layerType()
-                .split("Marker")[0]
-                .lower(),
-                "symbol_path": "",
-            }
+    def generate_symbol_dict(self, symbol):
+        symbol_dict = {
+            "layer": self.layer_original_name,
+        }
+        symbol_list = []
+        for symbol_layer in symbol:
+            symbol_type = symbol_layer.type()
 
-            if symbol_layer.layerType() == "RasterMarker":
-                symbol_dict["outline_width"] = None
-                symbol_dict[
-                    "symbol_path"
-                ] = "assets/symbol_raster/" + self.export_raster_symbol(symbol_layer)
+            # point
+            if symbol_type == 0:
+                pt_size = UnitConverter(symbol.size(), symbol.sizeUnit())
+                symbol_layer_dict = {
+                    "type": symbol_types[symbol_type],
+                    "size": pt_size.convert_to_point(),
+                    "fill_color": symbol.color().name(),
+                    "outline_color": symbol_layer.strokeColor().name(),
+                    "symbol_layer_type": symbol_layer.layerType()
+                    .split("Marker")[0]
+                    .lower(),
+                    "symbol_path": "",
+                }
 
-            else:
+                if symbol_layer.layerType() == "RasterMarker":
+                    symbol_layer_dict["outline_width"] = None
+                    symbol_layer_dict[
+                        "symbol_path"
+                    ] = "assets/symbol_raster/" + self.export_raster_symbol(
+                        symbol_layer
+                    )
+
+                else:
+                    outline_size = UnitConverter(
+                        symbol_layer.strokeWidth(),
+                        symbol_layer.strokeWidthUnit(),
+                    )
+                    symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
+
+                if symbol_layer.layerType() == "SvgMarker":
+                    symbol_layer_dict[
+                        "symbol_path"
+                    ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol_layer)
+
+            # line
+            if symbol_type == 1:
+                line_size = UnitConverter(
+                    symbol_layer.width(), symbol_layer.widthUnit()
+                )
+                symbol_layer_dict = {
+                    "type": symbol_types[symbol_type],
+                    "color": symbol_layer.color().name(),
+                    "width": line_size.convert_to_point(),
+                }
+
+            # polygon
+            if symbol_type == 2:
                 outline_size = UnitConverter(
                     symbol_layer.strokeWidth(),
                     symbol_layer.strokeWidthUnit(),
                 )
-                symbol_dict["outline_width"] = outline_size.convert_to_point()
-
-            if symbol_layer.layerType() == "SvgMarker":
-                symbol_dict[
-                    "symbol_path"
-                ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol_layer)
-
-        # line
-        if symbol_type == 1:
-            line_size = UnitConverter(symbol_layer.width(), symbol_layer.widthUnit())
-            symbol_dict = {
-                "layer": self.layer_original_name,
-                "type": symbol_types[symbol_type],
-                "color": symbol_layer.color().name(),
-                "width": line_size.convert_to_point(),
-            }
-
-        # polygon
-        if symbol_type == 2:
-            outline_size = UnitConverter(
-                symbol_layer.strokeWidth(),
-                symbol_layer.strokeWidthUnit(),
-            )
-            symbol_dict = {
-                "layer": self.layer_original_name,
-                "type": symbol_types[symbol_type],
-                "fill_color": symbol_layer.fillColor().name(),
-                "outline_color": symbol_layer.strokeColor().name(),
-                "outline_width": outline_size.convert_to_point(),
-            }
+                symbol_layer_dict = {
+                    "type": symbol_types[symbol_type],
+                    "fill_color": symbol_layer.fillColor().name(),
+                    "outline_color": symbol_layer.strokeColor().name(),
+                    "outline_width": outline_size.convert_to_point(),
+                }
+            symbol_list.append(symbol_layer_dict)
+        symbol_dict["symbol"] = symbol_list
         return symbol_dict
 
     def export_svg_symbol(self, symbol_layer):
