@@ -168,7 +168,7 @@ class VectorLayer:
 
             # point
             if symbol_type == 0:
-                pt_size = UnitConverter(symbol.size(), symbol.sizeUnit())
+                pt_size = UnitConverter(symbol_layer.size(), symbol_layer.sizeUnit())
                 symbol_layer_dict = {
                     "type": symbol_types[symbol_type],
                     "size": pt_size.convert_to_point(),
