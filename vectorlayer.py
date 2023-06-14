@@ -172,7 +172,7 @@ class VectorLayer:
                 symbol_layer_dict = {
                     "type": symbol_types[symbol_type],
                     "size": pt_size.convert_to_point(),
-                    "fill_color": symbol.color().name(),
+                    "fill_color": symbol_layer.color().name(),
                     "outline_color": symbol_layer.strokeColor().name(),
                     "symbol_layer_type": symbol_layer.layerType()
                     .split("Marker")[0]
