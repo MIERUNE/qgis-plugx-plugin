@@ -92,15 +92,32 @@ class QGIS2PlugX_dialog(QDialog):
                     qml_path, categories=QgsMapLayer.Symbology | QgsMapLayer.Labeling
                 )
 
+                # Convert to Project CRS
+                reprojected = processing.run(
+                    "native:reprojectlayer",
+                    {
+                        "INPUT": layer,
+                        "TARGET_CRS": QgsProject.instance().crs(),
+                        "OUTPUT": "TEMPORARY_OUTPUT",
+                    },
+                )["OUTPUT"]
+
+                clip_extent = f"{extent.xMinimum()}, \
+                        {extent.xMaximum()}, \
+                        {extent.yMinimum()}, \
+                        {extent.yMaximum()}  \
+                        [{QgsProject.instance().crs().authid()}]"
+
                 layer_intersected = processing.run(
                     "native:extractbyextent",
                     {
-                        "INPUT": layer,
-                        "EXTENT": extent,
+                        "INPUT": reprojected,
+                        "EXTENT": clip_extent,
                         "CLIP": True,
                         "OUTPUT": "TEMPORARY_OUTPUT",
                     },
                 )["OUTPUT"]
+
                 layer_intersected.loadNamedStyle(qml_path)
                 if os.path.exists(qml_path):
                     os.remove(qml_path)
