@@ -25,8 +25,6 @@ class VectorLayer:
         layer: QgsVectorLayer,
         directory: str,
         layer_original_name: str,
-        svgs: list,
-        rasters: list,
     ):
         self.layer = layer
         self.renderer_type = layer.renderer().type()
@@ -35,8 +33,8 @@ class VectorLayer:
         self.symbols = []
         self.svgs_path = os.path.join(directory, "assets", "symbol_svg")
         self.rasters_path = os.path.join(directory, "assets", "symbol_raster")
-        self.svgs = svgs
-        self.rasters = rasters
+        self.svgs = []
+        self.rasters = []
 
     def generate_single_symbols(self):
         # SHPを出力
@@ -264,11 +262,9 @@ class VectorLayer:
             )
         return f"{raster_index}{os.path.splitext(symbol_layer.path())[1]}"
 
-    def update_svgs_list(self):
-        return self.svgs
-
-    def update_rasters_list(self):
-        return self.rasters
+    def update_svgs_rasters_list(self, rasters, svgs):
+        self.svgs = svgs
+        self.rasters = rasters
 
     def generate_symbols(self):
         if self.renderer_type == "categorizedSymbol":

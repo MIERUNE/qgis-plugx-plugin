@@ -127,14 +127,13 @@ class QGIS2PlugX_dialog(QDialog):
                 output_layer_names.append(layer_intersected.name())
 
                 # スタイル出力用のVectorLayerインスランスを作成する
-                vector_layer = VectorLayer(
-                    layer_intersected, output_dir, layer.name(), svgs, rasters
-                )
+                vector_layer = VectorLayer(layer_intersected, output_dir, layer.name())
 
                 # シンボロジごとのSHPとjsonを出力
+                vector_layer.update_svgs_rasters_list(rasters, svgs)
                 vector_layer.generate_symbols()
-                svgs = vector_layer.update_svgs_list()
-                rasters = vector_layer.update_rasters_list()
+                svgs = vector_layer.svgs
+                rasters = vector_layer.rasters
 
                 if vector_layer.layer.labelsEnabled():
                     vector_layer.generate_label_json(all_labels, layer.name())
