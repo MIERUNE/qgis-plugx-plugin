@@ -2,7 +2,6 @@ import os
 
 import processing
 from qgis.core import (
-    QgsProject,
     QgsRendererCategory,
     QgsVectorFileWriter,
     QgsVectorLayer,
