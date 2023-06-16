@@ -92,15 +92,32 @@ class QGIS2PlugX_dialog(QDialog):
                     qml_path, categories=QgsMapLayer.Symbology | QgsMapLayer.Labeling
                 )
 
+                # Convert to Project CRS
+                reprojected = processing.run(
+                    "native:reprojectlayer",
+                    {
+                        "INPUT": layer,
+                        "TARGET_CRS": QgsProject.instance().crs(),
+                        "OUTPUT": "TEMPORARY_OUTPUT",
+                    },
+                )["OUTPUT"]
+
+                clip_extent = f"{extent.xMinimum()}, \
+                        {extent.xMaximum()}, \
+                        {extent.yMinimum()}, \
+                        {extent.yMaximum()}  \
+                        [{QgsProject.instance().crs().authid()}]"
+
                 layer_intersected = processing.run(
                     "native:extractbyextent",
                     {
-                        "INPUT": layer,
-                        "EXTENT": extent,
+                        "INPUT": reprojected,
+                        "EXTENT": clip_extent,
                         "CLIP": True,
                         "OUTPUT": "TEMPORARY_OUTPUT",
                     },
                 )["OUTPUT"]
+
                 layer_intersected.loadNamedStyle(qml_path)
                 if os.path.exists(qml_path):
                     os.remove(qml_path)
@@ -110,14 +127,13 @@ class QGIS2PlugX_dialog(QDialog):
                 output_layer_names.append(layer_intersected.name())
 
                 # スタイル出力用のVectorLayerインスランスを作成する
-                vector_layer = VectorLayer(
-                    layer_intersected, output_dir, layer.name(), svgs, rasters
-                )
+                vector_layer = VectorLayer(layer_intersected, output_dir, layer.name())
 
                 # シンボロジごとのSHPとjsonを出力
+                vector_layer.update_svgs_rasters_list(rasters, svgs)
                 vector_layer.generate_symbols()
-                svgs = vector_layer.update_svgs_list()
-                rasters = vector_layer.update_rasters_list()
+                svgs = vector_layer.svgs
+                rasters = vector_layer.rasters
 
                 if vector_layer.layer.labelsEnabled():
                     vector_layer.generate_label_json(all_labels, layer.name())
