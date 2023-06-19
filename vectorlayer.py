@@ -187,7 +187,7 @@ class VectorLayer:
                     )
 
                 elif symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
-                    symbol_layer_dict["outline_width"] = None
+                    symbol_layer_dict["outline_width"] = 0
 
                 else:
                     outline_size = UnitConverter(
@@ -203,13 +203,17 @@ class VectorLayer:
 
             # line
             if symbol_type == 1:
-                line_size = UnitConverter(
-                    symbol_layer.width(), symbol_layer.widthUnit()
-                )
                 symbol_layer_dict = {
                     "color": symbol_layer.color().name(),
-                    "width": line_size.convert_to_point(),
                 }
+
+                if symbol_layer.penStyle() == Qt.PenStyle.NoPen:
+                    symbol_layer_dict["width"] = 0
+                else:
+                    line_size = UnitConverter(
+                        symbol_layer.width(), symbol_layer.widthUnit()
+                    )
+                    symbol_layer_dict["width"] = line_size.convert_to_point()
 
             # polygon
             if symbol_type == 2:
@@ -219,7 +223,7 @@ class VectorLayer:
                 }
 
                 if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
-                    symbol_layer_dict["outline_width"] = None
+                    symbol_layer_dict["outline_width"] = 0
                 else:
                     outline_size = UnitConverter(
                         symbol_layer.strokeWidth(),
