@@ -186,6 +186,16 @@ class VectorLayer:
                         symbol_layer
                     )
 
+                elif symbol_layer.layerType() == "SvgMarker":
+                    symbol_layer_dict[
+                        "symbol_path"
+                    ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol_layer)
+                    outline_size = UnitConverter(
+                        symbol_layer.strokeWidth(),
+                        symbol_layer.strokeWidthUnit(),
+                    )
+                    symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
+
                 elif symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
                     symbol_layer_dict["outline_width"] = 0
 
@@ -195,11 +205,6 @@ class VectorLayer:
                         symbol_layer.strokeWidthUnit(),
                     )
                     symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
-
-                if symbol_layer.layerType() == "SvgMarker":
-                    symbol_layer_dict[
-                        "symbol_path"
-                    ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol_layer)
 
             # line
             if symbol_type == 1:
