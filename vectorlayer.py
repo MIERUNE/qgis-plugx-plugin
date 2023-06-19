@@ -2,7 +2,6 @@ import os
 
 import processing
 from qgis.core import (
-    QgsProject,
     QgsRendererCategory,
     QgsVectorFileWriter,
     QgsVectorLayer,
@@ -76,7 +75,7 @@ class VectorLayer:
             "UTF-8",
             self.layer.fields(),
             self.layer.wkbType(),
-            QgsProject.instance().crs(),
+            self.layer.crs(),
             "ESRI Shapefile",
         )
         output_layer.addFeatures(features)
@@ -89,7 +88,7 @@ class VectorLayer:
             "UTF-8",
             self.layer.fields(),
             self.layer.wkbType(),
-            QgsProject.instance().crs(),
+            self.layer.crs(),
             "ESRI Shapefile",
         )
         output_layer.addFeatures(self.layer.getFeatures())
@@ -160,6 +159,7 @@ class VectorLayer:
         symbol_dict = {
             "layer": self.layer_original_name,
             "type": symbol_types[symbol.type()],
+            "crs": self.layer.crs().authid(),
         }
         symbol_list = []
         for symbol_layer in symbol:
