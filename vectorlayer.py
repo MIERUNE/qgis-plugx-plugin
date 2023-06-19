@@ -6,7 +6,7 @@ from qgis.core import (
     QgsVectorFileWriter,
     QgsVectorLayer,
 )
-
+from PyQt5.QtCore import Qt
 from unit_converter import UnitConverter
 from utils import write_json
 import shutil
@@ -186,6 +186,9 @@ class VectorLayer:
                         symbol_layer
                     )
 
+                elif symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
+                    symbol_layer_dict["outline_width"] = None
+
                 else:
                     outline_size = UnitConverter(
                         symbol_layer.strokeWidth(),
@@ -210,15 +213,20 @@ class VectorLayer:
 
             # polygon
             if symbol_type == 2:
-                outline_size = UnitConverter(
-                    symbol_layer.strokeWidth(),
-                    symbol_layer.strokeWidthUnit(),
-                )
                 symbol_layer_dict = {
                     "fill_color": symbol_layer.fillColor().name(),
                     "outline_color": symbol_layer.strokeColor().name(),
-                    "outline_width": outline_size.convert_to_point(),
                 }
+
+                if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
+                    symbol_layer_dict["outline_width"] = None
+                else:
+                    outline_size = UnitConverter(
+                        symbol_layer.strokeWidth(),
+                        symbol_layer.strokeWidthUnit(),
+                    )
+                    symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
+
             symbol_list.append(symbol_layer_dict)
         symbol_dict["symbol"] = symbol_list
         return symbol_dict
