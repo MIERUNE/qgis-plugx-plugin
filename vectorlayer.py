@@ -6,7 +6,7 @@ from qgis.core import (
     QgsVectorFileWriter,
     QgsVectorLayer,
 )
-
+from PyQt5.QtCore import Qt
 from unit_converter import UnitConverter
 from utils import write_json
 import shutil
@@ -186,6 +186,19 @@ class VectorLayer:
                         symbol_layer
                     )
 
+                elif symbol_layer.layerType() == "SvgMarker":
+                    symbol_layer_dict[
+                        "symbol_path"
+                    ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol_layer)
+                    outline_size = UnitConverter(
+                        symbol_layer.strokeWidth(),
+                        symbol_layer.strokeWidthUnit(),
+                    )
+                    symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
+
+                elif symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
+                    symbol_layer_dict["outline_width"] = 0
+
                 else:
                     outline_size = UnitConverter(
                         symbol_layer.strokeWidth(),
@@ -193,32 +206,36 @@ class VectorLayer:
                     )
                     symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
 
-                if symbol_layer.layerType() == "SvgMarker":
-                    symbol_layer_dict[
-                        "symbol_path"
-                    ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol_layer)
-
             # line
             if symbol_type == 1:
-                line_size = UnitConverter(
-                    symbol_layer.width(), symbol_layer.widthUnit()
-                )
                 symbol_layer_dict = {
                     "color": symbol_layer.color().name(),
-                    "width": line_size.convert_to_point(),
                 }
+
+                if symbol_layer.penStyle() == Qt.PenStyle.NoPen:
+                    symbol_layer_dict["width"] = 0
+                else:
+                    line_size = UnitConverter(
+                        symbol_layer.width(), symbol_layer.widthUnit()
+                    )
+                    symbol_layer_dict["width"] = line_size.convert_to_point()
 
             # polygon
             if symbol_type == 2:
-                outline_size = UnitConverter(
-                    symbol_layer.strokeWidth(),
-                    symbol_layer.strokeWidthUnit(),
-                )
                 symbol_layer_dict = {
                     "fill_color": symbol_layer.fillColor().name(),
                     "outline_color": symbol_layer.strokeColor().name(),
-                    "outline_width": outline_size.convert_to_point(),
                 }
+
+                if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
+                    symbol_layer_dict["outline_width"] = 0
+                else:
+                    outline_size = UnitConverter(
+                        symbol_layer.strokeWidth(),
+                        symbol_layer.strokeWidthUnit(),
+                    )
+                    symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
+
             symbol_list.append(symbol_layer_dict)
         symbol_dict["symbol"] = symbol_list
         return symbol_dict
