@@ -223,20 +223,55 @@ class VectorLayer:
 
             # polygon
             if symbol_type == 2:
+                # default attributes
                 symbol_layer_dict = {
+                    "fill_type": symbol_layer.layerType(),
                     "fill_color": symbol_layer.fillColor().name(),
-                    "outline_color": symbol_layer.strokeColor().name(),
                 }
 
-                if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
-                    symbol_layer_dict["outline_width"] = 0
-                else:
-                    outline_size = UnitConverter(
-                        symbol_layer.strokeWidth(),
-                        symbol_layer.strokeWidthUnit(),
-                    )
-                    symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
+                # Case of simple fill
+                if symbol_layer.layerType() == "SimpleFill":
+                    symbol_layer_dict[
+                        "outline_color"
+                    ] = symbol_layer.strokeColor().name()
 
+                    if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
+                        symbol_layer_dict["outline_width"] = 0
+                    else:
+                        outline_size = UnitConverter(
+                            symbol_layer.strokeWidth(),
+                            symbol_layer.strokeWidthUnit(),
+                        )
+                        symbol_layer_dict[
+                            "outline_width"
+                        ] = outline_size.convert_to_point()
+
+                # Case of geometry fill, simple fill with color of first symbol layer of geometry
+                if symbol_layer.layerType() in [
+                    "CentroidFill",
+                    "PointPatternFill",
+                    "RandomMarkerFill",
+                    "LinePatternFill",
+                ]:
+                    symbol_layer_dict["fill_color"] = (
+                        symbol_layer.subSymbol().symbolLayer(0).color().name()
+                    )
+
+                # Case of SVG fill, simple fill with SVG color
+                if symbol_layer.layerType() == "SVGFill":
+                    symbol_layer_dict["fill_color"] = symbol_layer.svgFillColor().name()
+
+                # Case of line pattern, simple fill with line color
+                if symbol_layer.layerType() in ["GradientFill", "ShapeburstFill"]:
+                    symbol_layer_dict["fill_color"] = symbol_layer.color().name()
+                print(symbol_layer_dict)
+
+            # hybrid
+            if symbol_type == 3:
+                symbol_layer_dict = {
+                    "fill_type": symbol_layer.layerType(),
+                    "fill_color": symbol_layer.fillColor().name(),
+                }
             symbol_list.append(symbol_layer_dict)
         symbol_dict["symbol"] = symbol_list
         return symbol_dict
