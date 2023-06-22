@@ -257,7 +257,7 @@ class VectorLayer:
                             "outline_width"
                         ] = outline_size.convert_to_point()
 
-                # Case of geometry fill, simple fill with color of first symbol layer of geometry
+                # Turn in simple fill with first symbol layer color
                 if symbol_layer.layerType() in [
                     "CentroidFill",
                     "PointPatternFill",
