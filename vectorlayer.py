@@ -187,7 +187,7 @@ class VectorLayer:
                         symbol_layer
                     )
 
-                elif symbol_layer.layerType() == "SvgMarker":
+                if symbol_layer.layerType() == "SvgMarker":
                     symbol_layer_dict[
                         "symbol_path"
                     ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol_layer)
@@ -197,15 +197,17 @@ class VectorLayer:
                     )
                     symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
 
-                elif symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
-                    symbol_layer_dict["outline_width"] = 0
-
-                else:
-                    outline_size = UnitConverter(
-                        symbol_layer.strokeWidth(),
-                        symbol_layer.strokeWidthUnit(),
-                    )
-                    symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
+                if symbol_layer.layerType() == "SimpleMarker":
+                    if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
+                        symbol_layer_dict["outline_width"] = 0
+                    else:
+                        outline_size = UnitConverter(
+                            symbol_layer.strokeWidth(),
+                            symbol_layer.strokeWidthUnit(),
+                        )
+                        symbol_layer_dict[
+                            "outline_width"
+                        ] = outline_size.convert_to_point()
 
             # line
             if symbol_type == 1:
@@ -277,11 +279,15 @@ class VectorLayer:
             # hybrid
             if symbol_type == 3:
                 symbol_layer_dict = {
-                    "type": symbol_layer.layerType().lower(),
+                    "symbol_layer_type": symbol_layer.layerType().lower(),
                     "color": symbol_layer.color().name(),
                     "geometry": symbol_layer.geometryExpression(),
                 }
-
+            # if symbol layer type splitted name is empty retrieve original one
+            if len(symbol_layer_dict["symbol_layer_type"]) == 0:
+                symbol_layer_dict[
+                    "symbol_layer_type"
+                ] = symbol_layer.layerType().lower()
             symbol_list.append(symbol_layer_dict)
         symbol_dict["symbol"] = symbol_list
         return symbol_dict
