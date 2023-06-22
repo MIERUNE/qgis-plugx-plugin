@@ -209,17 +209,22 @@ class VectorLayer:
 
             # line
             if symbol_type == 1:
+                line_size = UnitConverter(
+                    symbol_layer.width(), symbol_layer.widthUnit()
+                )
+
+                # default attributes
                 symbol_layer_dict = {
+                    "line_type": symbol_layer.layerType(),
                     "color": symbol_layer.color().name(),
+                    "width": line_size.convert_to_point(),
                 }
 
-                if symbol_layer.penStyle() == Qt.PenStyle.NoPen:
+                if (
+                    symbol_layer.layerType() == "SimpleLine"
+                    and symbol_layer.penStyle() == Qt.PenStyle.NoPen
+                ):
                     symbol_layer_dict["width"] = 0
-                else:
-                    line_size = UnitConverter(
-                        symbol_layer.width(), symbol_layer.widthUnit()
-                    )
-                    symbol_layer_dict["width"] = line_size.convert_to_point()
 
             # polygon
             if symbol_type == 2:
@@ -264,14 +269,15 @@ class VectorLayer:
                 # Case of line pattern, simple fill with line color
                 if symbol_layer.layerType() in ["GradientFill", "ShapeburstFill"]:
                     symbol_layer_dict["fill_color"] = symbol_layer.color().name()
-                print(symbol_layer_dict)
 
             # hybrid
             if symbol_type == 3:
                 symbol_layer_dict = {
-                    "fill_type": symbol_layer.layerType(),
-                    "fill_color": symbol_layer.fillColor().name(),
+                    "type": symbol_layer.layerType(),
+                    "color": symbol_layer.color().name(),
+                    "geometry": symbol_layer.geometryExpression(),
                 }
+
             symbol_list.append(symbol_layer_dict)
         symbol_dict["symbol"] = symbol_list
         return symbol_dict
