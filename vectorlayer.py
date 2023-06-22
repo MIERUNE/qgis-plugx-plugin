@@ -5,6 +5,7 @@ from qgis.core import (
     QgsRendererCategory,
     QgsVectorFileWriter,
     QgsVectorLayer,
+    QgsProject,
 )
 from PyQt5.QtCore import Qt
 from unit_converter import UnitConverter
@@ -75,7 +76,7 @@ class VectorLayer:
             "UTF-8",
             self.layer.fields(),
             self.layer.wkbType(),
-            self.layer.crs(),
+            QgsProject.instance().crs(),
             "ESRI Shapefile",
         )
         output_layer.addFeatures(features)
@@ -88,7 +89,7 @@ class VectorLayer:
             "UTF-8",
             self.layer.fields(),
             self.layer.wkbType(),
-            self.layer.crs(),
+            QgsProject.instance().crs(),
             "ESRI Shapefile",
         )
         output_layer.addFeatures(self.layer.getFeatures())
