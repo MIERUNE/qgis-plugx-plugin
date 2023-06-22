@@ -215,7 +215,9 @@ class VectorLayer:
 
                 # default attributes
                 symbol_layer_dict = {
-                    "line_type": symbol_layer.layerType(),
+                    "symbol_layer_type": symbol_layer.layerType()
+                    .split("Line")[0]
+                    .lower(),
                     "color": symbol_layer.color().name(),
                     "width": line_size.convert_to_point(),
                 }
@@ -230,7 +232,9 @@ class VectorLayer:
             if symbol_type == 2:
                 # default attributes
                 symbol_layer_dict = {
-                    "fill_type": symbol_layer.layerType(),
+                    "symbol_layer_type": symbol_layer.layerType()
+                    .split("Fill")[0]
+                    .lower(),
                     "fill_color": symbol_layer.fillColor().name(),
                 }
 
@@ -273,7 +277,7 @@ class VectorLayer:
             # hybrid
             if symbol_type == 3:
                 symbol_layer_dict = {
-                    "type": symbol_layer.layerType(),
+                    "type": symbol_layer.layerType().lower(),
                     "color": symbol_layer.color().name(),
                     "geometry": symbol_layer.geometryExpression(),
                 }
