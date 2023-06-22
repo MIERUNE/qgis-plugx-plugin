@@ -278,7 +278,7 @@ class RasterLayer:
         raster_info = {
             "layer": self.layer.name(),
             "type": "raster",
-            "crs": self.layer.crs().authid(),
+            "crs": QgsProject.instance().crs().authid(),
             "extent": [
                 self.extent.xMinimum(),
                 self.extent.yMinimum(),

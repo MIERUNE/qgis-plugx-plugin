@@ -92,6 +92,15 @@ class QGIS2PlugX_dialog(QDialog):
                     qml_path, categories=QgsMapLayer.Symbology | QgsMapLayer.Labeling
                 )
 
+                reprojected = processing.run(
+                    "native:reprojectlayer",
+                    {
+                        "INPUT": layer,
+                        "TARGET_CRS": QgsProject.instance().crs(),
+                        "OUTPUT": "TEMPORARY_OUTPUT",
+                    },
+                )["OUTPUT"]
+
                 clip_extent = f"{extent.xMinimum()}, \
                         {extent.xMaximum()}, \
                         {extent.yMinimum()}, \
@@ -101,7 +110,7 @@ class QGIS2PlugX_dialog(QDialog):
                 layer_intersected = processing.run(
                     "native:extractbyextent",
                     {
-                        "INPUT": layer,
+                        "INPUT": reprojected,
                         "EXTENT": clip_extent,
                         "CLIP": True,
                         "OUTPUT": "TEMPORARY_OUTPUT",
