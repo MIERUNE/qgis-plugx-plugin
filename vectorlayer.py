@@ -291,7 +291,7 @@ class VectorLayer:
                 symbol_layer_dict = {
                     "symbol_layer_type": symbol_layer.layerType().lower(),
                     "color": symbol_layer.color().name(),
-                    "geometry": symbol_layer.geometryExpression(),
+                    # "geometry": symbol_layer.geometryExpression(),
                 }
 
             # if symbol layer type splitted name is empty retrieve original one
