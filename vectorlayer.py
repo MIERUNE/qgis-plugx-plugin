@@ -8,6 +8,7 @@ from qgis.core import (
     QgsProject,
 )
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMessageBox
 from unit_converter import UnitConverter
 from utils import write_json
 import shutil
@@ -17,6 +18,15 @@ symbol_types = {
     1: "line",
     2: "polygon",
 }
+
+# 対象してるシンボルタイプ
+target_symbol_layers = [
+    "SimpleMarker",
+    "RasterMarker",
+    "SvgMarker",
+    "SimpleLine",
+    "SimpleFill",
+]
 
 
 class VectorLayer:
@@ -283,11 +293,28 @@ class VectorLayer:
                     "color": symbol_layer.color().name(),
                     "geometry": symbol_layer.geometryExpression(),
                 }
+
             # if symbol layer type splitted name is empty retrieve original one
             if len(symbol_layer_dict["symbol_layer_type"]) == 0:
                 symbol_layer_dict[
                     "symbol_layer_type"
                 ] = symbol_layer.layerType().lower()
+
+            # turn to simple for unimplemented symbol types
+            if symbol_layer.layerType() not in target_symbol_layers:
+                message = (
+                    "以下のシンボルが対象外で、シンプルシンボルに変換します。"
+                    + f"\n\nレイヤ名: {self.layer_original_name}\n"
+                    + f"出力レイヤ名: {self.layer.name()}\n"
+                    + f'シンボル種類: {symbol_layer_dict["symbol_layer_type"]}'
+                )
+                QMessageBox.information(
+                    None,
+                    "Warning",
+                    message,
+                )
+                symbol_layer_dict["symbol_layer_type"] = "simple"
+
             symbol_list.append(symbol_layer_dict)
         symbol_dict["symbol"] = symbol_list
         return symbol_dict
