@@ -31,10 +31,10 @@ target_symbol_layers = [
 
 class VectorLayer:
     def __init__(
-        self,
-        layer: QgsVectorLayer,
-        directory: str,
-        layer_original_name: str,
+            self,
+            layer: QgsVectorLayer,
+            directory: str,
+            layer_original_name: str,
     ):
         self.layer = layer
         self.renderer_type = layer.renderer().type()
@@ -45,6 +45,8 @@ class VectorLayer:
         self.rasters_path = os.path.join(directory, "assets", "symbol_raster")
         self.svgs = []
         self.rasters = []
+
+        self.unsupported_symbols: bool = False
 
     def generate_single_symbols(self):
         # SHPを出力
@@ -235,8 +237,8 @@ class VectorLayer:
                 }
 
                 if (
-                    symbol_layer.layerType() == "SimpleLine"
-                    and symbol_layer.penStyle() == Qt.PenStyle.NoPen
+                        symbol_layer.layerType() == "SimpleLine"
+                        and symbol_layer.penStyle() == Qt.PenStyle.NoPen
                 ):
                     symbol_layer_dict["width"] = 0
 
@@ -302,17 +304,7 @@ class VectorLayer:
 
             # turn to simple for unimplemented symbol types
             if symbol_layer.layerType() not in target_symbol_layers:
-                message = (
-                    "以下のシンボルが対象外で、シンプルシンボルに変換します。"
-                    + f"\n\nレイヤ名: {self.layer_original_name}\n"
-                    + f"出力レイヤ名: {self.layer.name()}\n"
-                    + f'シンボル種類: {symbol_layer_dict["symbol_layer_type"]}'
-                )
-                QMessageBox.information(
-                    None,
-                    "Warning",
-                    message,
-                )
+                self.unsupported_symbols = True
                 symbol_layer_dict["symbol_layer_type"] = "simple"
 
             symbol_list.append(symbol_layer_dict)
