@@ -25,20 +25,20 @@ class QGIS2PlugX_dialog(QDialog):
             os.path.join(os.path.dirname(__file__), "QGIS2PlugX_dialog.ui"), self
         )
 
-        self.ui.pushButton_run.clicked.connect(self.run)
-        self.ui.pushButton_cancel.clicked.connect(self.close)
-        self.ui.mExtentGroupBox.setCurrentExtent(
-            iface.mapCanvas().extent(), QgsProject.instance().crs()
-        )
-        self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
-        self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
+        self.init_ui()
 
         # レイヤー一覧を作成する
         self.load_layer_list()
-        # レイヤーの追加・削除に反応して一覧を更新する
-        QgsProject().instance().layerTreeRoot().layerOrderChanged.connect(
-            self.load_layer_list
-        )
+
+    def init_ui(self):
+        # connect signals
+        self.ui.pushButton_run.clicked.connect(self.run)
+        self.ui.pushButton_cancel.clicked.connect(self.close)
+
+        # QgsExtentGroupBox
+        self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
+        self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
+        self.ui.mExtentGroupBox.setOutputExtentFromCurrent()
 
     def load_layer_list(self):
         self.layerListWidget.clear()
