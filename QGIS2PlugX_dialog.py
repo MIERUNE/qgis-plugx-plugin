@@ -27,9 +27,6 @@ class QGIS2PlugX_dialog(QDialog):
 
         self.init_ui()
 
-        # レイヤー一覧を作成する
-        self.load_layer_list()
-
     def init_ui(self):
         # connect signals
         self.ui.pushButton_run.clicked.connect(self.run)
@@ -39,6 +36,14 @@ class QGIS2PlugX_dialog(QDialog):
         self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
         self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
         self.ui.mExtentGroupBox.setOutputExtentFromCurrent()
+
+        # レイヤーが追加されるなど、レイヤー一覧が変更されたときに更新する
+        QgsProject.instance().layerTreeRoot().layerOrderChanged.connect(
+            self.load_layer_list
+        )
+        QgsProject.instance().layerRemoved.connect(self.load_layer_list)
+        QgsProject.instance().layersAdded.connect(self.load_layer_list)
+        self.load_layer_list()  # 初回読み込み
 
     def load_layer_list(self):
         self.layerListWidget.clear()
