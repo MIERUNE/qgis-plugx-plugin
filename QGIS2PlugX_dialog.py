@@ -6,8 +6,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QListWidgetItem, QMessageBox
 from qgis.core import (
     QgsMapLayer,
-    QgsProject,
     QgsMapLayerModel,
+    QgsProject,
     QgsRasterLayer,
     QgsVectorLayer,
 )
@@ -84,6 +84,8 @@ class QGIS2PlugX_dialog(QDialog):
         svgs = []
         rasters = []
 
+        symbol_error_layers: list = []
+
         for layer in layers:
             if isinstance(layer, QgsVectorLayer):
                 # 指定範囲内の地物を抽出し、元のスタイルを適用する
@@ -136,6 +138,8 @@ class QGIS2PlugX_dialog(QDialog):
 
                 if vector_layer.layer.labelsEnabled():
                     vector_layer.generate_label_json(all_labels, layer.name())
+                if vector_layer.unsupported_symbols:
+                    symbol_error_layers.append(layer.name())
 
             elif isinstance(layer, QgsRasterLayer):
                 output_layer_name = f"layer_{layers.index(layer)}"
@@ -145,11 +149,18 @@ class QGIS2PlugX_dialog(QDialog):
                 output_layer_names.append(output_layer_name)
 
         self.write_project_json(output_layer_names)
+
+        msg = f"処理が完了しました。\n\n出力先:\n{output_dir}"
+
+        if symbol_error_layers:
+            msg += "\n\n以下レイヤに対応不可なシンボロジがあるため、\nシンプルシンボルに変換しました。\n" + "\n".join(
+                symbol_error_layers
+            )
+
         QMessageBox.information(
             None,
             "完了",
-            f"処理が完了しました。\
-            \n\n出力先:\n{output_dir}",
+            msg,
         )
 
     def write_project_json(self, output_layer_names: list):
