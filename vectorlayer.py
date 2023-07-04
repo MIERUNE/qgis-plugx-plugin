@@ -1,21 +1,32 @@
 import os
+import shutil
 
 import processing
+from PyQt5.QtCore import Qt
 from qgis.core import (
+    QgsProject,
     QgsRendererCategory,
     QgsVectorFileWriter,
     QgsVectorLayer,
 )
-from PyQt5.QtCore import Qt
+
 from unit_converter import UnitConverter
 from utils import write_json
-import shutil
 
 symbol_types = {
     0: "point",
     1: "line",
     2: "polygon",
 }
+
+# 対象してるシンボルタイプ
+target_symbol_layers = [
+    "SimpleMarker",
+    "RasterMarker",
+    "SvgMarker",
+    "SimpleLine",
+    "SimpleFill",
+]
 
 
 class VectorLayer:
@@ -34,6 +45,8 @@ class VectorLayer:
         self.rasters_path = os.path.join(directory, "assets", "symbol_raster")
         self.svgs = []
         self.rasters = []
+
+        self.unsupported_symbols: bool = False
 
     def generate_single_symbols(self):
         # SHPを出力
@@ -75,7 +88,7 @@ class VectorLayer:
             "UTF-8",
             self.layer.fields(),
             self.layer.wkbType(),
-            self.layer.crs(),
+            QgsProject.instance().crs(),
             "ESRI Shapefile",
         )
         output_layer.addFeatures(features)
@@ -88,7 +101,7 @@ class VectorLayer:
             "UTF-8",
             self.layer.fields(),
             self.layer.wkbType(),
-            self.layer.crs(),
+            QgsProject.instance().crs(),
             "ESRI Shapefile",
         )
         output_layer.addFeatures(self.layer.getFeatures())
@@ -186,7 +199,7 @@ class VectorLayer:
                         symbol_layer
                     )
 
-                elif symbol_layer.layerType() == "SvgMarker":
+                if symbol_layer.layerType() == "SvgMarker":
                     symbol_layer_dict[
                         "symbol_path"
                     ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol_layer)
@@ -196,45 +209,103 @@ class VectorLayer:
                     )
                     symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
 
-                elif symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
-                    symbol_layer_dict["outline_width"] = 0
-
-                else:
-                    outline_size = UnitConverter(
-                        symbol_layer.strokeWidth(),
-                        symbol_layer.strokeWidthUnit(),
-                    )
-                    symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
+                if symbol_layer.layerType() == "SimpleMarker":
+                    if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
+                        symbol_layer_dict["outline_width"] = 0
+                    else:
+                        outline_size = UnitConverter(
+                            symbol_layer.strokeWidth(),
+                            symbol_layer.strokeWidthUnit(),
+                        )
+                        symbol_layer_dict[
+                            "outline_width"
+                        ] = outline_size.convert_to_point()
 
             # line
             if symbol_type == 1:
+                line_size = UnitConverter(
+                    symbol_layer.width(), symbol_layer.widthUnit()
+                )
+
+                # default attributes
                 symbol_layer_dict = {
+                    "symbol_layer_type": symbol_layer.layerType()
+                    .split("Line")[0]
+                    .lower(),
                     "color": symbol_layer.color().name(),
+                    "width": line_size.convert_to_point(),
                 }
 
-                if symbol_layer.penStyle() == Qt.PenStyle.NoPen:
+                if (
+                    symbol_layer.layerType() == "SimpleLine"
+                    and symbol_layer.penStyle() == Qt.PenStyle.NoPen
+                ):
                     symbol_layer_dict["width"] = 0
-                else:
-                    line_size = UnitConverter(
-                        symbol_layer.width(), symbol_layer.widthUnit()
-                    )
-                    symbol_layer_dict["width"] = line_size.convert_to_point()
 
             # polygon
             if symbol_type == 2:
+                # default attributes
                 symbol_layer_dict = {
+                    "symbol_layer_type": symbol_layer.layerType()
+                    .split("Fill")[0]
+                    .lower(),
                     "fill_color": symbol_layer.fillColor().name(),
-                    "outline_color": symbol_layer.strokeColor().name(),
                 }
 
-                if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
-                    symbol_layer_dict["outline_width"] = 0
-                else:
-                    outline_size = UnitConverter(
-                        symbol_layer.strokeWidth(),
-                        symbol_layer.strokeWidthUnit(),
+                # Case of simple fill
+                if symbol_layer.layerType() == "SimpleFill":
+                    symbol_layer_dict[
+                        "outline_color"
+                    ] = symbol_layer.strokeColor().name()
+
+                    if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
+                        symbol_layer_dict["outline_width"] = 0
+                    else:
+                        outline_size = UnitConverter(
+                            symbol_layer.strokeWidth(),
+                            symbol_layer.strokeWidthUnit(),
+                        )
+                        symbol_layer_dict[
+                            "outline_width"
+                        ] = outline_size.convert_to_point()
+
+                # Turn in simple fill with first symbol layer color
+                if symbol_layer.layerType() in [
+                    "CentroidFill",
+                    "PointPatternFill",
+                    "RandomMarkerFill",
+                    "LinePatternFill",
+                ]:
+                    symbol_layer_dict["fill_color"] = (
+                        symbol_layer.subSymbol().symbolLayer(0).color().name()
                     )
-                    symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
+
+                # Case of SVG fill, simple fill with SVG color
+                if symbol_layer.layerType() == "SVGFill":
+                    symbol_layer_dict["fill_color"] = symbol_layer.svgFillColor().name()
+
+                # Case of line pattern, simple fill with line color
+                if symbol_layer.layerType() in ["GradientFill", "ShapeburstFill"]:
+                    symbol_layer_dict["fill_color"] = symbol_layer.color().name()
+
+            # hybrid
+            if symbol_type == 3:
+                symbol_layer_dict = {
+                    "symbol_layer_type": symbol_layer.layerType().lower(),
+                    "color": symbol_layer.color().name(),
+                    # "geometry": symbol_layer.geometryExpression(),
+                }
+
+            # if symbol layer type splitted name is empty retrieve original one
+            if len(symbol_layer_dict["symbol_layer_type"]) == 0:
+                symbol_layer_dict[
+                    "symbol_layer_type"
+                ] = symbol_layer.layerType().lower()
+
+            # turn to simple for unimplemented symbol types
+            if symbol_layer.layerType() not in target_symbol_layers:
+                self.unsupported_symbols = True
+                symbol_layer_dict["symbol_layer_type"] = "simple"
 
             symbol_list.append(symbol_layer_dict)
         symbol_dict["symbol"] = symbol_list
