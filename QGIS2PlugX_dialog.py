@@ -243,7 +243,10 @@ class QGIS2PlugX_dialog(QDialog):
                 | Qt.ItemFlag.ItemIsUserCheckable
                 | Qt.ItemFlag.ItemIsAutoTristate
             )
-            item.setCheckState(0, Qt.CheckState.Checked)
+            item.setCheckState(
+                0,
+                Qt.CheckState.Checked if child.isVisible() else Qt.CheckState.Unchecked,
+            )
 
             # Move group or layer to its parent node
             if not parent_node:
