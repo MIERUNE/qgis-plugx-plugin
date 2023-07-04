@@ -6,8 +6,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QListWidgetItem, QMessageBox
 from qgis.core import (
     QgsMapLayer,
-    QgsProject,
     QgsMapLayerModel,
+    QgsProject,
     QgsRasterLayer,
     QgsVectorLayer,
 )
@@ -44,7 +44,7 @@ class QGIS2PlugX_dialog(QDialog):
         self.layerListWidget.clear()
         for layer in QgsProject().instance().layerTreeRoot().layerOrder():
             if not isinstance(layer, QgsRasterLayer) and not isinstance(
-                    layer, QgsVectorLayer
+                layer, QgsVectorLayer
             ):
                 # ラスター、ベクター以外はスキップ: PointCloudLayer, MeshLayer, ...
                 continue
@@ -153,7 +153,9 @@ class QGIS2PlugX_dialog(QDialog):
         msg = f"処理が完了しました。\n\n出力先:\n{output_dir}"
 
         if symbol_error_layers:
-            msg += "\n\n以下レイヤに対応不可なシンボロジがあるため、\nシンプルシンボルに変換しました。\n" + '\n'.join(symbol_error_layers)
+            msg += "\n\n以下レイヤに対応不可なシンボロジがあるため、\nシンプルシンボルに変換しました。\n" + "\n".join(
+                symbol_error_layers
+            )
 
         QMessageBox.information(
             None,
@@ -183,7 +185,7 @@ class QGIS2PlugX_dialog(QDialog):
         }
         # project.jsonを出力
         with open(
-                os.path.join(self.ui.outputFileWidget.filePath(), "project.json"), mode="w"
+            os.path.join(self.ui.outputFileWidget.filePath(), "project.json"), mode="w"
         ) as f:
             json.dump(project_json, f, ensure_ascii=False)
 

@@ -1,17 +1,17 @@
 import os
+import shutil
 
 import processing
+from PyQt5.QtCore import Qt
 from qgis.core import (
+    QgsProject,
     QgsRendererCategory,
     QgsVectorFileWriter,
     QgsVectorLayer,
-    QgsProject,
 )
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMessageBox
+
 from unit_converter import UnitConverter
 from utils import write_json
-import shutil
 
 symbol_types = {
     0: "point",
@@ -31,10 +31,10 @@ target_symbol_layers = [
 
 class VectorLayer:
     def __init__(
-            self,
-            layer: QgsVectorLayer,
-            directory: str,
-            layer_original_name: str,
+        self,
+        layer: QgsVectorLayer,
+        directory: str,
+        layer_original_name: str,
     ):
         self.layer = layer
         self.renderer_type = layer.renderer().type()
@@ -237,8 +237,8 @@ class VectorLayer:
                 }
 
                 if (
-                        symbol_layer.layerType() == "SimpleLine"
-                        and symbol_layer.penStyle() == Qt.PenStyle.NoPen
+                    symbol_layer.layerType() == "SimpleLine"
+                    and symbol_layer.penStyle() == Qt.PenStyle.NoPen
                 ):
                     symbol_layer_dict["width"] = 0
 
