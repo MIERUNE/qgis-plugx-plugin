@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>515</width>
-    <height>582</height>
+    <width>448</width>
+    <height>661</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,12 +17,18 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>レイヤー一覧</string>
+      <string>レイヤー設定</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QTreeWidget" name="layerTree">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>320</height>
+      </size>
+     </property>
      <column>
       <property name="text">
        <string notr="true">1</string>
@@ -31,7 +37,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QListWidget" name="layerListWidget"/>
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>マップ設定</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QgsExtentGroupBox" name="mExtentGroupBox"/>

@@ -17,7 +17,6 @@ from qgis.core import (
     QgsLayerTreeLayer,
     QgsApplication,
     QgsMapLayerType,
-    QgsWkbTypes,
 )
 from qgis.PyQt import uic
 from qgis.utils import iface
@@ -41,7 +40,6 @@ class QGIS2PlugX_dialog(QDialog):
         self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
         self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
 
-        self.layerSettingsDic = {}
         """layerId:setting という構造の辞書"""
         self.process_node(QgsProject.instance().layerTreeRoot(), None)
 
@@ -161,7 +159,21 @@ class QGIS2PlugX_dialog(QDialog):
 
     def get_checked_layers(self):
         layers = []
-        # TODO: implement
+        # QTreeWidgetの子要素を再帰的に取得する
+        for i in range(self.layerTree.topLevelItemCount()):
+            item = self.layerTree.topLevelItem(i)
+            layers.extend(self.get_checked_layers_recursive(item))
+        return layers
+
+    def get_checked_layers_recursive(self, item):
+        layers = []
+        if item.checkState(0) == Qt.CheckState.Checked:
+            layer = QgsProject.instance().mapLayer(item.text(1))
+            if layer:
+                layers.append(layer)
+        for i in range(item.childCount()):
+            child_item = item.child(i)
+            layers.extend(self.get_checked_layers_recursive(child_item))
         return layers
 
     def process_node(self, node, parent_node):
@@ -184,36 +196,27 @@ class QGIS2PlugX_dialog(QDialog):
                     child = sip.cast(child, QgsLayerTreeGroup)
                 child_type = "group"
                 child_icon = QIcon(QgsApplication.iconPath("mActionFolder.svg"))
+                child_id = ""
 
             elif QgsLayerTree.isLayer(child):
                 if not isinstance(child, QgsLayerTreeLayer):
                     # Sip cast issue , Lizmap plugin #299
                     child = sip.cast(child, QgsLayerTreeLayer)
-                child_id = child.layerId()
                 child_type = "layer"
                 child_icon = QgsMapLayerModel.iconForLayer(child.layer())
+                child_id = child.layer().id()
 
-                if child.layer().type() == QgsMapLayerType.VectorLayer:
-                    if child.layer().geometryType() == QgsWkbTypes.PointGeometry:
-                        layer_type = "point"
-                    elif child.layer().geometryType() == QgsWkbTypes.LineGeometry:
-                        layer_type = "line"
-                    elif child.layer().geometryType() == QgsWkbTypes.PolygonGeometry:
-                        layer_type = "polygon"
-                elif child.layer().type() == QgsMapLayerType.RasterLayer:
-                    layer_type = "raster"
-                else:
+                if not (
+                    child.layer().type() == QgsMapLayerType.VectorLayer
+                    or child.layer().type() == QgsMapLayerType.RasterLayer
+                ):
                     # Unsupported QgsMapLayerType
                     continue
 
-                self.layerSettingsDic[child_id] = {
-                    "type": layer_type,
-                    "name": child.layer().name(),
-                }
             else:
                 raise Exception("Unknown child type")
 
-            item = QTreeWidgetItem([child.name(), child_type])
+            item = QTreeWidgetItem([child.name(), child_id])
             item.setIcon(0, child_icon)
             item.setFlags(
                 item.flags()
