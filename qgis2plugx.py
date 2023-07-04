@@ -67,4 +67,6 @@ class QGIS2PlugX:
     def show_dialog(self):
         if self.qgis2plugx_dialog is None:
             self.qgis2plugx_dialog = QGIS2PlugX_dialog()
+        else:
+            self.qgis2plugx_dialog.load_layer_list()
         self.qgis2plugx_dialog.show()
