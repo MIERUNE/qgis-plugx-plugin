@@ -19,6 +19,9 @@ class QGIS2PlugX:
         self.toolbar = self.iface.addToolBar(PLUGIN_NAME)
         self.toolbar.setObjectName(PLUGIN_NAME)
 
+        # QDialogを保存するためのクラス変数
+        self.qgis2plugx_dialog = None
+
     def add_action(
         self,
         icon_path,
@@ -62,6 +65,8 @@ class QGIS2PlugX:
         del self.toolbar
 
     def show_dialog(self):
-        self.qgis2plugx_dialog = QGIS2PlugX_dialog()
-
+        if self.qgis2plugx_dialog is None:
+            self.qgis2plugx_dialog = QGIS2PlugX_dialog()
+        else:
+            self.qgis2plugx_dialog.process_node()
         self.qgis2plugx_dialog.show()

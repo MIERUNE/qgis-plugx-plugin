@@ -32,15 +32,25 @@ class QGIS2PlugX_dialog(QDialog):
             os.path.join(os.path.dirname(__file__), "QGIS2PlugX_dialog.ui"), self
         )
 
+        self.init_ui()
+
+    def init_ui(self):
+        # connect signals
         self.ui.pushButton_run.clicked.connect(self.run)
         self.ui.pushButton_cancel.clicked.connect(self.close)
-        self.ui.mExtentGroupBox.setCurrentExtent(
-            iface.mapCanvas().extent(), QgsProject.instance().crs()
-        )
+
+        # QgsExtentGroupBox
         self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
         self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
+        self.ui.mExtentGroupBox.setOutputExtentFromCurrent()
 
-        self.process_node(QgsProject.instance().layerTreeRoot(), None)
+        # レイヤーが追加されるなど、レイヤー一覧が変更されたときに更新する
+        QgsProject.instance().layerTreeRoot().layerOrderChanged.connect(
+            self.process_node
+        )
+        QgsProject.instance().layerRemoved.connect(self.process_node)
+        QgsProject.instance().layersAdded.connect(self.process_node)
+        self.process_node()  # 初回読み込み
 
     def run(self):
         # チェックしたレイヤをリストに取得する
@@ -197,10 +207,16 @@ class QGIS2PlugX_dialog(QDialog):
             layers.extend(self.get_checked_layers_recursive(child_item))
         return layers
 
-    def process_node(self, node, parent_node):
+    def process_node(self):
+        """
+        QGISのレイヤーツリーを読み込み
+        """
+        self.layerTree.clear()
+        self.process_node_recursive(QgsProject.instance().layerTreeRoot(), None)
+
+    def process_node_recursive(self, node, parent_node):
         """
         QGISのレイヤーツリーを再帰的に読み込み
-        プラグインUIのlayerTreeおよびクラス変数の辞書に値を保存する
 
         Args:
             node (_type_): _description_
@@ -256,4 +272,4 @@ class QGIS2PlugX_dialog(QDialog):
                 parent_node.addChild(item)
 
             if child_type == "group":
-                self.process_node(child, item)
+                self.process_node_recursive(child, item)
