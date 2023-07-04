@@ -2,14 +2,21 @@ import json
 import os
 
 import processing
+import sip
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QListWidgetItem, QMessageBox
+from PyQt5.QtWidgets import QDialog, QMessageBox, QTreeWidgetItem
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsMapLayer,
     QgsMapLayerModel,
     QgsProject,
     QgsRasterLayer,
     QgsVectorLayer,
+    QgsLayerTree,
+    QgsLayerTreeGroup,
+    QgsLayerTreeLayer,
+    QgsApplication,
+    QgsMapLayerType,
 )
 from qgis.PyQt import uic
 from qgis.utils import iface
@@ -39,26 +46,11 @@ class QGIS2PlugX_dialog(QDialog):
 
         # レイヤーが追加されるなど、レイヤー一覧が変更されたときに更新する
         QgsProject.instance().layerTreeRoot().layerOrderChanged.connect(
-            self.load_layer_list
+            self.process_node
         )
-        QgsProject.instance().layerRemoved.connect(self.load_layer_list)
-        QgsProject.instance().layersAdded.connect(self.load_layer_list)
-        self.load_layer_list()  # 初回読み込み
-
-    def load_layer_list(self):
-        self.layerListWidget.clear()
-        for layer in QgsProject().instance().layerTreeRoot().layerOrder():
-            if not isinstance(layer, QgsRasterLayer) and not isinstance(
-                layer, QgsVectorLayer
-            ):
-                # ラスター、ベクター以外はスキップ: PointCloudLayer, MeshLayer, ...
-                continue
-            icon = QgsMapLayerModel.iconForLayer(layer)
-            item = QListWidgetItem(icon, layer.name())
-            item.setData(Qt.UserRole, layer)
-            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
-            item.setCheckState(Qt.Unchecked)
-            self.layerListWidget.addItem(item)
+        QgsProject.instance().layerRemoved.connect(self.process_node)
+        QgsProject.instance().layersAdded.connect(self.process_node)
+        self.process_node()  # 初回読み込み
 
     def run(self):
         # チェックしたレイヤをリストに取得する
@@ -158,8 +150,10 @@ class QGIS2PlugX_dialog(QDialog):
         msg = f"処理が完了しました。\n\n出力先:\n{output_dir}"
 
         if symbol_error_layers:
-            msg += "\n\n以下レイヤに対応不可なシンボロジがあるため、\nシンプルシンボルに変換しました。\n" + "\n".join(
-                symbol_error_layers
+            msg += (
+                "\n\n以下レイヤに対応不可なシンボロジがあるため、\n\
+            シンプルシンボルに変換しました。\n"
+                + "\n".join(symbol_error_layers)
             )
 
         QMessageBox.information(
@@ -196,7 +190,86 @@ class QGIS2PlugX_dialog(QDialog):
 
     def get_checked_layers(self):
         layers = []
-        for i in range(self.layerListWidget.count()):
-            if self.layerListWidget.item(i).checkState() == Qt.Checked:
-                layers.append(self.layerListWidget.item(i).data(Qt.UserRole))
+        # QTreeWidgetの子要素を再帰的に取得する
+        for i in range(self.layerTree.topLevelItemCount()):
+            item = self.layerTree.topLevelItem(i)
+            layers.extend(self.get_checked_layers_recursive(item))
         return layers
+
+    def get_checked_layers_recursive(self, item):
+        layers = []
+        if item.checkState(0) == Qt.CheckState.Checked:
+            layer = QgsProject.instance().mapLayer(item.text(1))
+            if layer:
+                layers.append(layer)
+        for i in range(item.childCount()):
+            child_item = item.child(i)
+            layers.extend(self.get_checked_layers_recursive(child_item))
+        return layers
+
+    def process_node(self):
+        """
+        QGISのレイヤーツリーを読み込み
+        """
+        self.layerTree.clear()
+        self.process_node_recursive(QgsProject.instance().layerTreeRoot(), None)
+
+    def process_node_recursive(self, node, parent_node):
+        """
+        QGISのレイヤーツリーを再帰的に読み込み
+
+        Args:
+            node (_type_): _description_
+            parent_node (_type_): _description_
+            parent_tree (_type_): _description_
+
+        Raises:
+            Exception: _description_
+        """
+        for child in node.children():
+            if QgsLayerTree.isGroup(child):
+                if not isinstance(child, QgsLayerTreeGroup):
+                    # Sip cast issue , Lizmap plugin #299
+                    child = sip.cast(child, QgsLayerTreeGroup)
+                child_type = "group"
+                child_icon = QIcon(QgsApplication.iconPath("mActionFolder.svg"))
+                child_id = ""
+
+            elif QgsLayerTree.isLayer(child):
+                if not isinstance(child, QgsLayerTreeLayer):
+                    # Sip cast issue , Lizmap plugin #299
+                    child = sip.cast(child, QgsLayerTreeLayer)
+                child_type = "layer"
+                child_icon = QgsMapLayerModel.iconForLayer(child.layer())
+                child_id = child.layer().id()
+
+                if not (
+                    child.layer().type() == QgsMapLayerType.VectorLayer
+                    or child.layer().type() == QgsMapLayerType.RasterLayer
+                ):
+                    # Unsupported QgsMapLayerType
+                    continue
+
+            else:
+                raise Exception("Unknown child type")
+
+            item = QTreeWidgetItem([child.name(), child_id])
+            item.setIcon(0, child_icon)
+            item.setFlags(
+                item.flags()
+                | Qt.ItemFlag.ItemIsUserCheckable
+                | Qt.ItemFlag.ItemIsAutoTristate
+            )
+            item.setCheckState(
+                0,
+                Qt.CheckState.Checked if child.isVisible() else Qt.CheckState.Unchecked,
+            )
+
+            # Move group or layer to its parent node
+            if not parent_node:
+                self.layerTree.addTopLevelItem(item)
+            else:
+                parent_node.addChild(item)
+
+            if child_type == "group":
+                self.process_node_recursive(child, item)
