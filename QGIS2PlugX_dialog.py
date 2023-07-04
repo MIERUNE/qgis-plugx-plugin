@@ -40,7 +40,6 @@ class QGIS2PlugX_dialog(QDialog):
         self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
         self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
 
-        """layerId:setting という構造の辞書"""
         self.process_node(QgsProject.instance().layerTreeRoot(), None)
 
     def run(self):
