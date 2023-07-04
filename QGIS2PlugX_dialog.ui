@@ -22,6 +22,15 @@
     </widget>
    </item>
    <item>
+    <widget class="QTreeWidget" name="layerTree">
+     <column>
+      <property name="text">
+       <string notr="true">1</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
     <widget class="QListWidget" name="layerListWidget"/>
    </item>
    <item>

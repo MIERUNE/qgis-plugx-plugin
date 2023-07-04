@@ -2,14 +2,22 @@ import json
 import os
 
 import processing
+import sip
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QListWidgetItem, QMessageBox
+from PyQt5.QtWidgets import QDialog, QMessageBox, QTreeWidgetItem
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsMapLayer,
     QgsProject,
     QgsMapLayerModel,
     QgsRasterLayer,
     QgsVectorLayer,
+    QgsLayerTree,
+    QgsLayerTreeGroup,
+    QgsLayerTreeLayer,
+    QgsApplication,
+    QgsMapLayerType,
+    QgsWkbTypes,
 )
 from qgis.PyQt import uic
 from qgis.utils import iface
@@ -33,27 +41,9 @@ class QGIS2PlugX_dialog(QDialog):
         self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
         self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
 
-        # レイヤー一覧を作成する
-        self.load_layer_list()
-        # レイヤーの追加・削除に反応して一覧を更新する
-        QgsProject().instance().layerTreeRoot().layerOrderChanged.connect(
-            self.load_layer_list
-        )
-
-    def load_layer_list(self):
-        self.layerListWidget.clear()
-        for layer in QgsProject().instance().layerTreeRoot().layerOrder():
-            if not isinstance(layer, QgsRasterLayer) and not isinstance(
-                layer, QgsVectorLayer
-            ):
-                # ラスター、ベクター以外はスキップ: PointCloudLayer, MeshLayer, ...
-                continue
-            icon = QgsMapLayerModel.iconForLayer(layer)
-            item = QListWidgetItem(icon, layer.name())
-            item.setData(Qt.UserRole, layer)
-            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
-            item.setCheckState(Qt.Unchecked)
-            self.layerListWidget.addItem(item)
+        self.layerSettingsDic = {}
+        """layerId:setting という構造の辞書"""
+        self.process_node(QgsProject.instance().layerTreeRoot(), None)
 
     def run(self):
         # チェックしたレイヤをリストに取得する
@@ -171,7 +161,72 @@ class QGIS2PlugX_dialog(QDialog):
 
     def get_checked_layers(self):
         layers = []
-        for i in range(self.layerListWidget.count()):
-            if self.layerListWidget.item(i).checkState() == Qt.Checked:
-                layers.append(self.layerListWidget.item(i).data(Qt.UserRole))
+        # TODO: implement
         return layers
+
+    def process_node(self, node, parent_node):
+        """
+        QGISのレイヤーツリーを再帰的に読み込み
+        プラグインUIのlayerTreeおよびクラス変数の辞書に値を保存する
+
+        Args:
+            node (_type_): _description_
+            parent_node (_type_): _description_
+            parent_tree (_type_): _description_
+
+        Raises:
+            Exception: _description_
+        """
+        for child in node.children():
+            if QgsLayerTree.isGroup(child):
+                if not isinstance(child, QgsLayerTreeGroup):
+                    # Sip cast issue , Lizmap plugin #299
+                    child = sip.cast(child, QgsLayerTreeGroup)
+                child_type = "group"
+                child_icon = QIcon(QgsApplication.iconPath("mActionFolder.svg"))
+
+            elif QgsLayerTree.isLayer(child):
+                if not isinstance(child, QgsLayerTreeLayer):
+                    # Sip cast issue , Lizmap plugin #299
+                    child = sip.cast(child, QgsLayerTreeLayer)
+                child_id = child.layerId()
+                child_type = "layer"
+                child_icon = QgsMapLayerModel.iconForLayer(child.layer())
+
+                if child.layer().type() == QgsMapLayerType.VectorLayer:
+                    if child.layer().geometryType() == QgsWkbTypes.PointGeometry:
+                        layer_type = "point"
+                    elif child.layer().geometryType() == QgsWkbTypes.LineGeometry:
+                        layer_type = "line"
+                    elif child.layer().geometryType() == QgsWkbTypes.PolygonGeometry:
+                        layer_type = "polygon"
+                elif child.layer().type() == QgsMapLayerType.RasterLayer:
+                    layer_type = "raster"
+                else:
+                    # Unsupported QgsMapLayerType
+                    continue
+
+                self.layerSettingsDic[child_id] = {
+                    "type": layer_type,
+                    "name": child.layer().name(),
+                }
+            else:
+                raise Exception("Unknown child type")
+
+            item = QTreeWidgetItem([child.name(), child_type])
+            item.setIcon(0, child_icon)
+            item.setFlags(
+                item.flags()
+                | Qt.ItemFlag.ItemIsUserCheckable
+                | Qt.ItemFlag.ItemIsAutoTristate
+            )
+            item.setCheckState(0, Qt.CheckState.Checked)
+
+            # Move group or layer to its parent node
+            if not parent_node:
+                self.layerTree.addTopLevelItem(item)
+            else:
+                parent_node.addChild(item)
+
+            if child_type == "group":
+                self.process_node(child, item)
