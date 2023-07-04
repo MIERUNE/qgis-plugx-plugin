@@ -140,8 +140,10 @@ class QGIS2PlugX_dialog(QDialog):
         msg = f"処理が完了しました。\n\n出力先:\n{output_dir}"
 
         if symbol_error_layers:
-            msg += "\n\n以下レイヤに対応不可なシンボロジがあるため、\nシンプルシンボルに変換しました。\n" + "\n".join(
-                symbol_error_layers
+            msg += (
+                "\n\n以下レイヤに対応不可なシンボロジがあるため、\n\
+            シンプルシンボルに変換しました。\n"
+                + "\n".join(symbol_error_layers)
             )
 
         QMessageBox.information(
