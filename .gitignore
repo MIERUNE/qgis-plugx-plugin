@@ -7,3 +7,4 @@ __pycache__/
 coverage.xml
 .coverage
 requirements.txt
+.ruff_cache
