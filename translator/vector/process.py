@@ -74,11 +74,11 @@ def process(
 def _process_categorical(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
+    layer_intersected = _clip_in_projectcrs(layer, extent)
     has_unsupported_symbol = False
     for sub_idx, category in enumerate(layer.renderer().categories()):
         # shp
         shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
-        layer_intersected = _clip_in_projectcrs(layer, extent)
         output_layer = QgsVectorFileWriter(
             shp_path,
             "UTF-8",
