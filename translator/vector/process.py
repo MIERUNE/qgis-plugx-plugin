@@ -161,16 +161,3 @@ def _process_noncategorical(
     return {
         "has_unsupported_symbol": has_unsupported_symbol,
     }
-
-
-def _get_features_by_value(features: QgsVectorLayer, value: str) -> list:
-    result = []
-    if layer.renderer().type() == "singleSymbol":
-        raise Exception("invalid renderer type: categorizedSymbol only")
-
-    field = layer.renderer().classAttribute()
-
-    for feature in layer.getFeatures():
-        if feature[field] == value:
-            result.append(feature)
-    return result
