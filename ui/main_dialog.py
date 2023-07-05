@@ -82,7 +82,9 @@ class MainDialog(QDialog):
 
         symbol_error_layers: list = []
 
-        for layer in layers:
+        for i, layer in enumerate(layers):
+            layer_name = f"layer_{i}"  # layer_0, layer_1, ...
+
             if isinstance(layer, QgsVectorLayer):
                 # 指定範囲内の地物を抽出し、元のスタイルを適用する
                 qml_path = os.path.join(params["output_dir"], "layer.qml")
@@ -120,7 +122,7 @@ class MainDialog(QDialog):
                     os.remove(qml_path)
 
                 # レイヤ名をlayer_indexに変更する
-                layer_intersected.setName(f"layer_{layers.index(layer)}")
+                layer_intersected.setName(layer_name)
                 output_layer_names.append(layer_intersected.name())
 
                 # スタイル出力用のVectorLayerインスランスを作成する
@@ -140,13 +142,12 @@ class MainDialog(QDialog):
                     symbol_error_layers.append(layer.name())
 
             elif isinstance(layer, QgsRasterLayer):
-                output_layer_name = f"layer_{layers.index(layer)}"
                 rasterlayer = RasterTranslator(
-                    layer, output_layer_name, params["extent"], params["output_dir"]
+                    layer, layer_name, params["extent"], params["output_dir"]
                 )
                 rasterlayer.raster_to_png()
                 rasterlayer.write_json()
-                output_layer_names.append(output_layer_name)
+                output_layer_names.append(layer_name)
 
         project_json = {
             "project_name": os.path.basename(QgsProject.instance().fileName()),
