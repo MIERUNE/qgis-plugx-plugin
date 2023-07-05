@@ -20,7 +20,7 @@ class QGIS2PlugX:
         self.toolbar.setObjectName(PLUGIN_NAME)
 
         # QDialogを保存するためのクラス変数
-        self.qgis2plugx_dialog = None
+        self.main_dialog = None
 
     def add_action(
         self,
@@ -65,8 +65,8 @@ class QGIS2PlugX:
         del self.toolbar
 
     def show_dialog(self):
-        if self.qgis2plugx_dialog is None:
-            self.qgis2plugx_dialog = MainDialog()
+        if self.main_dialog is None:
+            self.main_dialog = MainDialog()
         else:
-            self.qgis2plugx_dialog.process_node()
-        self.qgis2plugx_dialog.show()
+            self.main_dialog.process_node()
+        self.main_dialog.show()
