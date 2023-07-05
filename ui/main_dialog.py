@@ -6,7 +6,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QMessageBox, QTreeWidgetItem
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
-    QgsMapLayer,
     QgsMapLayerModel,
     QgsProject,
     QgsRasterLayer,
@@ -20,8 +19,9 @@ from qgis.core import (
 from qgis.PyQt import uic
 from qgis.utils import iface
 
-from translator import VectorTranslator, RasterTranslator
-from translator.vector import VectorTranslator, clip_in_projectcrs
+from translator import RasterTranslator
+from translator.vector.process import process as process_vector
+from translator.vector.label import generate_label_json
 from utils import write_json
 
 
@@ -78,46 +78,24 @@ class MainDialog(QDialog):
         )["OUTPUT"]
 
         output_layer_names = []
-        svgs = []
-        rasters = []
+        layers_has_unsupported_symbol = []
 
-        symbol_error_layers: list = []
-
-        for i, layer in enumerate(layers):
-            layer_name = f"layer_{i}"  # layer_0, layer_1, ...
+        for idx, layer in enumerate(layers):
+            layer_name = f"layer_{idx}"  # layer_0, layer_1, ...
             output_layer_names.append(layer_name)
 
             if isinstance(layer, QgsVectorLayer):
-                # 指定範囲内の地物を抽出し、元のスタイルを適用する
-                qml_path = os.path.join(params["output_dir"], "layer.qml")
-                layer.saveNamedStyle(
-                    qml_path, categories=QgsMapLayer.Symbology | QgsMapLayer.Labeling
+                result = process_vector(
+                    layer, params["extent"], idx, params["output_dir"]
                 )
 
-                layer_intersected = clip_in_projectcrs(layer, params["extent"])
+                if layer.labelsEnabled():
+                    generate_label_json(
+                        all_labels, layer.name(), idx, params["output_dir"]
+                    )
 
-                layer_intersected.loadNamedStyle(qml_path)
-                if os.path.exists(qml_path):
-                    os.remove(qml_path)
-
-                # レイヤ名をlayer_indexに変更する
-                layer_intersected.setName(layer_name)
-
-                # スタイル出力用のVectorLayerインスランスを作成する
-                vector_layer = VectorTranslator(
-                    layer_intersected, params["output_dir"], layer.name()
-                )
-
-                # シンボロジごとのSHPとjsonを出力
-                vector_layer.update_svgs_rasters_list(rasters, svgs)
-                vector_layer.generate_symbols()
-                svgs = vector_layer.svgs
-                rasters = vector_layer.rasters
-
-                if vector_layer.layer.labelsEnabled():
-                    vector_layer.generate_label_json(all_labels, layer.name())
-                if vector_layer.unsupported_symbols:
-                    symbol_error_layers.append(layer.name())
+                if result["has_unsupported_symbol"]:
+                    layers_has_unsupported_symbol.append(layer.name())
 
             elif isinstance(layer, QgsRasterLayer):
                 rasterlayer = RasterTranslator(
@@ -150,11 +128,11 @@ class MainDialog(QDialog):
 
         msg = f"処理が完了しました。\n\n出力先:\n{params['output_dir']}"
 
-        if symbol_error_layers:
+        if len(layers_has_unsupported_symbol) > 0:
             msg += (
                 "\n\n以下レイヤに対応不可なシンボロジがあるため、\n\
             シンプルシンボルに変換しました。\n"
-                + "\n".join(symbol_error_layers)
+                + "\n".join(layers_has_unsupported_symbol)
             )
 
         QMessageBox.information(
