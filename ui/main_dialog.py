@@ -25,11 +25,11 @@ from rasterlayer import RasterLayer
 from vectorlayer import VectorLayer
 
 
-class QGIS2PlugX_dialog(QDialog):
+class MainDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.ui = uic.loadUi(
-            os.path.join(os.path.dirname(__file__), "QGIS2PlugX_dialog.ui"), self
+            os.path.join(os.path.dirname(__file__), "main_dialog.ui"), self
         )
 
         self.init_ui()

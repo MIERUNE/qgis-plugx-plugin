@@ -4,7 +4,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 from qgis.gui import QgisInterface
 
-from QGIS2PlugX_dialog import QGIS2PlugX_dialog
+from ui.main_dialog import MainDialog
 
 PLUGIN_NAME = "QGIS2PlugX"
 
@@ -66,7 +66,7 @@ class QGIS2PlugX:
 
     def show_dialog(self):
         if self.qgis2plugx_dialog is None:
-            self.qgis2plugx_dialog = QGIS2PlugX_dialog()
+            self.qgis2plugx_dialog = MainDialog()
         else:
             self.qgis2plugx_dialog.process_node()
         self.qgis2plugx_dialog.show()
