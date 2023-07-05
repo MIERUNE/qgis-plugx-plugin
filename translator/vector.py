@@ -10,8 +10,7 @@ from qgis.core import (
     QgsVectorLayer,
 )
 
-from unit_converter import UnitConverter
-from utils import write_json
+from utils import write_json, UnitConverter
 
 symbol_types = {
     0: "point",
@@ -29,7 +28,7 @@ target_symbol_layers = [
 ]
 
 
-class VectorLayer:
+class VectorTranslator:
     def __init__(
         self,
         layer: QgsVectorLayer,

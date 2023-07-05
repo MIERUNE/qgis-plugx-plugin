@@ -21,8 +21,7 @@ from qgis.core import (
 from qgis.PyQt import uic
 from qgis.utils import iface
 
-from rasterlayer import RasterLayer
-from vectorlayer import VectorLayer
+from translator import VectorTranslator, RasterTranslator
 
 
 class MainDialog(QDialog):
@@ -125,7 +124,9 @@ class MainDialog(QDialog):
                 output_layer_names.append(layer_intersected.name())
 
                 # スタイル出力用のVectorLayerインスランスを作成する
-                vector_layer = VectorLayer(layer_intersected, output_dir, layer.name())
+                vector_layer = VectorTranslator(
+                    layer_intersected, output_dir, layer.name()
+                )
 
                 # シンボロジごとのSHPとjsonを出力
                 vector_layer.update_svgs_rasters_list(rasters, svgs)
@@ -140,7 +141,9 @@ class MainDialog(QDialog):
 
             elif isinstance(layer, QgsRasterLayer):
                 output_layer_name = f"layer_{layers.index(layer)}"
-                rasterlayer = RasterLayer(layer, output_layer_name, extent, output_dir)
+                rasterlayer = RasterTranslator(
+                    layer, output_layer_name, extent, output_dir
+                )
                 rasterlayer.raster_to_png()
                 rasterlayer.write_json()
                 output_layer_names.append(output_layer_name)
