@@ -49,6 +49,17 @@ def _clip_in_projectcrs(layer: QgsVectorLayer, extent: QgsRectangle) -> QgsVecto
     return layer_intersected
 
 
+def _get_layer_type(layer: QgsVectorLayer):
+    if layer.geometryType() == 0:
+        return "point"
+    elif layer.geometryType() == 1:
+        return "line"
+    elif layer.geometryType() == 2:
+        return "polygon"
+    else:
+        return "unsupported"
+
+
 def process(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
@@ -63,6 +74,7 @@ def process(
 def _process_categorical(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
+    has_unsupported_symbol = False
     for sub_idx, category in enumerate(layer.renderer().categories()):
         # shp
         shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
@@ -75,24 +87,39 @@ def _process_categorical(
             QgsProject.instance().crs(),
             "ESRI Shapefile",
         )
-        output_layer.addFeatures(layer_intersected.getFeatures())
+        # extract features by category
+        filtered_features = list(
+            filter(
+                lambda f: f[layer.renderer().classAttribute()] == category.value(),
+                layer_intersected.getFeatures(),
+            )
+        )
+        output_layer.addFeatures(filtered_features)
         del output_layer
 
         # json
-        symbols_json = generate_symbols_data(category.symbol())
+        layer_json = {
+            "layer": layer.name(),
+            "type": _get_layer_type(layer),
+            "crs": layer.crs().authid(),
+            "symbol": generate_symbols_data(category.symbol()),
+            "legend": category.label(),
+        }
         write_json(
-            symbols_json,
+            layer_json,
             os.path.join(output_dir, f"layer_{idx}_{sub_idx}.json"),
         )
 
         # asset
         export_assets_from(category.symbol(), output_dir)
 
-        has_unsupported_symbol = is_included_unsupported_symbol_layer(category.symbol())
-
-        return {
-            "has_unsupported_symbol": has_unsupported_symbol,
-        }
+        has_unsupported_symbol = (
+            has_unsupported_symbol
+            or is_included_unsupported_symbol_layer(category.symbol())
+        )
+    return {
+        "has_unsupported_symbol": has_unsupported_symbol,
+    }
 
 
 def _process_noncategorical(
@@ -113,9 +140,14 @@ def _process_noncategorical(
     del output_layer
 
     # json
-    symbols_json = generate_symbols_data(layer.renderer().symbol())
+    layer_json = {
+        "layer": layer.name(),
+        "type": _get_layer_type(layer),
+        "crs": layer.crs().authid(),
+        "symbol": generate_symbols_data(layer.renderer().symbol()),
+    }
     write_json(
-        symbols_json,
+        layer_json,
         os.path.join(output_dir, f"layer_{idx}.json"),
     )
 
@@ -129,3 +161,16 @@ def _process_noncategorical(
     return {
         "has_unsupported_symbol": has_unsupported_symbol,
     }
+
+
+def _get_features_by_value(features: QgsVectorLayer, value: str) -> list:
+    result = []
+    if layer.renderer().type() == "singleSymbol":
+        raise Exception("invalid renderer type: categorizedSymbol only")
+
+    field = layer.renderer().classAttribute()
+
+    for feature in layer.getFeatures():
+        if feature[field] == value:
+            result.append(feature)
+    return result
