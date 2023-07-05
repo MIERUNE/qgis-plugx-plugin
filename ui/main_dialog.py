@@ -21,6 +21,7 @@ from qgis.PyQt import uic
 from qgis.utils import iface
 
 from translator import VectorTranslator, RasterTranslator
+from translator.vector import VectorTranslator, clip_in_projectcrs
 from utils import write_json
 
 
@@ -84,6 +85,7 @@ class MainDialog(QDialog):
 
         for i, layer in enumerate(layers):
             layer_name = f"layer_{i}"  # layer_0, layer_1, ...
+            output_layer_names.append(layer_name)
 
             if isinstance(layer, QgsVectorLayer):
                 # 指定範囲内の地物を抽出し、元のスタイルを適用する
@@ -92,30 +94,7 @@ class MainDialog(QDialog):
                     qml_path, categories=QgsMapLayer.Symbology | QgsMapLayer.Labeling
                 )
 
-                reprojected = processing.run(
-                    "native:reprojectlayer",
-                    {
-                        "INPUT": layer,
-                        "TARGET_CRS": QgsProject.instance().crs(),
-                        "OUTPUT": "TEMPORARY_OUTPUT",
-                    },
-                )["OUTPUT"]
-
-                clip_extent = f"{params['extent'].xMinimum()}, \
-                        {params['extent'].xMaximum()}, \
-                        {params['extent'].yMinimum()}, \
-                        {params['extent'].yMaximum()}  \
-                        [{QgsProject.instance().crs().authid()}]"
-
-                layer_intersected = processing.run(
-                    "native:extractbyextent",
-                    {
-                        "INPUT": reprojected,
-                        "EXTENT": clip_extent,
-                        "CLIP": True,
-                        "OUTPUT": "TEMPORARY_OUTPUT",
-                    },
-                )["OUTPUT"]
+                layer_intersected = clip_in_projectcrs(layer, params["extent"])
 
                 layer_intersected.loadNamedStyle(qml_path)
                 if os.path.exists(qml_path):
@@ -123,7 +102,6 @@ class MainDialog(QDialog):
 
                 # レイヤ名をlayer_indexに変更する
                 layer_intersected.setName(layer_name)
-                output_layer_names.append(layer_intersected.name())
 
                 # スタイル出力用のVectorLayerインスランスを作成する
                 vector_layer = VectorTranslator(
@@ -147,7 +125,6 @@ class MainDialog(QDialog):
                 )
                 rasterlayer.raster_to_png()
                 rasterlayer.write_json()
-                output_layer_names.append(layer_name)
 
         project_json = {
             "project_name": os.path.basename(QgsProject.instance().fileName()),
