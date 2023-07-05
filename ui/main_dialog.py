@@ -36,7 +36,7 @@ class MainDialog(QDialog):
 
     def init_ui(self):
         # connect signals
-        self.ui.pushButton_run.clicked.connect(self.run)
+        self.ui.pushButton_run.clicked.connect(self._run)
         self.ui.pushButton_cancel.clicked.connect(self.close)
 
         # QgsExtentGroupBox
@@ -52,7 +52,7 @@ class MainDialog(QDialog):
         QgsProject.instance().layersAdded.connect(self.process_node)
         self.process_node()  # 初回読み込み
 
-    def get_excution_params(self):
+    def _get_excution_params(self):
         params = {
             "extent": self.ui.mExtentGroupBox.outputExtent(),
             "output_dir": self.ui.outputFileWidget.filePath(),
@@ -60,9 +60,9 @@ class MainDialog(QDialog):
 
         return params
 
-    def run(self):
-        layers = self.get_checked_layers()
-        params = self.get_excution_params()
+    def _run(self):
+        layers = self._get_checked_layers()
+        params = self._get_excution_params()
 
         # ラベルSHPを出力する
         all_labels = processing.run(
@@ -141,15 +141,15 @@ class MainDialog(QDialog):
             msg,
         )
 
-    def get_checked_layers(self):
+    def _get_checked_layers(self):
         layers = []
         # QTreeWidgetの子要素を再帰的に取得する
         for i in range(self.layerTree.topLevelItemCount()):
             item = self.layerTree.topLevelItem(i)
-            layers.extend(self.get_checked_layers_recursive(item))
+            layers.extend(self._get_checked_layers_recursive(item))
         return layers
 
-    def get_checked_layers_recursive(self, item):
+    def _get_checked_layers_recursive(self, item):
         layers = []
         if item.checkState(0) == Qt.CheckState.Checked:
             layer = QgsProject.instance().mapLayer(item.text(1))
@@ -157,7 +157,7 @@ class MainDialog(QDialog):
                 layers.append(layer)
         for i in range(item.childCount()):
             child_item = item.child(i)
-            layers.extend(self.get_checked_layers_recursive(child_item))
+            layers.extend(self._get_checked_layers_recursive(child_item))
         return layers
 
     def process_node(self):
@@ -165,9 +165,9 @@ class MainDialog(QDialog):
         QGISのレイヤーツリーを読み込み
         """
         self.layerTree.clear()
-        self.process_node_recursive(QgsProject.instance().layerTreeRoot(), None)
+        self._process_node_recursive(QgsProject.instance().layerTreeRoot(), None)
 
-    def process_node_recursive(self, node, parent_node):
+    def _process_node_recursive(self, node, parent_node):
         """
         QGISのレイヤーツリーを再帰的に読み込み
 
@@ -225,4 +225,4 @@ class MainDialog(QDialog):
                 parent_node.addChild(item)
 
             if child_type == "group":
-                self.process_node_recursive(child, item)
+                self._process_node_recursive(child, item)
