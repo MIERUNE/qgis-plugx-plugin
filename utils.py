@@ -15,36 +15,30 @@ def write_json(data: Union[list, dict], filepath: str):
         outfile.write(json_data)
 
 
-class UnitConverter:
-    def __init__(self, value: float, unit: QgsUnitTypes.RenderUnit):
-        self.value = value
-        self.unit = unit
+def convert_to_point(value: float, unit: QgsUnitTypes.RenderUnit) -> float:
+    """calculate value in any unit to point"""
 
-        self.dpi = iface.mapCanvas().mapSettings().outputDpi()
-        self.scale = iface.mapCanvas().scale()
+    if unit == QgsUnitTypes.RenderPoints:
+        return value
 
-    def convert_to_point(self):
-        if self.unit == QgsUnitTypes.RenderPoints:
-            return self.value
+    if unit == QgsUnitTypes.RenderPixels:
+        render_context = QgsRenderContext()
+        to_pt = render_context.convertToPainterUnits(
+            1, QgsUnitTypes.RenderUnit.RenderPoints
+        )
+        return value * to_pt
 
-        if self.unit == QgsUnitTypes.RenderPixels:
-            render_context = QgsRenderContext()
-            to_pt = render_context.convertToPainterUnits(
-                1, QgsUnitTypes.RenderUnit.RenderPoints
-            )
-            return self.value * to_pt
+    if unit == QgsUnitTypes.RenderMillimeters:
+        return value * 2.8346456693
 
-        if self.unit == QgsUnitTypes.RenderMillimeters:
-            return self.value * 2.8346456693
+    if unit == QgsUnitTypes.RenderMetersInMapUnits:
+        return value / (iface.mapCanvas().scale() / 2834.65)  # 1m = 2834.65pt
 
-        if self.unit == QgsUnitTypes.RenderMetersInMapUnits:
-            return self.value / (self.scale / 2834.65)  # 1m = 2834.65pt
+    if unit == QgsUnitTypes.RenderMapUnits:
+        # MapUnitがメートルの場合のみ対応する
+        mapunit = iface.activeLayer().crs().mapUnits()
+        if mapunit == QgsUnitTypes.DistanceMeters:
+            return value / (iface.mapCanvas().scale() / 2834.65)  # 1m = 2834.65pt
 
-        if self.unit == QgsUnitTypes.RenderMapUnits:
-            # MapUnitがメートルの場合のみ対応する
-            mapunit = iface.activeLayer().crs().mapUnits()
-            if mapunit == QgsUnitTypes.DistanceMeters:
-                return self.value / (self.scale / 2834.65)  # 1m = 2834.65pt
-
-        if self.unit == QgsUnitTypes.RenderInches:
-            return self.value * 72
+    if unit == QgsUnitTypes.RenderInches:
+        return value * 72
