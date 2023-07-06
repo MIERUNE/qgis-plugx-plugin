@@ -60,7 +60,7 @@ def _get_layer_type(layer: QgsVectorLayer):
         return "unsupported"
 
 
-def process(
+def process_vector(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
     if layer.renderer().type() == "categorizedSymbol":
