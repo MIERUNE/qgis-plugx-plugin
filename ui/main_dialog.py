@@ -1,4 +1,3 @@
-import json
 import os
 
 import processing
@@ -21,15 +20,15 @@ from qgis.core import (
 from qgis.PyQt import uic
 from qgis.utils import iface
 
-from rasterlayer import RasterLayer
-from vectorlayer import VectorLayer
+from translator import VectorTranslator, RasterTranslator
+from utils import write_json
 
 
-class QGIS2PlugX_dialog(QDialog):
+class MainDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.ui = uic.loadUi(
-            os.path.join(os.path.dirname(__file__), "QGIS2PlugX_dialog.ui"), self
+            os.path.join(os.path.dirname(__file__), "main_dialog.ui"), self
         )
 
         self.init_ui()
@@ -52,23 +51,23 @@ class QGIS2PlugX_dialog(QDialog):
         QgsProject.instance().layersAdded.connect(self.process_node)
         self.process_node()  # 初回読み込み
 
+    def get_excution_params(self):
+        params = {
+            "extent": self.ui.mExtentGroupBox.outputExtent(),
+            "output_dir": self.ui.outputFileWidget.filePath(),
+        }
+
+        return params
+
     def run(self):
-        # チェックしたレイヤをリストに取得する
         layers = self.get_checked_layers()
-
-        # 処理範囲を取得する
-        extent = self.ui.mExtentGroupBox.outputExtent()
-        if not extent:
-            return
-
-        # 出力先のディレクトリを作成する
-        output_dir = self.ui.outputFileWidget.filePath()
+        params = self.get_excution_params()
 
         # ラベルSHPを出力する
         all_labels = processing.run(
             "native:extractlabels",
             {
-                "EXTENT": extent,
+                "EXTENT": params["extent"],
                 "SCALE": iface.mapCanvas().scale(),
                 "MAP_THEME": None,
                 "INCLUDE_UNPLACED": True,
@@ -86,7 +85,7 @@ class QGIS2PlugX_dialog(QDialog):
         for layer in layers:
             if isinstance(layer, QgsVectorLayer):
                 # 指定範囲内の地物を抽出し、元のスタイルを適用する
-                qml_path = os.path.join(output_dir, "layer.qml")
+                qml_path = os.path.join(params["output_dir"], "layer.qml")
                 layer.saveNamedStyle(
                     qml_path, categories=QgsMapLayer.Symbology | QgsMapLayer.Labeling
                 )
@@ -100,10 +99,10 @@ class QGIS2PlugX_dialog(QDialog):
                     },
                 )["OUTPUT"]
 
-                clip_extent = f"{extent.xMinimum()}, \
-                        {extent.xMaximum()}, \
-                        {extent.yMinimum()}, \
-                        {extent.yMaximum()}  \
+                clip_extent = f"{params['extent'].xMinimum()}, \
+                        {params['extent'].xMaximum()}, \
+                        {params['extent'].yMinimum()}, \
+                        {params['extent'].yMaximum()}  \
                         [{QgsProject.instance().crs().authid()}]"
 
                 layer_intersected = processing.run(
@@ -125,7 +124,9 @@ class QGIS2PlugX_dialog(QDialog):
                 output_layer_names.append(layer_intersected.name())
 
                 # スタイル出力用のVectorLayerインスランスを作成する
-                vector_layer = VectorLayer(layer_intersected, output_dir, layer.name())
+                vector_layer = VectorTranslator(
+                    layer_intersected, params["output_dir"], layer.name()
+                )
 
                 # シンボロジごとのSHPとjsonを出力
                 vector_layer.update_svgs_rasters_list(rasters, svgs)
@@ -140,30 +141,12 @@ class QGIS2PlugX_dialog(QDialog):
 
             elif isinstance(layer, QgsRasterLayer):
                 output_layer_name = f"layer_{layers.index(layer)}"
-                rasterlayer = RasterLayer(layer, output_layer_name, extent, output_dir)
+                rasterlayer = RasterTranslator(
+                    layer, output_layer_name, params["extent"], params["output_dir"]
+                )
                 rasterlayer.raster_to_png()
                 rasterlayer.write_json()
                 output_layer_names.append(output_layer_name)
-
-        self.write_project_json(output_layer_names)
-
-        msg = f"処理が完了しました。\n\n出力先:\n{output_dir}"
-
-        if symbol_error_layers:
-            msg += (
-                "\n\n以下レイヤに対応不可なシンボロジがあるため、\n\
-            シンプルシンボルに変換しました。\n"
-                + "\n".join(symbol_error_layers)
-            )
-
-        QMessageBox.information(
-            None,
-            "完了",
-            msg,
-        )
-
-    def write_project_json(self, output_layer_names: list):
-        """project.jsonにレイヤ情報を書き出す"""
 
         project_json = {
             "project_name": os.path.basename(QgsProject.instance().fileName()),
@@ -182,11 +165,25 @@ class QGIS2PlugX_dialog(QDialog):
             "scale": iface.mapCanvas().scale(),
             "layers": output_layer_names,
         }
-        # project.jsonを出力
-        with open(
-            os.path.join(self.ui.outputFileWidget.filePath(), "project.json"), mode="w"
-        ) as f:
-            json.dump(project_json, f, ensure_ascii=False)
+        write_json(
+            project_json,
+            os.path.join(self.ui.outputFileWidget.filePath(), "project.json"),
+        )
+
+        msg = f"処理が完了しました。\n\n出力先:\n{params['output_dir']}"
+
+        if symbol_error_layers:
+            msg += (
+                "\n\n以下レイヤに対応不可なシンボロジがあるため、\n\
+            シンプルシンボルに変換しました。\n"
+                + "\n".join(symbol_error_layers)
+            )
+
+        QMessageBox.information(
+            None,
+            "完了",
+            msg,
+        )
 
     def get_checked_layers(self):
         layers = []

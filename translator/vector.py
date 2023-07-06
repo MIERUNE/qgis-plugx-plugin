@@ -10,8 +10,7 @@ from qgis.core import (
     QgsVectorLayer,
 )
 
-from unit_converter import UnitConverter
-from utils import write_json
+from utils import write_json, convert_to_point
 
 symbol_types = {
     0: "point",
@@ -29,7 +28,7 @@ target_symbol_layers = [
 ]
 
 
-class VectorLayer:
+class VectorTranslator:
     def __init__(
         self,
         layer: QgsVectorLayer,
@@ -180,9 +179,10 @@ class VectorLayer:
 
             # point
             if symbol_type == 0:
-                pt_size = UnitConverter(symbol_layer.size(), symbol_layer.sizeUnit())
                 symbol_layer_dict = {
-                    "size": pt_size.convert_to_point(),
+                    "size": convert_to_point(
+                        symbol_layer.size(), symbol_layer.sizeUnit()
+                    ),
                     "fill_color": symbol_layer.color().name(),
                     "outline_color": symbol_layer.strokeColor().name(),
                     "symbol_layer_type": symbol_layer.layerType()
@@ -203,37 +203,29 @@ class VectorLayer:
                     symbol_layer_dict[
                         "symbol_path"
                     ] = "assets/symbol_svg/" + self.export_svg_symbol(symbol_layer)
-                    outline_size = UnitConverter(
-                        symbol_layer.strokeWidth(),
-                        symbol_layer.strokeWidthUnit(),
+                    symbol_layer_dict["outline_width"] = convert_to_point(
+                        symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
                     )
-                    symbol_layer_dict["outline_width"] = outline_size.convert_to_point()
 
                 if symbol_layer.layerType() == "SimpleMarker":
                     if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
                         symbol_layer_dict["outline_width"] = 0
                     else:
-                        outline_size = UnitConverter(
-                            symbol_layer.strokeWidth(),
-                            symbol_layer.strokeWidthUnit(),
+                        symbol_layer_dict["outline_width"] = convert_to_point(
+                            symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
                         )
-                        symbol_layer_dict[
-                            "outline_width"
-                        ] = outline_size.convert_to_point()
 
             # line
             if symbol_type == 1:
-                line_size = UnitConverter(
-                    symbol_layer.width(), symbol_layer.widthUnit()
-                )
-
                 # default attributes
                 symbol_layer_dict = {
                     "symbol_layer_type": symbol_layer.layerType()
                     .split("Line")[0]
                     .lower(),
                     "color": symbol_layer.color().name(),
-                    "width": line_size.convert_to_point(),
+                    "width": convert_to_point(
+                        symbol_layer.width(), symbol_layer.widthUnit()
+                    ),
                 }
 
                 if (
@@ -261,13 +253,9 @@ class VectorLayer:
                     if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen:
                         symbol_layer_dict["outline_width"] = 0
                     else:
-                        outline_size = UnitConverter(
-                            symbol_layer.strokeWidth(),
-                            symbol_layer.strokeWidthUnit(),
+                        symbol_layer_dict["outline_width"] = convert_to_point(
+                            symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
                         )
-                        symbol_layer_dict[
-                            "outline_width"
-                        ] = outline_size.convert_to_point()
 
                 # Turn in simple fill with first symbol layer color
                 if symbol_layer.layerType() in [

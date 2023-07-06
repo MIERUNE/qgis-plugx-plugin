@@ -18,7 +18,7 @@ from PyQt5.QtCore import QSize
 from qgis.PyQt.QtGui import QImage, QColor
 
 
-class RasterLayer:
+class RasterTranslator:
     def __init__(
         self,
         layer: QgsRasterLayer,
