@@ -33,11 +33,6 @@ def _get_asset_name(symbol_layer: QgsSymbolLayer):
     return os.path.basename(symbol_layer.path())
 
 
-def _get_symbol_level(symbol_layer: QgsSymbolLayer):
-    # https://github.com/qgis/QGIS/blob/65d40ee0ce59e761ee2de366ca9a963f35adfcfd/src/core/vector/qgsvectorlayerrenderer.cpp#L702
-    return symbol_layer.renderingPass()  # renderingPass means symbolLevels:
-
-
 def export_assets_from(symbol, output_dir: str):
     for symbol_layer in symbol:
         if symbol_layer.type() == Qgis.SymbolType.Marker:
@@ -84,7 +79,8 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "outline_width": None,
             "symbol_layer_type": "raster",
             "symbol_path": "assets/symbol_raster/" + _get_asset_name(symbol_layer),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),  # renderingPass means symbolLevels
+            # https://github.com/qgis/QGIS/blob/65d40ee0ce59e761ee2de366ca9a963f35adfcfd/src/core/vector/qgsvectorlayerrenderer.cpp#L702
         }
 
     elif symbol_layer.layerType() == "SvgMarker":
@@ -97,7 +93,7 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             ),
             "symbol_layer_type": "svg",
             "symbol_path": "assets/symbol_svg/" + _get_asset_name(symbol_layer),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
 
     elif symbol_layer.layerType() == "SimpleMarker":
@@ -112,7 +108,7 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             ),
             "symbol_layer_type": "simple",
             "symbol_path": "",
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
 
     elif symbol_layer.layerType() == "FontMarker":
@@ -124,7 +120,7 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "outline_width": None,
             "symbol_layer_type": "raster",
             "symbol_path": "assets/symbol_raster/" + _get_asset_name(symbol_layer),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "AnimatedMarker":
         # TODO: implement
@@ -135,7 +131,7 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "outline_width": None,
             "symbol_layer_type": "raster",
             "symbol_path": "assets/symbol_raster/" + _get_asset_name(symbol_layer),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "FilledMarker":
         # TODO: implement
@@ -146,7 +142,7 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "outline_width": None,
             "symbol_layer_type": "raster",
             "symbol_path": "assets/symbol_raster/" + _get_asset_name(symbol_layer),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "MaskMarker":
         # TODO: implement
@@ -157,7 +153,7 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "outline_width": None,
             "symbol_layer_type": "raster",
             "symbol_path": "assets/symbol_raster/" + _get_asset_name(symbol_layer),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
 
     return symbol_layer_dict
@@ -171,7 +167,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "width": 0
             if Qt.PenStyle.NoPen
             else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "InterpolatedLine":
         # TODO: implement
@@ -181,7 +177,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "width": 0
             if Qt.PenStyle.NoPen
             else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "MarkerLine":
         # TODO: implement
@@ -191,7 +187,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "width": 0
             if Qt.PenStyle.NoPen
             else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "HashedLine":
         # TODO: implement
@@ -201,7 +197,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "width": 0
             if Qt.PenStyle.NoPen
             else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "RasterLine":
         # TODO: implement
@@ -211,7 +207,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "width": 0
             if Qt.PenStyle.NoPen
             else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
 
     return symbol_layer_dict
@@ -229,55 +225,55 @@ def _get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             else convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "CentroidFill":
         symbol_layer_dict = {
             "symbol_layer_type": "simple",  # unsupported yet
             "fill_color": symbol_layer.subSymbol().symbolLayer(0).color().name(),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "PointPatternFill":
         # TODO: implement
         symbol_layer_dict = {
             "symbol_layer_type": "simple",  # unsupported yet
             "fill_color": symbol_layer.color().name(),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "RandomMarkerFill":
         # TODO: implement
         symbol_layer_dict = {
             "symbol_layer_type": "simple",  # unsupported yet
             "fill_color": symbol_layer.color().name(),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "LinePatternFill":
         # TODO: implement
         symbol_layer_dict = {
             "symbol_layer_type": "simple",  # unsupported yet
             "fill_color": symbol_layer.color().name(),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "SVGFill":
         # TODO: implement
         symbol_layer_dict = {
             "symbol_layer_type": "simple",  # unsupported yet
             "fill_color": symbol_layer.color().name(),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "GradientFill":
         # TODO: implement
         symbol_layer_dict = {
             "symbol_layer_type": "simple",  # unsupported yet
             "fill_color": symbol_layer.color().name(),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "ShapeburstFill":
         # TODO: implement
         symbol_layer_dict = {
             "symbol_layer_type": "simple",  # unsupported yet
             "fill_color": symbol_layer.color().name(),
-            "level": _get_symbol_level(symbol_layer),
+            "level": symbol_layer.renderingPass(),
         }
     return symbol_layer_dict
 
@@ -287,7 +283,7 @@ def _get_hybrid_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
     symbol_layer_dict = {
         "symbol_layer_type": symbol_layer.layerType().lower(),
         "color": symbol_layer.color().name(),
-        "level": _get_symbol_level(symbol_layer),
+        "level": symbol_layer.renderingPass(),
         # "geometry": symbol_layer.geometryExpression(),
     }
 
