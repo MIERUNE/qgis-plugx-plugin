@@ -19,8 +19,8 @@ from qgis.core import (
 from qgis.PyQt import uic
 from qgis.utils import iface
 
-from translator import RasterTranslator
-from translator.vector.process import process as process_vector
+from translator.raster.process import process_raster
+from translator.vector.process import process_vector
 from translator.vector.label import generate_label_json
 from utils import write_json
 
@@ -64,7 +64,7 @@ class MainDialog(QDialog):
         layers = self._get_checked_layers()
         params = self._get_excution_params()
 
-        # ラベルSHPを出力する
+        # export label shp, includes all layers
         all_labels = processing.run(
             "native:extractlabels",
             {
@@ -77,14 +77,12 @@ class MainDialog(QDialog):
             },
         )["OUTPUT"]
 
-        output_layer_names = []
-        layers_has_unsupported_symbol = []
-
+        # process layers
+        layers_has_unsupported_symbol = []  # if layer with unsupported symbol, memo it
         for idx, layer in enumerate(layers):
-            layer_name = f"layer_{idx}"  # layer_0, layer_1, ...
-            output_layer_names.append(layer_name)
-
-            if isinstance(layer, QgsVectorLayer):
+            if isinstance(layer, QgsRasterLayer):
+                process_raster(layer, params["extent"], idx, params["output_dir"])
+            elif isinstance(layer, QgsVectorLayer):
                 result = process_vector(
                     layer, params["extent"], idx, params["output_dir"]
                 )
@@ -97,13 +95,7 @@ class MainDialog(QDialog):
                 if result["has_unsupported_symbol"]:
                     layers_has_unsupported_symbol.append(layer.name())
 
-            elif isinstance(layer, QgsRasterLayer):
-                rasterlayer = RasterTranslator(
-                    layer, layer_name, params["extent"], params["output_dir"]
-                )
-                rasterlayer.raster_to_png()
-                rasterlayer.write_json()
-
+        # write project.json
         project_json = {
             "project_name": os.path.basename(QgsProject.instance().fileName()),
             "crs": QgsProject.instance().crs().authid(),
@@ -119,22 +111,21 @@ class MainDialog(QDialog):
                 self.ui.mExtentGroupBox.outputExtent().yMaximum(),
             ],
             "scale": iface.mapCanvas().scale(),
-            "layers": output_layer_names,
+            "layers": [f"layer_{idx}" for idx in range(len(layers))],  # layer_0,1,2..
         }
         write_json(
             project_json,
             os.path.join(self.ui.outputFileWidget.filePath(), "project.json"),
         )
 
+        # messaging
         msg = f"処理が完了しました。\n\n出力先:\n{params['output_dir']}"
-
         if len(layers_has_unsupported_symbol) > 0:
             msg += (
                 "\n\n以下レイヤに対応不可なシンボロジがあるため、\n\
             シンプルシンボルに変換しました。\n"
                 + "\n".join(layers_has_unsupported_symbol)
             )
-
         QMessageBox.information(
             None,
             "完了",
