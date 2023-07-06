@@ -6,7 +6,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QMessageBox, QTreeWidgetItem
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
-    QgsMapLayer,
     QgsMapLayerModel,
     QgsProject,
     QgsRasterLayer,
@@ -20,7 +19,9 @@ from qgis.core import (
 from qgis.PyQt import uic
 from qgis.utils import iface
 
-from translator import VectorTranslator, RasterTranslator
+from translator import RasterTranslator
+from translator.vector.process import process as process_vector
+from translator.vector.label import generate_label_json
 from utils import write_json
 
 
@@ -35,7 +36,7 @@ class MainDialog(QDialog):
 
     def init_ui(self):
         # connect signals
-        self.ui.pushButton_run.clicked.connect(self.run)
+        self.ui.pushButton_run.clicked.connect(self._run)
         self.ui.pushButton_cancel.clicked.connect(self.close)
 
         # QgsExtentGroupBox
@@ -51,7 +52,7 @@ class MainDialog(QDialog):
         QgsProject.instance().layersAdded.connect(self.process_node)
         self.process_node()  # 初回読み込み
 
-    def get_excution_params(self):
+    def _get_excution_params(self):
         params = {
             "extent": self.ui.mExtentGroupBox.outputExtent(),
             "output_dir": self.ui.outputFileWidget.filePath(),
@@ -59,9 +60,9 @@ class MainDialog(QDialog):
 
         return params
 
-    def run(self):
-        layers = self.get_checked_layers()
-        params = self.get_excution_params()
+    def _run(self):
+        layers = self._get_checked_layers()
+        params = self._get_excution_params()
 
         # ラベルSHPを出力する
         all_labels = processing.run(
@@ -77,76 +78,31 @@ class MainDialog(QDialog):
         )["OUTPUT"]
 
         output_layer_names = []
-        svgs = []
-        rasters = []
+        layers_has_unsupported_symbol = []
 
-        symbol_error_layers: list = []
+        for idx, layer in enumerate(layers):
+            layer_name = f"layer_{idx}"  # layer_0, layer_1, ...
+            output_layer_names.append(layer_name)
 
-        for layer in layers:
             if isinstance(layer, QgsVectorLayer):
-                # 指定範囲内の地物を抽出し、元のスタイルを適用する
-                qml_path = os.path.join(params["output_dir"], "layer.qml")
-                layer.saveNamedStyle(
-                    qml_path, categories=QgsMapLayer.Symbology | QgsMapLayer.Labeling
+                result = process_vector(
+                    layer, params["extent"], idx, params["output_dir"]
                 )
 
-                reprojected = processing.run(
-                    "native:reprojectlayer",
-                    {
-                        "INPUT": layer,
-                        "TARGET_CRS": QgsProject.instance().crs(),
-                        "OUTPUT": "TEMPORARY_OUTPUT",
-                    },
-                )["OUTPUT"]
+                if layer.labelsEnabled():
+                    generate_label_json(
+                        all_labels, layer.name(), idx, params["output_dir"]
+                    )
 
-                clip_extent = f"{params['extent'].xMinimum()}, \
-                        {params['extent'].xMaximum()}, \
-                        {params['extent'].yMinimum()}, \
-                        {params['extent'].yMaximum()}  \
-                        [{QgsProject.instance().crs().authid()}]"
-
-                layer_intersected = processing.run(
-                    "native:extractbyextent",
-                    {
-                        "INPUT": reprojected,
-                        "EXTENT": clip_extent,
-                        "CLIP": True,
-                        "OUTPUT": "TEMPORARY_OUTPUT",
-                    },
-                )["OUTPUT"]
-
-                layer_intersected.loadNamedStyle(qml_path)
-                if os.path.exists(qml_path):
-                    os.remove(qml_path)
-
-                # レイヤ名をlayer_indexに変更する
-                layer_intersected.setName(f"layer_{layers.index(layer)}")
-                output_layer_names.append(layer_intersected.name())
-
-                # スタイル出力用のVectorLayerインスランスを作成する
-                vector_layer = VectorTranslator(
-                    layer_intersected, params["output_dir"], layer.name()
-                )
-
-                # シンボロジごとのSHPとjsonを出力
-                vector_layer.update_svgs_rasters_list(rasters, svgs)
-                vector_layer.generate_symbols()
-                svgs = vector_layer.svgs
-                rasters = vector_layer.rasters
-
-                if vector_layer.layer.labelsEnabled():
-                    vector_layer.generate_label_json(all_labels, layer.name())
-                if vector_layer.unsupported_symbols:
-                    symbol_error_layers.append(layer.name())
+                if result["has_unsupported_symbol"]:
+                    layers_has_unsupported_symbol.append(layer.name())
 
             elif isinstance(layer, QgsRasterLayer):
-                output_layer_name = f"layer_{layers.index(layer)}"
                 rasterlayer = RasterTranslator(
-                    layer, output_layer_name, params["extent"], params["output_dir"]
+                    layer, layer_name, params["extent"], params["output_dir"]
                 )
                 rasterlayer.raster_to_png()
                 rasterlayer.write_json()
-                output_layer_names.append(output_layer_name)
 
         project_json = {
             "project_name": os.path.basename(QgsProject.instance().fileName()),
@@ -172,11 +128,11 @@ class MainDialog(QDialog):
 
         msg = f"処理が完了しました。\n\n出力先:\n{params['output_dir']}"
 
-        if symbol_error_layers:
+        if len(layers_has_unsupported_symbol) > 0:
             msg += (
                 "\n\n以下レイヤに対応不可なシンボロジがあるため、\n\
             シンプルシンボルに変換しました。\n"
-                + "\n".join(symbol_error_layers)
+                + "\n".join(layers_has_unsupported_symbol)
             )
 
         QMessageBox.information(
@@ -185,15 +141,15 @@ class MainDialog(QDialog):
             msg,
         )
 
-    def get_checked_layers(self):
+    def _get_checked_layers(self):
         layers = []
         # QTreeWidgetの子要素を再帰的に取得する
         for i in range(self.layerTree.topLevelItemCount()):
             item = self.layerTree.topLevelItem(i)
-            layers.extend(self.get_checked_layers_recursive(item))
+            layers.extend(self._get_checked_layers_recursive(item))
         return layers
 
-    def get_checked_layers_recursive(self, item):
+    def _get_checked_layers_recursive(self, item):
         layers = []
         if item.checkState(0) == Qt.CheckState.Checked:
             layer = QgsProject.instance().mapLayer(item.text(1))
@@ -201,7 +157,7 @@ class MainDialog(QDialog):
                 layers.append(layer)
         for i in range(item.childCount()):
             child_item = item.child(i)
-            layers.extend(self.get_checked_layers_recursive(child_item))
+            layers.extend(self._get_checked_layers_recursive(child_item))
         return layers
 
     def process_node(self):
@@ -209,9 +165,9 @@ class MainDialog(QDialog):
         QGISのレイヤーツリーを読み込み
         """
         self.layerTree.clear()
-        self.process_node_recursive(QgsProject.instance().layerTreeRoot(), None)
+        self._process_node_recursive(QgsProject.instance().layerTreeRoot(), None)
 
-    def process_node_recursive(self, node, parent_node):
+    def _process_node_recursive(self, node, parent_node):
         """
         QGISのレイヤーツリーを再帰的に読み込み
 
@@ -269,4 +225,4 @@ class MainDialog(QDialog):
                 parent_node.addChild(item)
 
             if child_type == "group":
-                self.process_node_recursive(child, item)
+                self._process_node_recursive(child, item)
