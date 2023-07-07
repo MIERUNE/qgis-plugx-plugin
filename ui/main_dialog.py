@@ -161,6 +161,7 @@ class MainDialog(QDialog):
         """
         QGISのレイヤーツリーを読み込み
         """
+
         self.layerTree.clear()
         self._process_node_recursive(QgsProject.instance().layerTreeRoot(), None)
 
@@ -177,6 +178,14 @@ class MainDialog(QDialog):
             Exception: _description_
         """
         for child in node.children():
+            # check signal is connected or not
+            try:
+                child.nameChanged.disconnect(self.process_node)
+            except TypeError:
+                # when signal is not connected
+                pass
+            child.nameChanged.connect(self.process_node)
+
             if QgsLayerTree.isGroup(child):
                 if not isinstance(child, QgsLayerTreeGroup):
                     # Sip cast issue , Lizmap plugin #299
