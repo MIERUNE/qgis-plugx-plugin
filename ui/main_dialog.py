@@ -43,6 +43,12 @@ class MainDialog(QDialog):
         self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
         self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs())
         self.ui.mExtentGroupBox.setOutputExtentFromCurrent()
+        QgsProject.instance().crsChanged.connect(
+            lambda: [
+                self.ui.mExtentGroupBox.setOutputCrs(QgsProject.instance().crs()),
+                self.ui.mExtentGroupBox.setOutputExtentFromCurrent(),
+            ]
+        )
 
         # レイヤーが追加されるなど、レイヤー一覧が変更されたときに更新する
         QgsProject.instance().layerTreeRoot().layerOrderChanged.connect(
