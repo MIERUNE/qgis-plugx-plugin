@@ -229,49 +229,49 @@ def _get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         }
     elif symbol_layer.layerType() == "CentroidFill":
         symbol_layer_dict = {
-            "symbol_layer_type": "simple",  # unsupported yet
+            "symbol_layer_type": "simple",
             "fill_color": symbol_layer.subSymbol().symbolLayer(0).color().name(),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "PointPatternFill":
         # TODO: implement
         symbol_layer_dict = {
-            "symbol_layer_type": "simple",  # unsupported yet
+            "symbol_layer_type": "simple",
             "fill_color": symbol_layer.color().name(),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "RandomMarkerFill":
         # TODO: implement
         symbol_layer_dict = {
-            "symbol_layer_type": "simple",  # unsupported yet
+            "symbol_layer_type": "simple",
             "fill_color": symbol_layer.color().name(),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "LinePatternFill":
         # TODO: implement
         symbol_layer_dict = {
-            "symbol_layer_type": "simple",  # unsupported yet
+            "symbol_layer_type": "simple",
             "fill_color": symbol_layer.color().name(),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "SVGFill":
         # TODO: implement
         symbol_layer_dict = {
-            "symbol_layer_type": "simple",  # unsupported yet
+            "symbol_layer_type": "simple",
             "fill_color": symbol_layer.color().name(),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "GradientFill":
         # TODO: implement
         symbol_layer_dict = {
-            "symbol_layer_type": "simple",  # unsupported yet
+            "symbol_layer_type": "simple",
             "fill_color": symbol_layer.color().name(),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "ShapeburstFill":
         # TODO: implement
         symbol_layer_dict = {
-            "symbol_layer_type": "simple",  # unsupported yet
+            "symbol_layer_type": "simple",
             "fill_color": symbol_layer.color().name(),
             "level": symbol_layer.renderingPass(),
         }
