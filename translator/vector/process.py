@@ -103,6 +103,7 @@ def _process_categorical(
             "type": _get_layer_type(layer),
             "crs": layer.crs().authid(),
             "symbol": generate_symbols_data(category.symbol()),
+            "usingSymbolLevels": layer.renderer().usingSymbolLevels(),
             "legend": category.label(),
         }
         write_json(
@@ -145,6 +146,7 @@ def _process_noncategorical(
         "type": _get_layer_type(layer),
         "crs": layer.crs().authid(),
         "symbol": generate_symbols_data(layer.renderer().symbol()),
+        "usingSymbolLevels": layer.renderer().usingSymbolLevels(),
     }
     write_json(
         layer_json,
