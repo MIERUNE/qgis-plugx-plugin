@@ -1,6 +1,5 @@
 import os
 import shutil
-from PyQt5.QtCore import Qt
 from qgis.core import Qgis, QgsSymbolLayer, QgsSymbol
 from utils import convert_to_point
 
@@ -101,9 +100,7 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
             "fill_color": symbol_layer.color().name(),
             "outline_color": symbol_layer.strokeColor().name(),
-            "outline_width": 0
-            if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen
-            else convert_to_point(
+            "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "symbol_layer_type": "simple",
@@ -240,8 +237,8 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         # never to be supported...
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
-            "color": symbol_layer.color().name(),
-            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "color": "#000000",
+            "width": 0,
             "level": symbol_layer.renderingPass(),
         }
     else:
@@ -257,9 +254,7 @@ def _get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "symbol_layer_type": "simple",
             "fill_color": symbol_layer.fillColor().name(),
             "outline_color": symbol_layer.strokeColor().name(),
-            "outline_width": 0
-            if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen
-            else convert_to_point(
+            "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "level": symbol_layer.renderingPass(),
@@ -323,7 +318,7 @@ def _get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         # never to be supported...
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
-            "fill_color": symbol_layer.color().name(),
+            "fill_color": "#000000",
             "level": symbol_layer.renderingPass(),
         }
     else:
