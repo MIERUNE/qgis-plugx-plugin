@@ -50,13 +50,13 @@ class MainDialog(QDialog):
             ]
         )
 
+        # close dialog when project cleared to avoid crash: Issue #55
+        QgsProject.instance().cleared.connect(self.close)
+
         # レイヤーが追加されるなど、レイヤー一覧が変更されたときに更新する
         QgsProject.instance().layerTreeRoot().layerOrderChanged.connect(
             self.process_node
         )
-        QgsProject.instance().layerRemoved.connect(self.process_node)
-        QgsProject.instance().layersAdded.connect(self.process_node)
-        self.process_node()  # 初回読み込み
 
     def _get_excution_params(self):
         params = {
@@ -161,6 +161,9 @@ class MainDialog(QDialog):
         """
         QGISのレイヤーツリーを読み込み
         """
+        if not self.isVisible():
+            # don't process_node when dialog invisible to avoid crash: Issue #55
+            return
 
         self.layerTree.clear()
         self._process_node_recursive(QgsProject.instance().layerTreeRoot(), None)
