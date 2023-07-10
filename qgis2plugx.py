@@ -67,6 +67,6 @@ class QGIS2PlugX:
     def show_dialog(self):
         if self.main_dialog is None:
             self.main_dialog = MainDialog()
-        else:
-            self.main_dialog.process_node()
+
         self.main_dialog.show()
+        self.main_dialog.process_node()
