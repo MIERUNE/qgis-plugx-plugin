@@ -185,9 +185,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "InterpolatedLine":
@@ -195,9 +193,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "MarkerLine":
@@ -205,9 +201,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "HashLine":
@@ -215,9 +209,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "RasterLine":
@@ -225,9 +217,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "Lineburst":
@@ -235,9 +225,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "ArrowLine":
@@ -245,9 +233,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "GeometryGenerator":
@@ -255,9 +241,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
     else:
