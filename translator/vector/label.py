@@ -49,7 +49,7 @@ def generate_label_json(
             )
 
     if len(labels) > 0:
-        label_dict = {"layer": layername, "labels": []}
+        label_dict = {"layer": layername, "labels": labels}
         write_json(
             label_dict,
             os.path.join(output_dir, f"label_{idx}.json"),
