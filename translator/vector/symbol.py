@@ -1,6 +1,5 @@
 import os
 import shutil
-from PyQt5.QtCore import Qt
 from qgis.core import Qgis, QgsSymbolLayer, QgsSymbol
 from utils import convert_to_point
 
@@ -101,9 +100,7 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
             "fill_color": symbol_layer.color().name(),
             "outline_color": symbol_layer.strokeColor().name(),
-            "outline_width": 0
-            if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen
-            else convert_to_point(
+            "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "symbol_layer_type": "simple",
@@ -118,8 +115,7 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "fill_color": symbol_layer.color().name(),
             "outline_color": symbol_layer.strokeColor().name(),
             "outline_width": None,
-            "symbol_layer_type": "raster",
-            "symbol_path": "assets/symbol_raster/" + _get_asset_name(symbol_layer),
+            "symbol_layer_type": "simple",
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "AnimatedMarker":
@@ -129,8 +125,17 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "fill_color": symbol_layer.color().name(),
             "outline_color": symbol_layer.strokeColor().name(),
             "outline_width": None,
-            "symbol_layer_type": "raster",
-            "symbol_path": "assets/symbol_raster/" + _get_asset_name(symbol_layer),
+            "symbol_layer_type": "simple",
+            "level": symbol_layer.renderingPass(),
+        }
+    elif symbol_layer.layerType() == "EllipseMarker":
+        # TODO: implement
+        symbol_layer_dict = {
+            "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
+            "fill_color": symbol_layer.color().name(),
+            "outline_color": symbol_layer.strokeColor().name(),
+            "outline_width": None,
+            "symbol_layer_type": "simple",
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "FilledMarker":
@@ -140,8 +145,7 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "fill_color": symbol_layer.color().name(),
             "outline_color": symbol_layer.strokeColor().name(),
             "outline_width": None,
-            "symbol_layer_type": "raster",
-            "symbol_path": "assets/symbol_raster/" + _get_asset_name(symbol_layer),
+            "symbol_layer_type": "simple",
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "MaskMarker":
@@ -151,10 +155,24 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "fill_color": symbol_layer.color().name(),
             "outline_color": symbol_layer.strokeColor().name(),
             "outline_width": None,
-            "symbol_layer_type": "raster",
-            "symbol_path": "assets/symbol_raster/" + _get_asset_name(symbol_layer),
+            "symbol_layer_type": "simple",
             "level": symbol_layer.renderingPass(),
         }
+    elif (
+        symbol_layer.layerType() == "GeometryGenerator"
+        or symbol_layer.layerType() == "VectorField"
+    ):
+        # never to be supported...
+        symbol_layer_dict = {
+            "size": 1,
+            "fill_color": "#000000",
+            "outline_color": "#000000",
+            "outline_width": None,
+            "symbol_layer_type": "unsupported",
+            "level": symbol_layer.renderingPass(),
+        }
+    else:
+        raise Exception("Unexpected symbol layer type")
 
     return symbol_layer_dict
 
@@ -164,9 +182,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "InterpolatedLine":
@@ -174,9 +190,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "MarkerLine":
@@ -184,19 +198,15 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
-    elif symbol_layer.layerType() == "HashedLine":
+    elif symbol_layer.layerType() == "HashLine":
         # TODO: implement
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "RasterLine":
@@ -204,11 +214,35 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "symbol_layer_type": "simple",
             "color": symbol_layer.color().name(),
-            "width": 0
-            if Qt.PenStyle.NoPen
-            else convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
+    elif symbol_layer.layerType() == "Lineburst":
+        # TODO: implement
+        symbol_layer_dict = {
+            "symbol_layer_type": "simple",
+            "color": symbol_layer.color().name(),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "level": symbol_layer.renderingPass(),
+        }
+    elif symbol_layer.layerType() == "ArrowLine":
+        # TODO: implement
+        symbol_layer_dict = {
+            "symbol_layer_type": "simple",
+            "color": symbol_layer.color().name(),
+            "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
+            "level": symbol_layer.renderingPass(),
+        }
+    elif symbol_layer.layerType() == "GeometryGenerator":
+        # never to be supported...
+        symbol_layer_dict = {
+            "symbol_layer_type": "simple",
+            "color": "#000000",
+            "width": 0,
+            "level": symbol_layer.renderingPass(),
+        }
+    else:
+        raise Exception("Unexpected symbol layer type")
 
     return symbol_layer_dict
 
@@ -220,9 +254,7 @@ def _get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "symbol_layer_type": "simple",
             "fill_color": symbol_layer.fillColor().name(),
             "outline_color": symbol_layer.strokeColor().name(),
-            "outline_width": 0
-            if symbol_layer.strokeStyle() == Qt.PenStyle.NoPen
-            else convert_to_point(
+            "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "level": symbol_layer.renderingPass(),
@@ -254,6 +286,13 @@ def _get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "fill_color": symbol_layer.color().name(),
             "level": symbol_layer.renderingPass(),
         }
+    elif symbol_layer.layerType() == "RasterFill":
+        # TODO: implement
+        symbol_layer_dict = {
+            "symbol_layer_type": "simple",
+            "fill_color": symbol_layer.color().name(),
+            "level": symbol_layer.renderingPass(),
+        }
     elif symbol_layer.layerType() == "SVGFill":
         # TODO: implement
         symbol_layer_dict = {
@@ -275,6 +314,16 @@ def _get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "fill_color": symbol_layer.color().name(),
             "level": symbol_layer.renderingPass(),
         }
+    elif symbol_layer.layerType() == "GeometryGenerator":
+        # never to be supported...
+        symbol_layer_dict = {
+            "symbol_layer_type": "simple",
+            "fill_color": "#000000",
+            "level": symbol_layer.renderingPass(),
+        }
+    else:
+        raise Exception("Unexpected symbol layer type")
+
     return symbol_layer_dict
 
 
