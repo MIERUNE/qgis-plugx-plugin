@@ -259,7 +259,7 @@ def _get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
     elif symbol_layer.layerType() == "SVGFill":
         # TODO: implement
         symbol_layer_dict = {
-            "type": "simple",
+            "type": "svg",
             "color": symbol_layer.color().name(),
             "level": symbol_layer.renderingPass(),
         }
