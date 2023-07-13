@@ -261,6 +261,10 @@ def _get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "type": "svg",
             "color": symbol_layer.color().name(),
+            "outline_color": symbol_layer.strokeColor().name(),
+            "outline_width": convert_to_point(
+                symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
+            ),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "GradientFill":
