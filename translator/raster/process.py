@@ -23,7 +23,6 @@ def process_raster(
     raster_info = {
         "layer": layer.name(),
         "type": "raster",
-        "crs": layer.crs().authid(),
         "extent": [
             extent.xMinimum(),
             extent.yMinimum(),
