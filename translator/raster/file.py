@@ -13,13 +13,12 @@ from qgis.utils import iface
 from PyQt5.QtCore import QSize
 from qgis.PyQt.QtGui import QImage, QColor
 
+from utils import get_tempdir
+
 
 def _process_multiband(
     layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_dir: str
 ):
-    # Create clip PNG file in Project CRS
-    output_png_path = os.path.join(output_dir, f"layer_{idx}.png")
-
     # Convert to Project CRS
     warped = processing.run(
         "gdal:warpreproject",
@@ -27,7 +26,9 @@ def _process_multiband(
             "INPUT": layer,
             "SOURCE_CRS": layer.crs(),
             "TARGET_CRS": QgsProject.instance().crs(),
-            "OUTPUT": "TEMPORARY_OUTPUT",
+            "OUTPUT": os.path.join(
+                get_tempdir(output_dir), f"{layer.name()}_warped.tif"
+            ),
         },
     )["OUTPUT"]
 
@@ -47,7 +48,7 @@ def _process_multiband(
             "OPTIONS": "",
             "DATA_TYPE": 0,
             "EXTRA": "",
-            "OUTPUT": output_png_path,
+            "OUTPUT": os.path.join(output_dir, f"layer_{idx}.png"),
         },
     )
 
@@ -57,17 +58,19 @@ def _process_singleband(
 ):
     # single band raster with 1 band
     # Reproject input raster to 2451
-    reprojeted = processing.run(
+    warped1 = processing.run(
         "gdal:warpreproject",
         {
             "INPUT": layer,
             "SOURCE_CRS": layer.crs(),
             "TARGET_CRS": QgsCoordinateReferenceSystem("EPSG:2451"),
-            "OUTPUT": "TEMPORARY_OUTPUT",
+            "OUTPUT": os.path.join(
+                get_tempdir(output_dir), f"{layer.name()}_warped1.tif"
+            ),
         },
     )["OUTPUT"]
 
-    layer_geographic = QgsRasterLayer(reprojeted, "Raster Layer")
+    layer_geographic = QgsRasterLayer(warped1, "Raster Layer")
 
     # set style to layer geographic from input raster
     layer_geographic.setRenderer(layer.renderer().clone())
@@ -102,14 +105,12 @@ def _process_singleband(
     # Get the rendered image
     image = render.renderedImage()
     output_symbolized_png_path = os.path.join(
-        output_dir, layer.name() + "_symbolized.png"
+        get_tempdir(output_dir), f"{layer.name()}_symbolized.png"
     )
     image.save(output_symbolized_png_path, "png")
 
     # Generate input raster world file
-    pgw_file = output_symbolized_png_path.replace(".png", ".pgw")
-
-    raster_canvas = os.path.join(output_dir, layer.name() + "_canvas.png")
+    raster_canvas = os.path.join(get_tempdir(output_dir), f"{layer.name()}_canvas.png")
     processing.run(
         "gdal:translate",
         {
@@ -124,23 +125,25 @@ def _process_singleband(
         },
     )
 
-    wld_file = os.path.join(output_dir, layer.name() + "_canvas.wld")
-    os.rename(wld_file, pgw_file)
+    wld_file = raster_canvas.replace(".png", ".wld")
+    os.rename(
+        wld_file, output_symbolized_png_path.replace(".png", ".pgw")
+    )  # _canvas.wld -> _symbolized.pgw
 
     # Convert to Project CRS
-    warped = processing.run(
+    warped2 = processing.run(
         "gdal:warpreproject",
         {
             "INPUT": output_symbolized_png_path,
             "SOURCE_CRS": layer_geographic.crs(),
             "TARGET_CRS": QgsProject.instance().crs(),
-            "OUTPUT": "TEMPORARY_OUTPUT",
+            "OUTPUT": os.path.join(
+                get_tempdir(output_dir), f"{layer.name()}_warped2.tif"
+            ),
         },
     )["OUTPUT"]
 
     # Clip converted PNG file
-    output_png_path = os.path.join(output_dir, f"layer_{idx}.png")
-
     clip_extent = f"{extent.xMinimum()}, \
                     {extent.xMaximum()}, \
                     {extent.yMinimum()}, \
@@ -150,23 +153,16 @@ def _process_singleband(
     processing.run(
         "gdal:cliprasterbyextent",
         {
-            "INPUT": warped,
+            "INPUT": warped2,
             "PROJWIN": clip_extent,
             "OVERCRS": False,
             "NODATA": None,
             "OPTIONS": "",
             "DATA_TYPE": 0,
             "EXTRA": "",
-            "OUTPUT": output_png_path,
+            "OUTPUT": os.path.join(output_dir, f"layer_{idx}.png"),
         },
     )
-
-    # clean up
-    os.remove(output_symbolized_png_path)
-    os.remove(output_symbolized_png_path + ".aux.xml")
-    os.remove(pgw_file)
-    os.remove(raster_canvas)
-    os.remove(raster_canvas + ".aux.xml")
 
 
 def process_file(
