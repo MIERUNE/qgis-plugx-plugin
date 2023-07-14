@@ -1,3 +1,4 @@
+import os
 import json
 from typing import Union
 
@@ -42,3 +43,12 @@ def convert_to_point(value: float, unit: QgsUnitTypes.RenderUnit) -> float:
 
     if unit == QgsUnitTypes.RenderInches:
         return value * 72
+
+
+def get_tempdir(output_dir: str) -> str:
+    """return tempdir path shared by all modules. if not exists, create it."""
+    temp_dir_path = os.path.join(output_dir, "temp")
+    if not os.path.exists(os.path.join(output_dir, temp_dir_path)):
+        os.mkdir(os.path.join(output_dir, temp_dir_path))
+
+    return os.path.join(output_dir, temp_dir_path)
