@@ -12,6 +12,8 @@ from qgis.core import (
 )
 from qgis.utils import iface
 
+from utils import get_tempdir
+
 
 def process_wms(layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_dir: str):
     """process wms, xyz..."""
@@ -39,7 +41,9 @@ def process_wms(layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_di
     image_width = int(extent_width / scale * dpi / inch_to_meter)
     image_height = int(extent_height / scale * dpi / inch_to_meter)
 
-    clipped_tiff_path = os.path.join(output_dir, f"{layer.name()}_clipped.tif")
+    clipped_tiff_path = os.path.join(
+        get_tempdir(output_dir), f"{layer.name()}_clipped.tif"
+    )
 
     # Save TIFF file in EPSG:3857
     file_writer = QgsRasterFileWriter(clipped_tiff_path)
@@ -60,7 +64,9 @@ def process_wms(layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_di
             "INPUT": clipped_tiff_path,
             "SOURCE_CRS": QgsCoordinateReferenceSystem("EPSG:3857"),
             "TARGET_CRS": QgsProject.instance().crs(),
-            "OUTPUT": "TEMPORARY_OUTPUT",
+            "OUTPUT": os.path.join(
+                get_tempdir(output_dir), f"{layer.name()}_warped.tif"
+            ),
         },
     )["OUTPUT"]
 
@@ -84,7 +90,3 @@ def process_wms(layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_di
             "OUTPUT": os.path.join(output_dir, f"layer_{idx}.png"),
         },
     )
-
-    # clean up
-    os.remove(clipped_tiff_path)
-    os.remove(clipped_tiff_path + ".aux.xml")

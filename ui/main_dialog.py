@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import processing
 import sip
@@ -22,7 +23,7 @@ from qgis.utils import iface
 from translator.raster.process import process_raster
 from translator.vector.process import process_vector
 from translator.vector.label import generate_label_json
-from utils import write_json
+from utils import write_json, get_tempdir
 
 
 class MainDialog(QDialog):
@@ -137,6 +138,17 @@ class MainDialog(QDialog):
             "完了",
             msg,
         )
+
+        # remove temp dir including intermediate files
+        try:
+            shutil.rmtree(get_tempdir(params["output_dir"]))
+        # if dir is locked by process
+        except PermissionError:
+            QMessageBox.warning(
+                self,
+                "エラー",
+                "一時フォルダの削除に失敗しました。\n手動で削除してください。",
+            )
 
     def _get_checked_layers(self):
         layers = []
