@@ -2,6 +2,7 @@ import os
 import shutil
 from qgis.core import Qgis, QgsSymbolLayer, QgsSymbol
 from utils import convert_to_point
+from PyQt5.QtCore import Qt
 
 
 def is_included_unsupported_symbol_layer(symbol: QgsSymbol):
@@ -50,6 +51,33 @@ def export_assets_from(symbol, output_dir: str):
                 symbol_layer.path(),
                 asset_path,
             )
+
+
+def get_pen_style_from_id(pen_style_id):
+    pen_style_names = {
+        Qt.NoPen: "no pen",
+        Qt.SolidLine: "solid line",
+        Qt.DashLine: "dash line",
+        Qt.DotLine: "dot line",
+        Qt.DashDotLine: "dash dot line",
+        Qt.DashDotDotLine: "dash dot dot line",
+        Qt.CustomDashLine: "custom dash line",
+    }
+    return pen_style_names.get(pen_style_id, "unknown pen style")
+
+
+def get_cap_style_from_id(cap_style_id):
+    cap_style_names = {Qt.FlatCap: "flat", Qt.SquareCap: "square", Qt.RoundCap: "round"}
+    return cap_style_names.get(cap_style_id, "unknown cap style")
+
+
+def get_join_style_from_id(join_style_id):
+    join_style_names = {
+        Qt.MiterJoin: "miter",
+        Qt.BevelJoin: "bevel",
+        Qt.RoundJoin: "round",
+    }
+    return join_style_names.get(join_style_id, "unknown join style")
 
 
 def generate_symbols_data(symbol: QgsSymbol):
@@ -157,9 +185,19 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "type": "simple",
             "color": symbol_layer.color().name(),
+            "stroke_style": get_pen_style_from_id(symbol_layer.penStyle()),
+            "join_style": get_join_style_from_id(symbol_layer.penJoinStyle()),
+            "cap_style": get_cap_style_from_id(symbol_layer.penCapStyle()),
             "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
+        if symbol_layer.useCustomDashPattern() == True:
+            symbol_layer_dict["dash_pattern"] = []
+            for dash_value in symbol_layer.customDashVector():
+                symbol_layer_dict["dash_pattern"].append(
+                    convert_to_point(dash_value, symbol_layer.customDashPatternUnit())
+                )
+
     elif symbol_layer.layerType() == "InterpolatedLine":
         # TODO: implement
         symbol_layer_dict = {
