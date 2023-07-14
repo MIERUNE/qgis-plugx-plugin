@@ -191,7 +191,7 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
-        if symbol_layer.useCustomDashPattern() == True:
+        if symbol_layer.useCustomDashPattern():
             symbol_layer_dict["dash_pattern"] = []
             for dash_value in symbol_layer.customDashVector():
                 symbol_layer_dict["dash_pattern"].append(
