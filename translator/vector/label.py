@@ -57,7 +57,7 @@ def generate_label_json(
 
 def generate_label_vector(extent: QgsRectangle) -> QgsVectorLayer:
     """export QgsVectorLayer of label, includes all layers"""
-    processing.run(
+    label = processing.run(
         "native:extractlabels",
         {
             "EXTENT": extent,
@@ -68,3 +68,5 @@ def generate_label_vector(extent: QgsRectangle) -> QgsVectorLayer:
             "OUTPUT": "TEMPORARY_OUTPUT",
         },
     )["OUTPUT"]
+
+    return label
