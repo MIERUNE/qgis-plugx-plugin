@@ -1,6 +1,6 @@
 import os
+import shutil
 
-import processing
 import sip
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QMessageBox, QTreeWidgetItem
@@ -21,8 +21,8 @@ from qgis.utils import iface
 
 from translator.raster.process import process_raster
 from translator.vector.process import process_vector
-from translator.vector.label import generate_label_json
-from utils import write_json
+from translator.vector.label import generate_label_json, generate_label_vector
+from utils import write_json, get_tempdir
 
 
 class MainDialog(QDialog):
@@ -70,18 +70,8 @@ class MainDialog(QDialog):
         layers = self._get_checked_layers()
         params = self._get_excution_params()
 
-        # export label shp, includes all layers
-        all_labels = processing.run(
-            "native:extractlabels",
-            {
-                "EXTENT": params["extent"],
-                "SCALE": iface.mapCanvas().scale(),
-                "MAP_THEME": None,
-                "INCLUDE_UNPLACED": True,
-                "DPI": iface.mapCanvas().mapSettings().outputDpi(),
-                "OUTPUT": "TEMPORARY_OUTPUT",
-            },
-        )["OUTPUT"]
+        # generate label vector includes labels of all layers
+        all_labels = generate_label_vector(params["extent"])
 
         # process layers
         layers_has_unsupported_symbol = []  # if layer with unsupported symbol, memo it
@@ -95,7 +85,10 @@ class MainDialog(QDialog):
 
                 if layer.labelsEnabled():
                     generate_label_json(
-                        all_labels, layer.name(), idx, params["output_dir"]
+                        all_labels,
+                        layer.name(),
+                        idx,
+                        params["output_dir"],
                     )
 
                 if result["has_unsupported_symbol"]:
@@ -137,6 +130,17 @@ class MainDialog(QDialog):
             "完了",
             msg,
         )
+
+        # remove temp dir including intermediate files
+        try:
+            shutil.rmtree(get_tempdir(params["output_dir"]))
+        # if dir is locked by process
+        except PermissionError:
+            QMessageBox.warning(
+                self,
+                "エラー",
+                "一時フォルダの削除に失敗しました。\n手動で削除してください。",
+            )
 
     def _get_checked_layers(self):
         layers = []
