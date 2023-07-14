@@ -15,11 +15,13 @@ jobs:
     - name: rename some files to rewrite
       run: |
         cp ./metadata.txt ./metadata.old.txt
+        cp ./qgis2plugx.py ./qgis2plugx.old.py
     # metadata.txtにバージョン情報を書き込み
     - name: metadata
       run : |
         sed -e "s/version={{PLUGIN_VERSION}}/version=${{ github.event.release.tag_name }}/g" ./metadata.old.txt > ./metadata.txt
-        rm ./metadata.old.txt
+        sed -e "s/version: {{PLUGIN_VERSION}}/version: ${{ github.event.release.tag_name }}/g" ./qgis2plugx.old.py > ./qgis2plugx.py
+        rm ./metadata.old.txt ./qgis2plugx.old.py
     - name: Create Plugin Directory
       run: |
         mkdir ${{env.PLUGIN_NAME}}
