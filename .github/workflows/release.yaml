@@ -11,6 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    # 内容を書き換えるファイルの名前を一時的に変更
+    - name: rename some files to rewrite
+      run: |
+        cp ./metadata.txt ./metadata.old.txt
+    # metadata.txtにバージョン情報を書き込み
+    - name: metadata
+      run : |
+        sed -e "s/version={{PLUGIN_VERSION}}/version=${{ github.event.release.tag_name }}/g" ./metadata.old.txt > ./metadata.txt
+        rm ./metadata.old.txt
     - name: Create Plugin Directory
       run: |
         mkdir ${{env.PLUGIN_NAME}}

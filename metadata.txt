@@ -3,7 +3,7 @@ name=PlugX
 qgisMinimumVersion=3.0
 about=
 description=
-version=0.0.2
+version={{PLUGIN_VERSION}}
 
 #Plugin main icon
 icon=imgs/icon.png
