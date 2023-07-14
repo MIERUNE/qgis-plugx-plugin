@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QAction, QMessageBox
 from qgis.gui import QgisInterface
 
 from ui.main_dialog import MainDialog
@@ -50,12 +50,28 @@ class QGIS2PlugX:
         return action
 
     def initGui(self):
-        # メニュー設定
         self.add_action(
             icon_path=None,
             text="QGIS2PlugX",
             callback=self.show_dialog,
             parent=self.win,
+            add_to_menu=False,
+        )
+
+        self.add_action(
+            icon_path=None,
+            text="Export",
+            callback=self.show_dialog,
+            parent=self.win,
+            add_to_toolbar=False,
+        )
+
+        self.add_action(
+            icon_path=None,
+            text="About",
+            callback=self.show_about,
+            parent=self.win,
+            add_to_toolbar=False,
         )
 
     def unload(self):
@@ -70,3 +86,11 @@ class QGIS2PlugX:
 
         self.main_dialog.show()
         self.main_dialog.process_node()
+
+    def show_about(self):
+        version_txt = r"version: {{PLUGIN_VERSION}}"
+        QMessageBox.about(
+            self.win,
+            PLUGIN_NAME,
+            version_txt,
+        )
