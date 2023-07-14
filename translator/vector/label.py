@@ -1,9 +1,8 @@
 import os
 import processing
 
-from qgis.core import (
-    QgsVectorLayer,
-)
+from qgis.core import QgsVectorLayer, QgsRectangle
+from qgis.utils import iface
 
 from utils import write_json
 
@@ -54,3 +53,18 @@ def generate_label_json(
             label_dict,
             os.path.join(output_dir, f"label_{idx}.json"),
         )
+
+
+def generate_label_vector(extent: QgsRectangle) -> QgsVectorLayer:
+    """export QgsVectorLayer of label, includes all layers"""
+    processing.run(
+        "native:extractlabels",
+        {
+            "EXTENT": extent,
+            "SCALE": iface.mapCanvas().scale(),
+            "MAP_THEME": None,
+            "INCLUDE_UNPLACED": True,
+            "DPI": iface.mapCanvas().mapSettings().outputDpi(),
+            "OUTPUT": "TEMPORARY_OUTPUT",
+        },
+    )["OUTPUT"]
