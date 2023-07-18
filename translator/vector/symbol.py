@@ -129,6 +129,10 @@ def _get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "type": "simple",
+            "offset": [
+                convert_to_point(symbol_layer.offset().x(), symbol_layer.offsetUnit()),
+                convert_to_point(symbol_layer.offset().y(), symbol_layer.offsetUnit()),
+            ],
             "level": symbol_layer.renderingPass(),
         }
 
@@ -207,9 +211,12 @@ def _get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "MarkerLine":
-        # TODO: implement
         symbol_layer_dict = {
             "type": "marker",
+            "markers": generate_symbols_data(symbol_layer.subSymbol()),
+            "interval": convert_to_point(
+                symbol_layer.interval(), symbol_layer.intervalUnit()
+            ),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "HashLine":
