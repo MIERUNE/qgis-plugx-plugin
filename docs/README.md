@@ -1,4 +1,4 @@
-# QGIS Pluginx for PlugX
+# QGIS Pluginx for PlugX - Design Documents
 
 ## 概要
 
