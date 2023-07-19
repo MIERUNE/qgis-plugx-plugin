@@ -1,35 +1,39 @@
-import os
-import shutil
-from qgis.core import Qgis, QgsSymbolLayer, QgsSymbol
+from qgis.core import QgsSymbolLayer
 from utils import convert_to_point
 from PyQt5.QtCore import Qt
 
+from .marker import get_point_symbol_data
 
-def _get_pen_style_from_id(pen_style_id):
-    pen_style_names = {
-        Qt.NoPen: "no pen",
-        Qt.SolidLine: "solid line",
-        Qt.DashLine: "dash line",
-        Qt.DotLine: "dot line",
-        Qt.DashDotLine: "dash dot line",
-        Qt.DashDotDotLine: "dash dot dot line",
-        Qt.CustomDashLine: "custom dash line",
+
+def _get_penstyle_from(symbol_layer: QgsSymbolLayer) -> dict:
+    penstyle = {
+        "stroke": {
+            Qt.NoPen: "no pen",
+            Qt.SolidLine: "solid line",
+            Qt.DashLine: "dash line",
+            Qt.DotLine: "dot line",
+            Qt.DashDotLine: "dash dot line",
+            Qt.DashDotDotLine: "dash dot dot line",
+            Qt.CustomDashLine: "custom dash line",
+        }.get(symbol_layer.penStyle(), "solid line"),
+        "join": {
+            Qt.MiterJoin: "miter",
+            Qt.BevelJoin: "bevel",
+            Qt.RoundJoin: "round",
+        }.get(symbol_layer.penJoinStyle(), "miter"),
+        "cap": {Qt.FlatCap: "flat", Qt.SquareCap: "square", Qt.RoundCap: "round"}.get(
+            symbol_layer.penCapStyle(), "flat"
+        ),
     }
-    return pen_style_names.get(pen_style_id, "unknown pen style")
 
+    # custom dash pattern
+    if symbol_layer.useCustomDashPattern():
+        penstyle["dash_pattern"] = [
+            convert_to_point(dash_value, symbol_layer.customDashPatternUnit())
+            for dash_value in symbol_layer.customDashVector()
+        ]
 
-def _get_cap_style_from_id(cap_style_id):
-    cap_style_names = {Qt.FlatCap: "flat", Qt.SquareCap: "square", Qt.RoundCap: "round"}
-    return cap_style_names.get(cap_style_id, "unknown cap style")
-
-
-def _get_join_style_from_id(join_style_id):
-    join_style_names = {
-        Qt.MiterJoin: "miter",
-        Qt.BevelJoin: "bevel",
-        Qt.RoundJoin: "round",
-    }
-    return join_style_names.get(join_style_id, "unknown join style")
+    return penstyle
 
 
 def get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
@@ -37,18 +41,10 @@ def get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "type": "simple",
             "color": symbol_layer.color().name(),
-            "stroke_style": _get_pen_style_from_id(symbol_layer.penStyle()),
-            "join_style": _get_join_style_from_id(symbol_layer.penJoinStyle()),
-            "cap_style": _get_cap_style_from_id(symbol_layer.penCapStyle()),
+            "penstyle": _get_penstyle_from(symbol_layer),
             "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }
-        if symbol_layer.useCustomDashPattern():
-            symbol_layer_dict["dash_pattern"] = []
-            for dash_value in symbol_layer.customDashVector():
-                symbol_layer_dict["dash_pattern"].append(
-                    convert_to_point(dash_value, symbol_layer.customDashPatternUnit())
-                )
 
     elif symbol_layer.layerType() == "InterpolatedLine":
         # TODO: implement
@@ -61,7 +57,9 @@ def get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
     elif symbol_layer.layerType() == "MarkerLine":
         symbol_layer_dict = {
             "type": "marker",
-            "markers": generate_symbols_data(symbol_layer.subSymbol()),
+            "markers": [
+                get_point_symbol_data(marker) for marker in symbol_layer.subSymbol()
+            ],
             "interval": convert_to_point(
                 symbol_layer.interval(), symbol_layer.intervalUnit()
             ),

@@ -1,8 +1,5 @@
-import os
-import shutil
-from qgis.core import Qgis, QgsSymbolLayer, QgsSymbol
+from qgis.core import QgsSymbolLayer
 from utils import convert_to_point
-from PyQt5.QtCore import Qt
 
 
 def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:

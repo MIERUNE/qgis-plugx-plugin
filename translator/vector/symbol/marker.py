@@ -1,20 +1,8 @@
-import os
-import shutil
-from qgis.core import Qgis, QgsSymbolLayer, QgsSymbol
+from qgis.core import QgsSymbolLayer
+
+
 from utils import convert_to_point
-from PyQt5.QtCore import Qt
-
-
-def _get_asset_raster_dir(output_dir: str):
-    return os.path.join(output_dir, "assets", "symbol_raster")
-
-
-def _get_asset_svg_dir(output_dir: str):
-    return os.path.join(output_dir, "assets", "symbol_svg")
-
-
-def _get_asset_name(symbol_layer: QgsSymbolLayer):
-    return os.path.basename(symbol_layer.path())
+from translator.vector.symbol.utils import get_asset_name
 
 
 def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
@@ -22,7 +10,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
             "type": "raster",
-            "asset_path": "assets/symbol_raster/" + _get_asset_name(symbol_layer),
+            "asset_path": "assets/symbol_raster/" + get_asset_name(symbol_layer),
             "level": symbol_layer.renderingPass(),  # renderingPass means symbolLevels
             # https://github.com/qgis/QGIS/blob/65d40ee0ce59e761ee2de366ca9a963f35adfcfd/src/core/vector/qgsvectorlayerrenderer.cpp#L702
         }
@@ -36,7 +24,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "type": "svg",
-            "asset_path": "assets/symbol_svg/" + _get_asset_name(symbol_layer),
+            "asset_path": "assets/symbol_svg/" + get_asset_name(symbol_layer),
             "level": symbol_layer.renderingPass(),
         }
 
