@@ -4,11 +4,11 @@ from qgis.core import QgsSymbolLayer
 
 
 def get_asset_raster_dir(output_dir: str):
-    return os.path.join(output_dir, "assets", "symbol_raster")
+    return os.path.join(output_dir, "assets", "raster")
 
 
 def get_asset_svg_dir(output_dir: str):
-    return os.path.join(output_dir, "assets", "symbol_svg")
+    return os.path.join(output_dir, "assets", "svg")
 
 
 def get_asset_name(symbol_layer: QgsSymbolLayer):

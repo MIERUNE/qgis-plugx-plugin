@@ -8,21 +8,25 @@ from .marker import get_point_symbol_data
 def _get_penstyle_from(symbol_layer: QgsSymbolLayer) -> dict:
     penstyle = {
         "stroke": {
-            Qt.NoPen: "no pen",
-            Qt.SolidLine: "solid line",
-            Qt.DashLine: "dash line",
-            Qt.DotLine: "dot line",
-            Qt.DashDotLine: "dash dot line",
-            Qt.DashDotDotLine: "dash dot dot line",
-            Qt.CustomDashLine: "custom dash line",
-        }.get(symbol_layer.penStyle(), "solid line"),
+            Qt.NoPen: "nopen",
+            Qt.SolidLine: "solid",
+            Qt.DashLine: "dash",
+            Qt.DotLine: "dot",
+            Qt.DashDotLine: "dashdot",
+            Qt.DashDotDotLine: "dashdotdot",
+            Qt.CustomDashLine: "customdash",
+        }.get(
+            symbol_layer.penStyle(), "solid"  # fallback
+        ),
         "join": {
             Qt.MiterJoin: "miter",
             Qt.BevelJoin: "bevel",
             Qt.RoundJoin: "round",
-        }.get(symbol_layer.penJoinStyle(), "miter"),
+        }.get(
+            symbol_layer.penJoinStyle(), "miter"  # fallback
+        ),
         "cap": {Qt.FlatCap: "flat", Qt.SquareCap: "square", Qt.RoundCap: "round"}.get(
-            symbol_layer.penCapStyle(), "flat"
+            symbol_layer.penCapStyle(), "flat"  # fallback
         ),
     }
 
