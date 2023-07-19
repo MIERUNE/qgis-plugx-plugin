@@ -108,7 +108,7 @@
       "color": "#ff0000",
       "outline_color": "#ff0000",
       "outline_width": 2,
-      "asset_path": "assets/symbol_svg/some.svg",
+      "asset_path": "assets/svg/some.svg",
       "level": 0
     }
   ]
