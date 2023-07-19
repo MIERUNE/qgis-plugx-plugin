@@ -35,11 +35,12 @@ def process_wms(layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_di
     extent_width = extent_to_clip.xMaximum() - extent_to_clip.xMinimum()
     extent_height = extent_to_clip.yMaximum() - extent_to_clip.yMinimum()
 
-    dpi = iface.mapCanvas().mapSettings().outputDpi()
-    scale = iface.mapCanvas().scale()
-    inch_to_meter = 0.0254
-    image_width = int(extent_width / scale * dpi / inch_to_meter)
-    image_height = int(extent_height / scale * dpi / inch_to_meter)
+    # Calculate image size in pixels
+    dpi = iface.mapCanvas().mapSettings().outputDpi()  # dots / inch
+    inch_to_meter = 0.0254  # 1 inch = 0.0254 meter
+    # length_in_dots = length_in_meter / (dpm = dpi/inch_to_meter)
+    image_width = int(extent_width / dpi / inch_to_meter)
+    image_height = int(extent_height / dpi / inch_to_meter)
 
     clipped_tiff_path = os.path.join(
         get_tempdir(output_dir), f"{layer.name()}_clipped.tif"
