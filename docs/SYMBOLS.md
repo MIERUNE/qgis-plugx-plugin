@@ -95,13 +95,29 @@
 }
 ```
 
-### interpolated (InterpolatedLine)
+### marker (MarkerLine)
 
 ```json
-未実装: type=simpleと同様
+{
+  "type": "marker",
+  "markers" [
+    // point-svg の配列
+    {
+      "type": "svg",
+      "size": 10,
+      "color": "#ff0000",
+      "outline_color": "#ff0000",
+      "outline_width": 2,
+      "asset_path": "assets/symbol_svg/some.svg",
+      "level": 0
+    }
+  ]
+  "interval": 2,
+  "level": 1
+}
 ```
 
-### marker (MarkerLine)
+### interpolated (InterpolatedLine)
 
 ```json
 未実装: type=simpleと同様
