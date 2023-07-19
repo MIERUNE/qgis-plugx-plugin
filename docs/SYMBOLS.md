@@ -15,8 +15,8 @@
 {
   "type": "simple",
   "size": 10,
-  "color": "#ff0000",
-  "outline_color": "#ff0000",
+  "color": "#ff0000ff",
+  "outline_color": "#ff0000ff",
   "outline_width": 2,
   "level": 0
 }
@@ -28,8 +28,8 @@
 {
   "type": "svg",
   "size": 10,
-  "color": "#ff0000",
-  "outline_color": "#ff0000",
+  "color": "#ff0000ff",
+  "outline_color": "#ff0000ff",
   "outline_width": 2,
   "asset_path": "assets/symbol_svg/some.svg",
   "level": 0
@@ -84,7 +84,7 @@
 ```json
 {
   "type": "simple",
-  "color": "#ff0000",
+  "color": "#ff0000ff",
   "penstyle": {
     "stroke": "solid", // nopen | solid | dash | dot | dashdot | dashdotdot | customdash
     "cap": "square", // flat | square | round
@@ -105,8 +105,8 @@
     {
       "type": "svg",
       "size": 10,
-      "color": "#ff0000",
-      "outline_color": "#ff0000",
+      "color": "#ff0000ff",
+      "outline_color": "#ff0000ff",
       "outline_width": 2,
       "asset_path": "assets/svg/some.svg",
       "level": 0
@@ -154,8 +154,8 @@
 ```json
 {
   "type": "simple",
-  "color": "#ff0000",
-  "outline_color": "#ff0000",
+  "color": "#ff0000ff",
+  "outline_color": "#ff0000ff",
   "outline_width": 2,
   "level": 1
 }

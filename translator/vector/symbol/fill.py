@@ -1,5 +1,6 @@
 from qgis.core import QgsSymbolLayer
 from utils import convert_to_point
+from translator.vector.symbol.utils import to_rgba
 
 
 def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
@@ -7,8 +8,8 @@ def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
     if symbol_layer.layerType() == "SimpleFill":
         symbol_layer_dict = {
             "type": "simple",
-            "color": symbol_layer.fillColor().name(),
-            "outline_color": symbol_layer.strokeColor().name(),
+            "color": to_rgba(symbol_layer.fillColor()),
+            "outline_color": to_rgba(symbol_layer.strokeColor()),
             "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
@@ -47,8 +48,8 @@ def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         # TODO: implement
         symbol_layer_dict = {
             "type": "svg",
-            "color": symbol_layer.color().name(),
-            "outline_color": symbol_layer.svgStrokeColor().name(),
+            "color": to_rgba(symbol_layer.color()),
+            "outline_color": to_rgba(symbol_layer.svgStrokeColor()),
             "outline_width": convert_to_point(
                 symbol_layer.svgStrokeWidth(), symbol_layer.svgStrokeWidthUnit()
             ),
