@@ -85,6 +85,11 @@
 {
   "type": "simple",
   "color": "#ff0000",
+  "penstyle": {
+    "stroke": "solid", // nopen | solid | dash | dot | dashdot | dashdotdot | customdash
+    "cap": "square", // flat | square | round
+    "join": "bevel" // miter | bevel | round
+  },
   "width": 2,
   "level": 1
 }
