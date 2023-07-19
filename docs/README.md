@@ -91,7 +91,6 @@
 {
   "layer": "P_stations", // layer name
   "type": "point", // point | line | polygon | raster
-  "crs": "EPSG:32654",
   "symbols": [
       // symbol typeに応じた辞書からなる配列。別ページにて仕様を定義
       {
