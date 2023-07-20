@@ -11,6 +11,9 @@ from qgis.core import (
     QgsCoordinateTransform,
 )
 from qgis.utils import iface
+import processing
+
+from utils import get_tempdir
 
 
 def _get_multiplier_by_unit_of(crs: QgsCoordinateReferenceSystem) -> float:
@@ -57,21 +60,18 @@ def process_wms(layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_di
     _layer = layer.clone()
     _layer.setCrs(QgsProject.instance().crs())
 
-    extent_width = extent.xMaximum() - extent.xMinimum()
-    extent_height = extent.yMaximum() - extent.yMinimum()
-
     # Calculate image size in pixels
     dpi = iface.mapCanvas().mapSettings().outputDpi()  # dots / inch
     inch_to_crs_unit = _get_multiplier_by_unit_of(QgsProject.instance().crs())
     # length_in_dots = length_in_crs_unit / (dpm = dpi/inch_to_crs_unit)
+    extent_width = extent.xMaximum() - extent.xMinimum()
+    extent_height = extent.yMaximum() - extent.yMinimum()
     image_width = int(extent_width / dpi * inch_to_crs_unit)
     image_height = int(extent_height / dpi * inch_to_crs_unit)
 
-    # export png in project crs
-    file_writer = QgsRasterFileWriter(
-        os.path.join(output_dir, f"layer_{idx}.png"),
-    )
-    file_writer.setOutputFormat("PNG")
+    # export layer as tiff
+    tiff_path = os.path.join(get_tempdir(output_dir), f"layer_{idx}.tiff")
+    file_writer = QgsRasterFileWriter(tiff_path)
     pipe = QgsRasterPipe()
     pipe.set(layer.dataProvider().clone())
     file_writer.writeRaster(
@@ -79,7 +79,17 @@ def process_wms(layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_di
         image_width,
         image_height,
         extent_in_layer_crs,
-        QgsProject.instance().crs(),
+        layer.crs(),
+    )
+
+    # translate to png
+    processing.run(
+        "gdal:translate",
+        {
+            "INPUT": tiff_path,
+            "OUTSIZE": f"{image_width} {image_height}",
+            "OUTPUT": os.path.join(output_dir, f"layer_{idx}.png"),
+        },
     )
 
     # write world file
