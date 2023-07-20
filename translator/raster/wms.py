@@ -56,16 +56,13 @@ def process_wms(layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_di
     )
     extent_in_layer_crs = transform.transformBoundingBox(extent)
 
-    # set project crs for layer
-    _layer = layer.clone()
-    _layer.setCrs(QgsProject.instance().crs())
-
     # Calculate image size in pixels
     dpi = iface.mapCanvas().mapSettings().outputDpi()  # dots / inch
     inch_to_crs_unit = _get_multiplier_by_unit_of(QgsProject.instance().crs())
-    # length_in_dots = length_in_crs_unit / (dpm = dpi/inch_to_crs_unit)
+    # xy length in project-crs unit
     extent_width = extent.xMaximum() - extent.xMinimum()
     extent_height = extent.yMaximum() - extent.yMinimum()
+    # length_in_dots = length_in_crs_unit / (dpm = dpi/inch_to_crs_unit)
     image_width = int(extent_width / dpi * inch_to_crs_unit)
     image_height = int(extent_height / dpi * inch_to_crs_unit)
 
@@ -82,21 +79,16 @@ def process_wms(layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_di
         layer.crs(),
     )
 
-    # translate to png
+    # reproject to project crs, output as PNG
+    png_path = os.path.join(output_dir, f"layer_{idx}.png")
     processing.run(
-        "gdal:translate",
+        "gdal:warpreproject",
         {
             "INPUT": tiff_path,
-            "OUTSIZE": f"{image_width} {image_height}",
-            "OUTPUT": os.path.join(output_dir, f"layer_{idx}.png"),
+            "SOURCE_CRS": layer.crs(),
+            "TARGET_CRS": QgsProject.instance().crs(),
+            "TARGET_EXTENT": extent,
+            "RESAMPLING": 1,
+            "OUTPUT": png_path,
         },
     )
-
-    # write world file
-    with open(os.path.join(output_dir, f"layer_{idx}.pgw"), "w") as f:
-        f.write(f"{extent_width / image_width}\n")
-        f.write("0\n")
-        f.write("0\n")
-        f.write(f"{-extent_height / image_height}\n")
-        f.write(f"{extent.xMinimum()}\n")
-        f.write(f"{extent.yMaximum()}\n")
