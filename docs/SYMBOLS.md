@@ -151,6 +151,8 @@
 
 ### simple (SimpleFill)
 
+![](./imgs/simplefill.png)
+
 ```json
 {
   "type": "simple",
