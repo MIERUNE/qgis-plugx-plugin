@@ -1,5 +1,29 @@
 from qgis.core import QgsSymbolLayer
 from utils import convert_to_point
+from PyQt5.QtCore import Qt
+from translator.vector.symbol.utils import to_rgba
+
+
+def _get_brushstyle_from(symbol_layer: QgsSymbolLayer) -> dict:
+    return {
+        Qt.NoBrush: "nobrush",
+        Qt.SolidPattern: "solid",
+        Qt.Dense1Pattern: "dense1",
+        Qt.Dense2Pattern: "dense2",
+        Qt.Dense3Pattern: "dense3",
+        Qt.Dense4Pattern: "dense4",
+        Qt.Dense5Pattern: "dense5",
+        Qt.Dense6Pattern: "dense6",
+        Qt.Dense7Pattern: "dense7",
+        Qt.HorPattern: "horizontal",
+        Qt.VerPattern: "vertical",
+        Qt.CrossPattern: "cross",
+        Qt.BDiagPattern: "backwarddiagonal",
+        Qt.FDiagPattern: "forwarddiagonal",
+        Qt.DiagCrossPattern: "crossingdiagonal",
+    }.get(
+        symbol_layer.brushStyle(), "solid"  # fallback
+    )
 
 
 def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
@@ -7,8 +31,9 @@ def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
     if symbol_layer.layerType() == "SimpleFill":
         symbol_layer_dict = {
             "type": "simple",
-            "color": symbol_layer.fillColor().name(),
-            "outline_color": symbol_layer.strokeColor().name(),
+            "color": to_rgba(symbol_layer.fillColor()),
+            "brushstyle": _get_brushstyle_from(symbol_layer),
+            "outline_color": to_rgba(symbol_layer.strokeColor()),
             "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
@@ -47,8 +72,8 @@ def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         # TODO: implement
         symbol_layer_dict = {
             "type": "svg",
-            "color": symbol_layer.color().name(),
-            "outline_color": symbol_layer.svgStrokeColor().name(),
+            "color": to_rgba(symbol_layer.color()),
+            "outline_color": to_rgba(symbol_layer.svgStrokeColor()),
             "outline_width": convert_to_point(
                 symbol_layer.svgStrokeWidth(), symbol_layer.svgStrokeWidthUnit()
             ),

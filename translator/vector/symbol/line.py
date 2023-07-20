@@ -3,6 +3,7 @@ from utils import convert_to_point
 from PyQt5.QtCore import Qt
 
 from .marker import get_point_symbol_data
+from translator.vector.symbol.utils import to_rgba
 
 
 def _get_penstyle_from(symbol_layer: QgsSymbolLayer) -> dict:
@@ -44,7 +45,7 @@ def get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
     if symbol_layer.layerType() == "SimpleLine":
         symbol_layer_dict = {
             "type": "simple",
-            "color": symbol_layer.color().name(),
+            "color": to_rgba(symbol_layer.color()),
             "penstyle": _get_penstyle_from(symbol_layer),
             "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
@@ -54,7 +55,7 @@ def get_line_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         # TODO: implement
         symbol_layer_dict = {
             "type": "interpolated",
-            "color": symbol_layer.color().name(),
+            "color": to_rgba(symbol_layer.color()),
             "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
         }

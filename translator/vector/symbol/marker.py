@@ -2,7 +2,7 @@ from qgis.core import QgsSymbolLayer
 
 
 from utils import convert_to_point
-from translator.vector.symbol.utils import get_asset_name
+from translator.vector.symbol.utils import get_asset_name, to_rgba
 
 
 def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
@@ -18,8 +18,8 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
     elif symbol_layer.layerType() == "SvgMarker":
         symbol_layer_dict = {
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
-            "color": symbol_layer.color().name(),
-            "outline_color": symbol_layer.strokeColor().name(),
+            "color": to_rgba(symbol_layer.color()),
+            "outline_color": to_rgba(symbol_layer.strokeColor()),
             "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
@@ -31,8 +31,8 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
     elif symbol_layer.layerType() == "SimpleMarker":
         symbol_layer_dict = {
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
-            "color": symbol_layer.color().name(),
-            "outline_color": symbol_layer.strokeColor().name(),
+            "color": to_rgba(symbol_layer.color()),
+            "outline_color": to_rgba(symbol_layer.strokeColor()),
             "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
@@ -48,7 +48,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         # TODO: implement
         symbol_layer_dict = {
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
-            "color": symbol_layer.color().name(),
+            "color": to_rgba(symbol_layer.color()),
             "type": "font",
             "level": symbol_layer.renderingPass(),
         }
@@ -63,7 +63,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         # TODO: implement
         symbol_layer_dict = {
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
-            "color": symbol_layer.color().name(),
+            "color": to_rgba(symbol_layer.color()),
             "type": "ellipse",
             "level": symbol_layer.renderingPass(),
         }
