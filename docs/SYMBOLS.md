@@ -15,8 +15,8 @@
 {
   "type": "simple",
   "size": 10,
-  "color": "#ff0000",
-  "outline_color": "#ff0000",
+  "color": "#ff0000ff",
+  "outline_color": "#ff0000ff",
   "outline_width": 2,
   "level": 0
 }
@@ -28,8 +28,8 @@
 {
   "type": "svg",
   "size": 10,
-  "color": "#ff0000",
-  "outline_color": "#ff0000",
+  "color": "#ff0000ff",
+  "outline_color": "#ff0000ff",
   "outline_width": 2,
   "asset_path": "assets/symbol_svg/some.svg",
   "level": 0
@@ -84,7 +84,7 @@
 ```json
 {
   "type": "simple",
-  "color": "#ff0000",
+  "color": "#ff0000ff",
   "penstyle": {
     "stroke": "solid", // nopen | solid | dash | dot | dashdot | dashdotdot | customdash
     "cap": "square", // flat | square | round
@@ -95,13 +95,29 @@
 }
 ```
 
-### interpolated (InterpolatedLine)
+### marker (MarkerLine)
 
 ```json
-未実装: type=simpleと同様
+{
+  "type": "marker",
+  "markers" [
+    // point-svg の配列
+    {
+      "type": "svg",
+      "size": 10,
+      "color": "#ff0000ff",
+      "outline_color": "#ff0000ff",
+      "outline_width": 2,
+      "asset_path": "assets/svg/some.svg",
+      "level": 0
+    }
+  ]
+  "interval": 2,
+  "level": 1
+}
 ```
 
-### marker (MarkerLine)
+### interpolated (InterpolatedLine)
 
 ```json
 未実装: type=simpleと同様
@@ -135,11 +151,14 @@
 
 ### simple (SimpleFill)
 
+![](./imgs/simplefill.png)
+
 ```json
 {
   "type": "simple",
-  "color": "#ff0000",
-  "outline_color": "#ff0000",
+  "color": "#ff0000ff",
+  "brushstyle": "solid", // nobrush | solid | dense1 | dense2 | dense3 | dense4 | dense5 | dense6 | dense7 | horizontal | vertical | cross | backwarddiagonal | forwarddiagonal | crossingdiagonal
+  "outline_color": "#ff0000ff",
   "outline_width": 2,
   "level": 1
 }

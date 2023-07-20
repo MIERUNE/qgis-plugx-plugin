@@ -1,4 +1,4 @@
-# QGIS Pluginx for PlugX - Design Documents
+# QGIS Plugin for PlugX - Design Documents
 
 ## 概要
 
@@ -99,7 +99,7 @@
           "color": "#ff0000",
           "outline_color": "#ff0000",
           "outline_width": 2,
-          "asset_path": "assets/symbol_svg/some.svg",
+          "asset_path": "assets/svg/some.svg",
           "level": 0
       }
   ],
