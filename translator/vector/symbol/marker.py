@@ -1,8 +1,38 @@
-from qgis.core import QgsSymbolLayer
+from qgis.core import QgsSymbolLayer, QgsMarkerSymbolLayer
 
 
 from utils import convert_to_point
 from translator.vector.symbol.utils import get_asset_name, to_rgba
+
+
+def _get_markershape_from(symbol_layer: QgsSymbolLayer) -> dict:
+    return {
+        QgsMarkerSymbolLayer.Shape.Square: "square",
+        QgsMarkerSymbolLayer.Shape.Diamond: "diamond",
+        QgsMarkerSymbolLayer.Shape.Pentagon: "pentagon",
+        QgsMarkerSymbolLayer.Shape.Hexagon: "hexagon",
+        QgsMarkerSymbolLayer.Shape.Triangle: "triangle",
+        QgsMarkerSymbolLayer.Shape.EquilateralTriangle: "equilateraltriangle",
+        QgsMarkerSymbolLayer.Shape.Star: "star",
+        QgsMarkerSymbolLayer.Shape.Arrow: "arrow",
+        QgsMarkerSymbolLayer.Shape.Circle: "circle",
+        QgsMarkerSymbolLayer.Shape.Cross: "cross",
+        QgsMarkerSymbolLayer.Shape.CrossFill: "crossfill",
+        QgsMarkerSymbolLayer.Shape.Cross2: "cross2",
+        QgsMarkerSymbolLayer.Shape.Line: "line",
+        QgsMarkerSymbolLayer.Shape.ArrowHead: "arrowhead",
+        QgsMarkerSymbolLayer.Shape.ArrowHeadFilled: "arrowheadfilled",
+        QgsMarkerSymbolLayer.Shape.SemiCircle: "semicircle",
+        QgsMarkerSymbolLayer.Shape.ThirdCircle: "thirdcircle",
+        QgsMarkerSymbolLayer.Shape.QuarterCircle: "quartercircle",
+        QgsMarkerSymbolLayer.Shape.QuarterSquare: "quartersquare",
+        QgsMarkerSymbolLayer.Shape.HalfSquare: "halfsquare",
+        QgsMarkerSymbolLayer.Shape.DiagonalHalfSquare: "diagonalhalfsquare",
+        QgsMarkerSymbolLayer.Shape.RightHalfTriangle: "righthalftriangle",
+        QgsMarkerSymbolLayer.Shape.LeftHalfTriangle: "lefthalftriangle",
+    }.get(
+        symbol_layer.shape(), "circle"  # fallback
+    )
 
 
 def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
@@ -37,6 +67,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "type": "simple",
+            "shape": _get_markershape_from(symbol_layer),
             "offset": [
                 convert_to_point(symbol_layer.offset().x(), symbol_layer.offsetUnit()),
                 convert_to_point(symbol_layer.offset().y(), symbol_layer.offsetUnit()),
