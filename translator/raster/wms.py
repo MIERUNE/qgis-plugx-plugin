@@ -1,92 +1,62 @@
 import os
 
-import processing
 from qgis.core import (
-    QgsCoordinateReferenceSystem,
-    QgsCoordinateTransform,
     QgsProject,
     QgsRasterFileWriter,
     QgsRasterLayer,
     QgsRasterPipe,
     QgsRectangle,
+    QgsCoordinateTransform,
 )
 from qgis.utils import iface
+import processing
 
 from utils import get_tempdir
 
 
 def process_wms(layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_dir: str):
     """process wms, xyz..."""
-    # Convert Bbox to EPSG:3857
+
+    # extent is in Project crs, transform to layer crs
     transform = QgsCoordinateTransform(
         QgsProject.instance().crs(),
-        QgsCoordinateReferenceSystem("EPSG:3857"),
+        layer.crs(),
         QgsProject.instance(),
     )
-    extent_3857 = transform.transformBoundingBox(extent)
-    extent_to_clip = QgsRectangle(
-        extent_3857.xMinimum(),
-        extent_3857.yMinimum(),
-        extent_3857.xMaximum(),
-        extent_3857.yMaximum(),
-    )
+    extent_in_layer_crs = transform.transformBoundingBox(extent)
 
-    # Calculate extent in EPSG:3857
-    extent_width = extent_to_clip.xMaximum() - extent_to_clip.xMinimum()
-    extent_height = extent_to_clip.yMaximum() - extent_to_clip.yMinimum()
+    # xy length in project-crs unit
+    extent_width = extent.xMaximum() - extent.xMinimum()
+    extent_height = extent.yMaximum() - extent.yMinimum()
 
-    dpi = iface.mapCanvas().mapSettings().outputDpi()
-    scale = iface.mapCanvas().scale()
-    inch_to_meter = 0.0254
-    image_width = int(extent_width / scale * dpi / inch_to_meter)
-    image_height = int(extent_height / scale * dpi / inch_to_meter)
+    # calculate image size: same to map canvas
+    units_per_pixel = iface.mapCanvas().mapUnitsPerPixel()
+    image_width = int(extent_width / units_per_pixel)
+    image_height = int(extent_height / units_per_pixel)
 
-    clipped_tiff_path = os.path.join(
-        get_tempdir(output_dir), f"{layer.name()}_clipped.tif"
-    )
-
-    # Save TIFF file in EPSG:3857
-    file_writer = QgsRasterFileWriter(clipped_tiff_path)
+    # export layer as tiff
+    tiff_path = os.path.join(get_tempdir(output_dir), f"layer_{idx}.tiff")
+    file_writer = QgsRasterFileWriter(tiff_path)
     pipe = QgsRasterPipe()
     pipe.set(layer.dataProvider().clone())
     file_writer.writeRaster(
         pipe,
         image_width,
         image_height,
-        extent_to_clip,
-        QgsCoordinateReferenceSystem("EPSG:3857"),
+        extent_in_layer_crs,
+        layer.crs(),
     )
 
-    # Convert to Project CRS
-    warped = processing.run(
+    # reproject to project crs, output as PNG
+    png_path = os.path.join(output_dir, f"layer_{idx}.png")
+    processing.run(
         "gdal:warpreproject",
         {
-            "INPUT": clipped_tiff_path,
-            "SOURCE_CRS": QgsCoordinateReferenceSystem("EPSG:3857"),
+            "INPUT": tiff_path,
+            "SOURCE_CRS": layer.crs(),
             "TARGET_CRS": QgsProject.instance().crs(),
-            "OUTPUT": os.path.join(
-                get_tempdir(output_dir), f"{layer.name()}_warped.tif"
-            ),
-        },
-    )["OUTPUT"]
-
-    # Create clip PNG file in Project CRS
-    clip_extent = f"{extent.xMinimum()}, \
-                    {extent.xMaximum()}, \
-                    {extent.yMinimum()}, \
-                    {extent.yMaximum()}  \
-                    [{QgsProject.instance().crs().authid()}]"
-
-    processing.run(
-        "gdal:cliprasterbyextent",
-        {
-            "INPUT": warped,
-            "PROJWIN": clip_extent,
-            "OVERCRS": False,
-            "NODATA": None,
-            "OPTIONS": "",
-            "DATA_TYPE": 0,
-            "EXTRA": "",
-            "OUTPUT": os.path.join(output_dir, f"layer_{idx}.png"),
+            "TARGET_EXTENT": extent,
+            "RESAMPLING": 1,
+            "OUTPUT": png_path,
         },
     )
