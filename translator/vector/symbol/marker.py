@@ -30,6 +30,20 @@ def _get_markershape_from(symbol_layer: QgsSymbolLayer) -> dict:
         QgsSimpleMarkerSymbolLayer.Shape.DiagonalHalfSquare: "diagonalhalfsquare",
         QgsSimpleMarkerSymbolLayer.Shape.RightHalfTriangle: "righthalftriangle",
         QgsSimpleMarkerSymbolLayer.Shape.LeftHalfTriangle: "lefthalftriangle",
+        QgsSimpleMarkerSymbolLayer.Shape.Trapezoid: "trapezoid",
+        QgsSimpleMarkerSymbolLayer.Shape.ParallelogramLeft: "parallelogramleft",
+        QgsSimpleMarkerSymbolLayer.Shape.ParallelogramRight: "parallelogramright",
+        QgsSimpleMarkerSymbolLayer.Shape.Shield: "shield",
+        QgsSimpleMarkerSymbolLayer.Shape.Octagon: "octagon",
+        QgsSimpleMarkerSymbolLayer.Shape.Decagon: "decagon",
+        QgsSimpleMarkerSymbolLayer.Shape.SquareWithCorners: "squarecorners",
+        QgsSimpleMarkerSymbolLayer.Shape.RoundedSquare: "squarerounded",
+        QgsSimpleMarkerSymbolLayer.Shape.DiamondStar: "diamondstar",
+        QgsSimpleMarkerSymbolLayer.Shape.Heart: "heart",
+        QgsSimpleMarkerSymbolLayer.Shape.HalfArc: "halfarc",
+        QgsSimpleMarkerSymbolLayer.Shape.ThirdArc: "thirdarc",
+        QgsSimpleMarkerSymbolLayer.Shape.QuarterArc: "quarterarc",
+        QgsSimpleMarkerSymbolLayer.Shape.AsteriskFill: "asteriskfill",
     }.get(
         symbol_layer.shape(), "circle"  # fallback
     )

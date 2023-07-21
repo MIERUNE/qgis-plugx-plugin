@@ -9,7 +9,7 @@
 
 ### simple (SimpleMarker)
 
-<!-- TODO: Sample Image -->
+![](./imgs/simplemarker.png)
 
 ```json
 {
@@ -18,7 +18,7 @@
   "color": "#ff0000ff",
   "outline_color": "#ff0000ff",
   "outline_width": 2,
-  "shape": "circle",
+  "shape": "circle", //square | diamond | pentagon | hexagon | triangle | equilateraltriangle | star | arrow | circle | cross | crossfill | cross2 | line | arrowhead | arrowheadfilled | semicircle | thirdcircle | quartercircle | quartersquare | halfsquare | diagonalhalfsquare | righthalftriangle | lefthalftriangle | trapezoid | parallelogramleft | parallelogramright | shield | octagon | decagon | squarecorners | squarerounded | diamondstar | heart | halfarc | thirdarc | quarterarc | asteriskfill
   "offset": [
                 0.0,
                 0.0
