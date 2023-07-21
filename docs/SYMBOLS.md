@@ -97,6 +97,8 @@
 
 ### simple (SimpleLine)
 
+![](./imgs/penstyle.png)
+
 ```json
 {
   "type": "simple",
