@@ -75,10 +75,10 @@
       "size": 10.0,
       "bold": true,
       "underline": false,
-      "text:color": "#323232",
+      "text:color": "#323232ff",
       "text:opacity": 100.0,
       "buffer:width": 2.834645669291339, // buffer=縁取り
-      "buffer:color": "#fafafa",
+      "buffer:color": "#fafafaff",
       "buffer:opacity": 100.0
     }
   ]
@@ -96,10 +96,15 @@
       {
           "type": "svg",
           "size": 10,
-          "color": "#ff0000",
-          "outline_color": "#ff0000",
+          "color": "#ff0000ff",
+          "outline_color": "#ff0000ff",
           "outline_width": 2,
           "asset_path": "assets/svg/some.svg",
+          "offset": [
+                0.0,
+                0.0
+            ],
+          "rotation": 0.0, // degrees
           "level": 0
       }
   ],

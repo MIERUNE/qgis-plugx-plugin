@@ -18,6 +18,12 @@
   "color": "#ff0000ff",
   "outline_color": "#ff0000ff",
   "outline_width": 2,
+  "shape": "circle",
+  "offset": [
+                0.0,
+                0.0
+            ],
+  "rotation": 0.0, //degrees
   "level": 0
 }
 ```
@@ -32,6 +38,11 @@
   "outline_color": "#ff0000ff",
   "outline_width": 2,
   "asset_path": "assets/symbol_svg/some.svg",
+  "offset": [
+                0.0,
+                0.0
+            ],
+  "rotation": 180.0, //degrees
   "level": 0
 }
 ```
@@ -43,6 +54,11 @@
   "type": "raster",
   "size": 10,
   "asset_path": "assets/symbol_raster/some.png",
+  "offset": [
+                0.0,
+                0.0
+            ],
+  "rotation": 0.0, // degrees
   "level": 1
 }
 ```
