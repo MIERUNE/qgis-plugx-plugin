@@ -1,10 +1,11 @@
 import os
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QMessageBox
+from PyQt5.QtWidgets import QAction
 from qgis.gui import QgisInterface
 
 from ui.main_dialog import MainDialog
+from ui.about_dialog import AboutDialog
 
 PLUGIN_NAME = "QGIS2PlugX"
 
@@ -21,6 +22,7 @@ class QGIS2PlugX:
 
         # QDialogを保存するためのクラス変数
         self.main_dialog = None
+        self.about_dialog = None
 
     def add_action(
         self,
@@ -88,9 +90,9 @@ class QGIS2PlugX:
         self.main_dialog.process_node()
 
     def show_about(self):
-        version_txt = r"version: {{PLUGIN_VERSION}}"
-        QMessageBox.about(
-            self.win,
-            PLUGIN_NAME,
-            version_txt,
-        )
+        if self.about_dialog is None:
+            self.about_dialog = AboutDialog()
+
+        version = r"{{PLUGIN_VERSION}}"
+        self.about_dialog.show()
+        self.about_dialog.set_contents(PLUGIN_NAME, version)
