@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtWidgets import QDialog, QLabel
+from PyQt5.QtWidgets import QDialog
 
 from qgis.PyQt import uic
 
