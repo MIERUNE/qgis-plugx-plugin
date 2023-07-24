@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from translator.vector.symbol.utils import to_rgba
 
 
-def _get_brushstyle_from(symbol_layer: QgsSymbolLayer) -> dict:
+def _get_brushstyle_from(brush_style: Qt.BrushStyle) -> str:
     return {
         Qt.NoBrush: "nobrush",
         Qt.SolidPattern: "solid",
@@ -22,7 +22,7 @@ def _get_brushstyle_from(symbol_layer: QgsSymbolLayer) -> dict:
         Qt.FDiagPattern: "forwarddiagonal",
         Qt.DiagCrossPattern: "crossingdiagonal",
     }.get(
-        symbol_layer.brushStyle(), "solid"  # fallback
+        brush_style, "solid"  # fallback
     )
 
 
@@ -32,7 +32,7 @@ def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "type": "simple",
             "color": to_rgba(symbol_layer.fillColor()),
-            "brushstyle": _get_brushstyle_from(symbol_layer),
+            "brushstyle": _get_brushstyle_from(symbol_layer.brushStyle()),
             "outline_color": to_rgba(symbol_layer.strokeColor()),
             "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()

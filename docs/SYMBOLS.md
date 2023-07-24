@@ -9,7 +9,7 @@
 
 ### simple (SimpleMarker)
 
-<!-- TODO: Sample Image -->
+![](./imgs/simplemarker.png)
 
 ```json
 {
@@ -18,6 +18,9 @@
   "color": "#ff0000ff",
   "outline_color": "#ff0000ff",
   "outline_width": 2,
+  "shape": "circle", //square | diamond | pentagon | hexagon | triangle | equilateraltriangle | star | arrow | circle | cross | crossfill | cross2 | line | arrowhead | arrowheadfilled | semicircle | thirdcircle | quartercircle | quartersquare | halfsquare | diagonalhalfsquare | righthalftriangle | lefthalftriangle | trapezoid | parallelogramleft | parallelogramright | shield | octagon | decagon | squarecorners | squarerounded | diamondstar | heart | halfarc | thirdarc | quarterarc | asteriskfill
+  "offset": [0.0, 0.0],
+  "rotation": 0.0, //degrees, 時計回り
   "level": 0
 }
 ```
@@ -32,6 +35,8 @@
   "outline_color": "#ff0000ff",
   "outline_width": 2,
   "asset_path": "assets/symbol_svg/some.svg",
+  "offset": [0.0, 0.0],
+  "rotation": 180.0, //degrees, 時計回り
   "level": 0
 }
 ```
@@ -43,6 +48,8 @@
   "type": "raster",
   "size": 10,
   "asset_path": "assets/symbol_raster/some.png",
+  "offset": [0.0, 0.0],
+  "rotation": 0.0, // degrees, 時計回り
   "level": 1
 }
 ```
@@ -80,6 +87,8 @@
 ## Line
 
 ### simple (SimpleLine)
+
+![](./imgs/penstyle.png)
 
 ```json
 {
