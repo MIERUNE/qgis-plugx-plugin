@@ -5,7 +5,7 @@ from utils import convert_to_point
 from translator.vector.symbol.utils import get_asset_name, to_rgba
 
 
-def _get_markershape_from(symbol_layer: QgsSymbolLayer) -> dict:
+def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayer) -> str:
     return {
         QgsSimpleMarkerSymbolLayer.Shape.Square: "square",
         QgsSimpleMarkerSymbolLayer.Shape.Diamond: "diamond",
@@ -45,7 +45,7 @@ def _get_markershape_from(symbol_layer: QgsSymbolLayer) -> dict:
         QgsSimpleMarkerSymbolLayer.Shape.QuarterArc: "quarterarc",
         QgsSimpleMarkerSymbolLayer.Shape.AsteriskFill: "asteriskfill",
     }.get(
-        symbol_layer.shape(), "circle"  # fallback
+        symbol_shape, "circle"  # fallback
     )
 
 
@@ -91,7 +91,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "type": "simple",
-            "shape": _get_markershape_from(symbol_layer),
+            "shape": _get_markershape_from(symbol_layer.shape()),
             "offset": [
                 convert_to_point(symbol_layer.offset().x(), symbol_layer.offsetUnit()),
                 convert_to_point(symbol_layer.offset().y(), symbol_layer.offsetUnit()),

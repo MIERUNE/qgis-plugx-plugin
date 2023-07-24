@@ -100,11 +100,8 @@
           "outline_color": "#ff0000ff",
           "outline_width": 2,
           "asset_path": "assets/svg/some.svg",
-          "offset": [
-                0.0,
-                0.0
-            ],
-          "rotation": 0.0, // degrees
+          "offset": [0.0, 0.0],
+          "rotation": 0.0, // degrees, 時計回り
           "level": 0
       }
   ],
