@@ -93,6 +93,4 @@ class QGIS2PlugX:
         if self.about_dialog is None:
             self.about_dialog = AboutDialog()
 
-        version = r"{{PLUGIN_VERSION}}"
         self.about_dialog.show()
-        self.about_dialog.set_contents(PLUGIN_NAME, version)

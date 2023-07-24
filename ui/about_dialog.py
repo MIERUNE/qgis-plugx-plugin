@@ -17,12 +17,3 @@ class AboutDialog(QDialog):
     def init_ui(self):
         # connect signals
         self.ui.pushButton_close.clicked.connect(self.close)
-
-    def set_contents(self, plugin_name, version):
-        self.label_output = self.ui.findChild(QLabel, "plugin_name")
-        if self.label_output:
-            self.label_output.setText(plugin_name)
-
-        self.label_output = self.ui.findChild(QLabel, "version_value")
-        if self.label_output:
-            self.label_output.setText(version)
