@@ -15,13 +15,13 @@ jobs:
     - name: rename some files to rewrite
       run: |
         cp ./metadata.txt ./metadata.old.txt
-        cp ./about_dialog.py ./about_dialog.old.py
+        cp ./ui/about_dialog.py ./ui/about_dialog.old.py
     # metadata.txtにバージョン情報を書き込み
     - name: metadata
       run : |
         sed -e "s/version={{PLUGIN_VERSION}}/version=${{ github.event.release.tag_name }}/g" ./metadata.old.txt > ./metadata.txt
-        sed -e "s/version: {{PLUGIN_VERSION}}/version: ${{ github.event.release.tag_name }}/g" ./about_dialog.old.ui > ./about_dialog.ui
-        rm ./metadata.old.txt ./about_dialog.old.ui
+        sed -e "s/version: {{PLUGIN_VERSION}}/version: ${{ github.event.release.tag_name }}/g" ./ui/about_dialog.old.ui > ./ui/about_dialog.ui
+        rm ./metadata.old.txt ./ui/about_dialog.old.ui
     - name: Create Plugin Directory
       run: |
         mkdir ${{env.PLUGIN_NAME}}
