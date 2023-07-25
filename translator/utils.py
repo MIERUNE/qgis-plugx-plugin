@@ -18,5 +18,5 @@ def get_blend_mode_string(blend_mode: QPainter.CompositionMode) -> str:
         QPainter.CompositionMode_Difference: "difference",
         QPainter.CompositionMode_Exclusion: "subtract",
     }.get(
-        blend_mode, "normal"
-    )  # fallback
+        blend_mode, "normal"  # fallback
+    )
