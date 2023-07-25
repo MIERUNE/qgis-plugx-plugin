@@ -9,6 +9,7 @@ from qgis.core import (
 )
 from qgis.utils import iface
 from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QColor
 
 from utils import write_json
 
@@ -28,6 +29,7 @@ def process_raster(
     # Set map to export image
     settings = QgsMapSettings()
     settings.setDestinationCrs(QgsProject.instance().crs())
+    settings.setBackgroundColor(QColor(255, 255, 255, 0))  # transparent
     settings.setLayers([layer])
     settings.setExtent(extent)
     settings.setOutputSize(QSize(image_width, image_height))
