@@ -312,6 +312,7 @@ Outlineは未定
 
 ### Point
 
+- Mask Marker
 - Vector Field Marker
 - Geometry Generator
 
