@@ -39,7 +39,7 @@ def process_file(
     image = render.renderedImage()
     image.save(os.path.join(output_dir, f"layer_{idx}.png"), "png")
 
-    # make world file
+    # make world file for check
     with open(os.path.join(output_dir, f"layer_{idx}.pgw"), "w") as f:
         f.write(f"{units_per_pixel}\n0.0\n0.0\n-{units_per_pixel}\n")
         f.write(f"{extent.xMinimum()}\n{extent.yMaximum()}\n")
