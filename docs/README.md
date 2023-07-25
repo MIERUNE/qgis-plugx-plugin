@@ -113,7 +113,7 @@
 }
 ```
 
-#### rater layer
+#### raster layer
 
 ```json
 {
