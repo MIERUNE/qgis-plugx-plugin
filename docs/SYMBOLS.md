@@ -314,6 +314,21 @@
 }
 ```
 
+### raster (RasterFill)
+
+![](./imgs/fill_raster.png)
+
+```json
+# 未実装: basic attributes only
+{
+  "type": "raster",
+  "color": "#ff0000ff",
+  "outline_color": "#ff0000ff",
+  "outline_width": 2,
+  "level": 1
+}
+```
+
 ### gradient (GradientFill)
 
 ![](./imgs/fill_gradient.png)
