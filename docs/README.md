@@ -108,7 +108,7 @@
       }
   ],
   "usingSymbolLevels": true,
-  "opacity": 0.7,
+  "opacity": 0.7, // 透過度: 0.0 ~ 1.0
   "blend_mode": "normal", // normal | lighten | screen | dogde | addition | darken | multiply | burn | overlay | soft_light | hard_light | difference | subtract
 }
 ```
