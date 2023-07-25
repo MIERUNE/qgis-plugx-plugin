@@ -15,7 +15,7 @@ jobs:
     - name: rename some files to rewrite
       run: |
         cp ./metadata.txt ./metadata.old.txt
-        cp ./qgis2plugx.py ./qgis2plugx.old.py
+        cp ./about_dialog.py ./about_dialog.old.py
     # metadata.txtにバージョン情報を書き込み
     - name: metadata
       run : |
