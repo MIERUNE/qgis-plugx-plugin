@@ -98,18 +98,6 @@
 }
 ```
 
-### mask (MaskMarker)
-
-```json
-# 未実装: basic attributes only
-{
-  "type": "unsupported",
-  "size": 10,
-  "color": "#ff0000ff",
-  "level": 0
-}
-```
-
 ### ellipse (Ellipse)
 
 ![](./imgs/marker_ellipse.png)
@@ -123,6 +111,19 @@
   "level": 0
 }
 ```
+
+### mask (MaskMarker)
+
+```json
+# 未実装: basic attributes only
+{
+  "type": "unsupported",
+  "size": 10,
+  "color": "#ff0000ff",
+  "level": 0
+}
+```
+
 
 ## Line
 
