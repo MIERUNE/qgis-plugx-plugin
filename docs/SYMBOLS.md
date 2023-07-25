@@ -253,6 +253,8 @@
 
 ### centroid (CentroidFill)
 
+![](./imgs/fill_centroid.png)
+
 ```json
 # 未実装: basic attributes only
 {
@@ -262,6 +264,8 @@
 ```
 
 ### pointpattern (PointPattern)
+
+![](./imgs/fill_pointpattern.png)
 
 ```json
 # 未実装: basic attributes only
@@ -273,6 +277,8 @@
 
 ### randommarker (RandomMarker)’
 
+![](./imgs/fill_randommarker.png)
+
 ```json
 # 未実装: basic attributes only
 {
@@ -283,6 +289,8 @@
 
 ### linepattern (LinePattern)
 
+![](./imgs/fill_linepattern.png)
+
 ```json
 # 未実装: basic attributes only
 {
@@ -292,6 +300,8 @@
 ```
 
 ### svg (SVGFill)
+
+![](./imgs/fill_svg.png)
 
 ```json
 # 未実装: basic attributes only
@@ -306,6 +316,8 @@
 
 ### gradient (GradientFill)
 
+![](./imgs/fill_gradient.png)
+
 ```json
 # 未実装: basic attributes only
 {
@@ -315,6 +327,8 @@
 ```
 
 ### shapeburst (ShapeburstFill)
+
+![](./imgs/fill_shapeburst.png)
 
 ```json
 # 未実装: basic attributes only
