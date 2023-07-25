@@ -20,7 +20,7 @@ jobs:
     - name: metadata
       run : |
         sed -e "s/version={{PLUGIN_VERSION}}/version=${{ github.event.release.tag_name }}/g" ./metadata.old.txt > ./metadata.txt
-        sed -e "s/version: {{PLUGIN_VERSION}}/version: ${{ github.event.release.tag_name }}/g" ./ui/about_dialog.old.ui > ./ui/about_dialog.ui
+        sed -e "s/{{PLUGIN_VERSION}}/${{ github.event.release.tag_name }}/g" ./ui/about_dialog.old.ui > ./ui/about_dialog.ui
         rm ./metadata.old.txt ./ui/about_dialog.old.ui
     - name: Create Plugin Directory
       run: |
