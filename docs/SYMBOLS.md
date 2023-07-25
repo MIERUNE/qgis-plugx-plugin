@@ -147,6 +147,8 @@
 
 ### marker (MarkerLine)
 
+![](./imgs/line_marker.png)
+
 ```json
 {
   "type": "marker",
@@ -169,6 +171,8 @@
 
 ### interpolated (InterpolatedLine)
 
+![](./imgs/line_interpolated.png)
+
 ```json
 # 未実装: basic attributes only
 {
@@ -181,6 +185,8 @@
 
 ### hashed (HashLine)
 
+![](./imgs/line_hashed.png)
+
 ```json
 # 未実装: basic attributes only
 {
@@ -190,6 +196,8 @@
 ```
 
 ### raster (RasterLine)
+
+![](./imgs/line_raster.png)
 
 ```json
 # 未実装: basic attributes only
@@ -202,6 +210,8 @@
 
 ### arrow (ArrowLine)
 
+![](./imgs/line_arrow.png)
+
 ```json
 # 未実装: basic attributes only
 {
@@ -212,6 +222,8 @@
 ```
 
 ### lineburst(Lineburst)
+
+![](./imgs/lineburst.png)
 
 ```json
 # 未実装: basic attributes only
