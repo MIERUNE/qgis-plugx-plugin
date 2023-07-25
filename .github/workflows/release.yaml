@@ -15,7 +15,7 @@ jobs:
     - name: rename some files to rewrite
       run: |
         cp ./metadata.txt ./metadata.old.txt
-        cp ./ui/about_dialog.py ./ui/about_dialog.old.py
+        cp ./ui/about_dialog.ui ./ui/about_dialog.old.ui
     # metadata.txtにバージョン情報を書き込み
     - name: metadata
       run : |
