@@ -9,7 +9,7 @@
 
 ### simple (SimpleMarker)
 
-![](./imgs/simplemarker.png)
+![](./imgs/marker_simple.png)
 
 ```json
 {
@@ -27,6 +27,8 @@
 
 ### svg (SvgMarker)
 
+![](./imgs/marker_svg.png)
+
 ```json
 {
   "type": "svg",
@@ -43,6 +45,8 @@
 
 ### raster (RasterMarker)
 
+![](./imgs/marker_raster.png)
+
 ```json
 {
   "type": "raster",
@@ -56,33 +60,70 @@
 
 ### font (FontMarker)
 
+![](./imgs/marker_font.png)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "font",
+  "size": 10,
+  "color": "#ff0000ff",
+  "level": 0
+}
 ```
 
 ### animated (AnimatedMarker)
 
+![](./imgs/marker_animated.gif)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "animated",
+  "size": 10,
+  "level": 0
+}
 ```
 
 ### filled (FilledMarker)
 
+![](./imgs/marker_filled.png) 
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "filled",
+  "size": 10,
+  "level": 0
+}
+```
+
+### ellipse (Ellipse)
+
+![](./imgs/marker_ellipse.png)
+
+```json
+# 未実装: basic attributes only
+{
+  "type": "ellipse",
+  "size": 10,
+  "color": "#ff0000ff",
+  "level": 0
+}
 ```
 
 ### mask (MaskMarker)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "unsupported",
+  "size": 10,
+  "color": "#ff0000ff",
+  "level": 0
+}
 ```
 
-### ellipse(Ellipse)
-
-```json
-未実装: type=simpleと同様
-```
 
 ## Line
 
@@ -106,6 +147,8 @@
 
 ### marker (MarkerLine)
 
+![](./imgs/line_marker.png)
+
 ```json
 {
   "type": "marker",
@@ -128,39 +171,74 @@
 
 ### interpolated (InterpolatedLine)
 
+![](./imgs/line_interpolated.png)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "interpolated",
+  "color": "#ff0000ff",
+  "width": 2,
+  "level": 1
+}
 ```
 
 ### hashed (HashLine)
 
+![](./imgs/line_hashed.png)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "hash",
+  "level": 1
+}
 ```
 
 ### raster (RasterLine)
 
+![](./imgs/line_raster.png)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "raster",
+  "width": 2,
+  "level": 1
+}
 ```
 
-### arrow(ArrowLine)
+### arrow (ArrowLine)
+
+![](./imgs/line_arrow.png)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "arrow",
+  "width": 2,
+  "level": 1
+}
 ```
 
-### lineburst(Lineburst)
+### lineburst (Lineburst)
+
+![](./imgs/lineburst.png)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "lineburst",
+  "width": 2,
+  "level": 1
+}
 ```
 
 ## Polygon
 
 ### simple (SimpleFill)
 
-![](./imgs/simplefill.png)
+![](./imgs/fill_simple.png)
 
 ```json
 {
@@ -175,44 +253,104 @@
 
 ### centroid (CentroidFill)
 
+![](./imgs/fill_centroid.png)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "centroid",
+  "level": 1
+}
 ```
 
 ### pointpattern (PointPattern)
 
+![](./imgs/fill_pointpattern.png)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "pointpattern",
+  "level": 1
+}
 ```
 
 ### randommarker (RandomMarker)’
 
+![](./imgs/fill_randommarker.png)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "randommarker",
+  "level": 1
+}
 ```
 
 ### linepattern (LinePattern)
 
+![](./imgs/fill_linepattern.png)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "linepattern",
+  "level": 1
+}
 ```
 
 ### svg (SVGFill)
 
+![](./imgs/fill_svg.png)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "svg",
+  "color": "#ff0000ff",
+  "outline_color": "#ff0000ff",
+  "outline_width": 2,
+  "level": 1
+}
+```
+
+### raster (RasterFill)
+
+![](./imgs/fill_raster.png)
+
+```json
+# 未実装: basic attributes only
+{
+  "type": "raster",
+  "color": "#ff0000ff",
+  "outline_color": "#ff0000ff",
+  "outline_width": 2,
+  "level": 1
+}
 ```
 
 ### gradient (GradientFill)
 
+![](./imgs/fill_gradient.png)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "gradient",
+  "level": 1
+}
 ```
 
 ### shapeburst (ShapeburstFill)
 
+![](./imgs/fill_shapeburst.png)
+
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "shapeburst",
+  "level": 1
+}
 ```
 
 ## Hybrid
@@ -228,6 +366,7 @@ Outlineは未定
 
 ### Point
 
+- Mask Marker
 - Vector Field Marker
 - Geometry Generator
 
