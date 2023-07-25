@@ -57,31 +57,59 @@
 ### font (FontMarker)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "font",
+  "size": 10,
+  "color": "#ff0000ff",
+  "level": 0
+}
 ```
 
 ### animated (AnimatedMarker)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "animated",
+  "size": 10,
+  "level": 0
+}
 ```
 
 ### filled (FilledMarker)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "filled",
+  "size": 10,
+  "level": 0
+}
 ```
 
 ### mask (MaskMarker)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "unsupported",
+  "size": 10,
+  "color": "#ff0000ff",
+  "level": 0
+}
 ```
 
-### ellipse(Ellipse)
+### ellipse (Ellipse)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "ellipse",
+  "size": 10,
+  "color": "#ff0000ff",
+  "level": 0
+}
 ```
 
 ## Line
@@ -129,31 +157,56 @@
 ### interpolated (InterpolatedLine)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "interpolated",
+  "color": "#ff0000ff",
+  "width": 2,
+  "level": 1
+}
 ```
 
 ### hashed (HashLine)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "hash",
+  "level": 1
+}
 ```
 
 ### raster (RasterLine)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "raster",
+  "width": 2,
+  "level": 1
+}
 ```
 
-### arrow(ArrowLine)
+### arrow (ArrowLine)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "arrow",
+  "width": 2,
+  "level": 1
+}
 ```
 
 ### lineburst(Lineburst)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "lineburst",
+  "width": 2,
+  "level": 1
+}
 ```
 
 ## Polygon
@@ -176,43 +229,74 @@
 ### centroid (CentroidFill)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "centroid",
+  "level": 1
+}
 ```
 
 ### pointpattern (PointPattern)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "pointpattern",
+  "level": 1
+}
 ```
 
 ### randommarker (RandomMarker)’
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "randommarker",
+  "level": 1
+}
 ```
 
 ### linepattern (LinePattern)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "linepattern",
+  "level": 1
+}
 ```
 
 ### svg (SVGFill)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "svg",
+  "color": "#ff0000ff",
+  "outline_color": "#ff0000ff",
+  "outline_width": 2,
+  "level": 1
+}
 ```
 
 ### gradient (GradientFill)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "gradient",
+  "level": 1
+}
 ```
 
 ### shapeburst (ShapeburstFill)
 
 ```json
-未実装: type=simpleと同様
+# 未実装: basic attributes only
+{
+  "type": "shapeburst",
+  "level": 1
+}
 ```
 
 ## Hybrid
