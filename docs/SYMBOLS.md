@@ -27,6 +27,8 @@
 
 ### svg (SvgMarker)
 
+![](./imgs/marker_svg.png)
+
 ```json
 {
   "type": "svg",
@@ -43,6 +45,8 @@
 
 ### raster (RasterMarker)
 
+![](./imgs/marker_raster.png)
+
 ```json
 {
   "type": "raster",
@@ -56,6 +60,8 @@
 
 ### font (FontMarker)
 
+![](./imgs/marker_font.png)
+
 ```json
 # 未実装: basic attributes only
 {
@@ -68,6 +74,8 @@
 
 ### animated (AnimatedMarker)
 
+![](./imgs/marker_animated.gif)
+
 ```json
 # 未実装: basic attributes only
 {
@@ -78,6 +86,8 @@
 ```
 
 ### filled (FilledMarker)
+
+![](./imgs/marker_filled.png) 
 
 ```json
 # 未実装: basic attributes only
@@ -101,6 +111,8 @@
 ```
 
 ### ellipse (Ellipse)
+
+![](./imgs/marker_ellipse.png)
 
 ```json
 # 未実装: basic attributes only
