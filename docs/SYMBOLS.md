@@ -9,7 +9,7 @@
 
 ### simple (SimpleMarker)
 
-![](./imgs/simplemarker.png)
+![](./imgs/marker_simple.png)
 
 ```json
 {
@@ -221,7 +221,7 @@
 }
 ```
 
-### lineburst(Lineburst)
+### lineburst (Lineburst)
 
 ![](./imgs/lineburst.png)
 
@@ -238,7 +238,7 @@
 
 ### simple (SimpleFill)
 
-![](./imgs/simplefill.png)
+![](./imgs/fill_simple.png)
 
 ```json
 {
