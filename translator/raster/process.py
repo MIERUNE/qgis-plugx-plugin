@@ -31,7 +31,9 @@ def process_raster(
     settings = QgsMapSettings()
     settings.setDestinationCrs(QgsProject.instance().crs())
     settings.setBackgroundColor(QColor(255, 255, 255, 0))  # transparent
-    settings.setLayers([layer])
+    _layer = layer.clone()  # clone to avoid changing opacity of original layer
+    _layer.setOpacity(1.0)
+    settings.setLayers([_layer])
     settings.setExtent(extent)
     settings.setOutputSize(QSize(image_width, image_height))
 
