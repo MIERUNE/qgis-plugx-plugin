@@ -26,6 +26,8 @@ def generate_symbols_data(symbol: QgsSymbol):
         elif symbol_layer.type() == Qgis.SymbolType.Hybrid:
             symbol_layer_dict = get_hybrid_symbol_data(symbol_layer)
 
+        symbol_layer_dict["opacity"] = symbol.opacity()
+
         symbols.append(symbol_layer_dict)
 
     return symbols
