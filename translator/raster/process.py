@@ -6,6 +6,7 @@ from qgis.core import (
     QgsProject,
     QgsMapSettings,
     QgsMapRendererParallelJob,
+    QgsCoordinateTransform,
 )
 from qgis.utils import iface
 from PyQt5.QtCore import QSize
@@ -18,9 +19,23 @@ from translator.utils import get_blend_mode_string
 def process_raster(
     layer: QgsRasterLayer, extent: QgsRectangle, idx: int, output_dir: str
 ):
+    # transform layer-extent to project-crs
+    transform = QgsCoordinateTransform(
+        layer.crs(),
+        QgsProject.instance().crs(),
+        QgsProject.instance(),
+    )
+    layer_extent = transform.transformBoundingBox(layer.extent())
+
+    # minimal extent of layer-extent and output-extent
+    intersected_extent = extent.intersect(layer_extent)
+    if intersected_extent.isEmpty():
+        # no intersected extent: skip
+        return
+
     # xy length in project-crs unit
-    extent_width = extent.xMaximum() - extent.xMinimum()
-    extent_height = extent.yMaximum() - extent.yMinimum()
+    extent_width = intersected_extent.xMaximum() - intersected_extent.xMinimum()
+    extent_height = intersected_extent.yMaximum() - intersected_extent.yMinimum()
 
     # calculate image size: same to map canvas
     units_per_pixel = iface.mapCanvas().mapUnitsPerPixel()
@@ -34,7 +49,7 @@ def process_raster(
     _layer = layer.clone()  # clone to avoid changing opacity of original layer
     _layer.setOpacity(1.0)
     settings.setLayers([_layer])
-    settings.setExtent(extent)
+    settings.setExtent(intersected_extent)
     settings.setOutputSize(QSize(image_width, image_height))
 
     # Render the map
@@ -49,17 +64,17 @@ def process_raster(
     # make world file for check
     with open(os.path.join(output_dir, f"layer_{idx}.pgw"), "w") as f:
         f.write(f"{units_per_pixel}\n0.0\n0.0\n-{units_per_pixel}\n")
-        f.write(f"{extent.xMinimum()}\n{extent.yMaximum()}\n")
+        f.write(f"{intersected_extent.xMinimum()}\n{intersected_extent.yMaximum()}\n")
 
     # json
     raster_info = {
         "layer": layer.name(),
         "type": "raster",
         "extent": [
-            extent.xMinimum(),
-            extent.yMinimum(),
-            extent.xMaximum(),
-            extent.yMaximum(),
+            intersected_extent.xMinimum(),
+            intersected_extent.yMinimum(),
+            intersected_extent.xMaximum(),
+            intersected_extent.yMaximum(),
         ],
         "opacity": layer.opacity(),
         "blend_mode": get_blend_mode_string(layer.blendMode()),
