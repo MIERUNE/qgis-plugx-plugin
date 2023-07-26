@@ -74,10 +74,13 @@ class MainDialog(QDialog):
         all_labels = generate_label_vector(params["extent"])
 
         # process layers
-        layers_has_unsupported_symbol = []  # if layer with unsupported symbol, memo it
+        results = []
         for idx, layer in enumerate(layers):
             if isinstance(layer, QgsRasterLayer):
-                process_raster(layer, params["extent"], idx, params["output_dir"])
+                result = process_raster(
+                    layer, params["extent"], idx, params["output_dir"]
+                )
+                results.append(result)
             elif isinstance(layer, QgsVectorLayer):
                 result = process_vector(
                     layer, params["extent"], idx, params["output_dir"]
@@ -90,9 +93,25 @@ class MainDialog(QDialog):
                         idx,
                         params["output_dir"],
                     )
+                results.append(result)
 
-                if result["has_unsupported_symbol"]:
-                    layers_has_unsupported_symbol.append(layer.name())
+        # list-up layers has unsupported symbol
+        layers_has_unsupported_symbol = list(
+            map(
+                lambda r: r["layer_name"],
+                list(
+                    filter(lambda r: r.get("has_unsupported_symbol") is True, results)
+                ),
+            )
+        )
+
+        # list-up layers processed successfully: layer_0, layer_2, layer_5, ...
+        layers_processed_successfully = list(
+            map(
+                lambda r: f"layer_{r['idx']}",
+                list(filter(lambda r: r["completed"] is True, results)),
+            )
+        )
 
         # write project.json
         project_json = {
@@ -110,7 +129,7 @@ class MainDialog(QDialog):
                 self.ui.mExtentGroupBox.outputExtent().yMaximum(),
             ],
             "scale": iface.mapCanvas().scale(),
-            "layers": [f"layer_{idx}" for idx in range(len(layers))],  # layer_0,1,2..
+            "layers": layers_processed_successfully,  # layer_0,2,5..
         }
         write_json(
             project_json,

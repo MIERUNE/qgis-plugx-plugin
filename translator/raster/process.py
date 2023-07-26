@@ -31,7 +31,12 @@ def process_raster(
     intersected_extent = extent.intersect(layer_extent)
     if intersected_extent.isEmpty():
         # no intersected extent: skip
-        return
+        return {
+            "idx": idx,
+            "layer_name": layer.name(),
+            "completed": False,
+            "reason": "extent is empty",
+        }
 
     # xy length in project-crs unit
     extent_width = intersected_extent.xMaximum() - intersected_extent.xMinimum()
@@ -80,3 +85,9 @@ def process_raster(
         "blend_mode": get_blend_mode_string(layer.blendMode()),
     }
     write_json(raster_info, os.path.join(output_dir, f"layer_{idx}.json"))
+
+    return {
+        "idx": idx,
+        "layer_name": layer.name(),
+        "completed": True,
+    }
