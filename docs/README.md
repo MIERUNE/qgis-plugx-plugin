@@ -24,12 +24,14 @@
 │       ├── 0.png
 │       ├── 1.gif
 │       └── n.jpg
-├── layer_0_0.shp # layer_n_mという命名規則: n=レイヤーの順序、m=シンボルの順序。辞書順で降順＝数字が大きいほど手前。
+├── layer_0_0.shp # layer_n_mという命名規則: n=レイヤーの順序、m=シンボルの順序。辞書順で降順＝数字が大きいほど手前。mは省略可能。
 ├── layer_0_0.json
-├── layer_0_1.shp
+├── layer_0_1.shp # ベクターレイヤーの場合、シンボルの数だけ出力される
 ├── layer_0_1.json
-├── layer_1.shp
-├── layer_1.json
+├── layer_2.shp # データが空のレイヤーはスキップされる（必ずしも連番ではない）
+├── layer_2.json
+├── layer_5.png
+├── layer_5.json
 ├── layer_n.shp
 ├── layer_n.json
 ├── label_1.json
@@ -52,10 +54,10 @@
   ],
   "scale": 23031.837306501773,
   "layers": [
-    "layer_0",
-    "layer_1",
+    "layer_0", // 出力されたレイヤー一覧: layer_n_mに対応する
     "layer_2",
-    "layer_3"
+    "layer_5",
+    "layer_n"
   ]
 }
 ```
@@ -93,6 +95,8 @@
 {
   "layer": "P_stations", // layer name
   "type": "point", // point | line | polygon
+  "opacity": 0.7, // 透過度: 0.0 ~ 1.0
+  "blend_mode": "normal", // normal | lighten | screen | dogde | addition | darken | multiply | burn | overlay | soft_light | hard_light | difference | subtract
   "symbols": [
       // symbol typeに応じた辞書からなる配列。別ページにて仕様を定義
       {
@@ -108,8 +112,6 @@
       }
   ],
   "usingSymbolLevels": true,
-  "opacity": 0.7, // 透過度: 0.0 ~ 1.0
-  "blend_mode": "normal", // normal | lighten | screen | dogde | addition | darken | multiply | burn | overlay | soft_light | hard_light | difference | subtract
 }
 ```
 
@@ -119,9 +121,9 @@
 {
   "layer": "imagery",
   "type": "raster",
-  "extent": [414139.4988, 4033518.258, 421614.6096, 4040087.8327],
   "opacity": 0.7,
   "blend_mode": "multiply", // normal | lighten | screen | dogde | addition | darken | multiply | burn | overlay | soft_light | hard_light | difference | subtract
+  "extent": [414139.4988, 4033518.258, 421614.6096, 4040087.8327],
 }
 ```
 

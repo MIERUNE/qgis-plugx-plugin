@@ -121,7 +121,10 @@ def _process_categorical(
             or is_included_unsupported_symbol_layer(category.symbol())
         )
     return {
+        "idx": idx,
+        "layer_name": layer.name(),
         "has_unsupported_symbol": has_unsupported_symbol,
+        "completed": True,
     }
 
 
@@ -164,5 +167,8 @@ def _process_noncategorical(
     )
 
     return {
+        "idx": idx,
+        "layer_name": layer.name(),
         "has_unsupported_symbol": has_unsupported_symbol,
+        "completed": True,
     }
