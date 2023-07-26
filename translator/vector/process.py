@@ -9,6 +9,7 @@ from .symbol import (
 )
 
 from utils import write_json
+from translator.utils import get_blend_mode_string
 
 
 def _clip_in_projectcrs(layer: QgsVectorLayer, extent: QgsRectangle) -> QgsVectorLayer:
@@ -104,6 +105,8 @@ def _process_categorical(
             "symbols": generate_symbols_data(category.symbol()),
             "usingSymbolLevels": layer.renderer().usingSymbolLevels(),
             "legend": category.label(),
+            "opacity": layer.opacity(),
+            "blend_mode": get_blend_mode_string(layer.blendMode()),
         }
         write_json(
             layer_json,
@@ -145,6 +148,8 @@ def _process_noncategorical(
         "type": _get_layer_type(layer),
         "symbols": generate_symbols_data(layer.renderer().symbol()),
         "usingSymbolLevels": layer.renderer().usingSymbolLevels(),
+        "opacity": layer.opacity(),
+        "blend_mode": get_blend_mode_string(layer.blendMode()),
     }
     write_json(
         layer_json,

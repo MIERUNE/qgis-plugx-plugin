@@ -6,6 +6,7 @@ from qgis.core import (
 )
 
 from utils import write_json
+from translator.utils import get_blend_mode_string
 from .wms import process_wms
 from .file import process_file
 
@@ -29,5 +30,7 @@ def process_raster(
             extent.xMaximum(),
             extent.yMaximum(),
         ],
+        "opacity": layer.opacity(),
+        "blend_mode": get_blend_mode_string(layer.blendMode()),
     }
     write_json(raster_info, os.path.join(output_dir, f"layer_{idx}.json"))
