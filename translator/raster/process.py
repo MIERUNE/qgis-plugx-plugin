@@ -12,6 +12,7 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QColor
 
 from utils import write_json
+from translator.utils import get_blend_mode_string
 
 
 def process_raster(
@@ -58,5 +59,7 @@ def process_raster(
             extent.xMaximum(),
             extent.yMaximum(),
         ],
+        "opacity": layer.opacity(),
+        "blend_mode": get_blend_mode_string(layer.blendMode()),
     }
     write_json(raster_info, os.path.join(output_dir, f"layer_{idx}.json"))

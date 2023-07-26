@@ -87,10 +87,12 @@
 
 ### layer_{n}_{m}.json
 
+#### vector layer
+
 ```json
 {
   "layer": "P_stations", // layer name
-  "type": "point", // point | line | polygon | raster
+  "type": "point", // point | line | polygon
   "symbols": [
       // symbol typeに応じた辞書からなる配列。別ページにて仕様を定義
       {
@@ -105,7 +107,21 @@
           "level": 0
       }
   ],
-	"usingSymbolLevels": true
+  "usingSymbolLevels": true,
+  "opacity": 0.7, // 透過度: 0.0 ~ 1.0
+  "blend_mode": "normal", // normal | lighten | screen | dogde | addition | darken | multiply | burn | overlay | soft_light | hard_light | difference | subtract
+}
+```
+
+#### raster layer
+
+```json
+{
+  "layer": "imagery",
+  "type": "raster",
+  "extent": [414139.4988, 4033518.258, 421614.6096, 4040087.8327],
+  "opacity": 0.7,
+  "blend_mode": "multiply", // normal | lighten | screen | dogde | addition | darken | multiply | burn | overlay | soft_light | hard_light | difference | subtract
 }
 ```
 
