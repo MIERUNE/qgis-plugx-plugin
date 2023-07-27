@@ -58,7 +58,11 @@
     "layer_2",
     "layer_5",
     "layer_n"
-  ]
+  ],
+  "assets_path": {
+        "svg": "assets/svg/",
+        "raster": "assets/raster/"
+    }
 }
 ```
 
