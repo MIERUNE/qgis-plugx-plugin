@@ -16,14 +16,9 @@
 .
 ├── project.json
 ├── assets
-│   ├── svg
-│   │   ├── 0.svg
-│   │   ├── 1.svg
-│   │   └── n.svg
-│   └── raster
-│       ├── 0.png
-│       ├── 1.gif
-│       └── n.jpg
+│   ├── someicon.svg
+│   ├── somepic.png
+│   ├── someanimation.gif
 ├── layer_0_0.shp # layer_n_mという命名規則: n=レイヤーの順序、m=シンボルの順序。辞書順で降順＝数字が大きいほど手前。mは省略可能。
 ├── layer_0_0.json
 ├── layer_0_1.shp # ベクターレイヤーの場合、シンボルの数だけ出力される
@@ -59,10 +54,7 @@
     "layer_5",
     "layer_n"
   ],
-  "assets_path": {
-        "svg": "assets/svg/",
-        "raster": "assets/raster/"
-    }
+  "assets_path": "assets"
 }
 ```
 
@@ -109,7 +101,7 @@
           "color": "#ff0000ff",
           "outline_color": "#ff0000ff",
           "outline_width": 2,
-          "asset_file": "some.svg",
+          "asset_name": "some.svg",
           "offset": [0.0, 0.0],
           "rotation": 0.0, // degrees, 時計回り
           "level": 0,

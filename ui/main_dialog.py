@@ -130,7 +130,7 @@ class MainDialog(QDialog):
             ],
             "scale": iface.mapCanvas().scale(),
             "layers": layers_processed_successfully,  # layer_0,2,5..
-            "assets_path": {"svg": "assets/svg/", "raster": "assets/raster/"},
+            "assets_path": "assets",
         }
         write_json(
             project_json,
