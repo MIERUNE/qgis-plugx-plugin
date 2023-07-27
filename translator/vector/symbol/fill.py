@@ -26,7 +26,7 @@ def _get_brushstyle_from(brush_style: Qt.BrushStyle) -> str:
     )
 
 
-def _get_strokestyle_from(symbol_layer: QgsSymbolLayer) -> dict:
+def _get_penstyle_from(symbol_layer: QgsSymbolLayer) -> dict:
     return {
         "stroke": {
             Qt.NoPen: "nopen",
@@ -62,7 +62,7 @@ def get_polygon_symbol_data(
             "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
-            "outline_style": _get_strokestyle_from(symbol_layer),
+            "outline_penstyle": _get_penstyle_from(symbol_layer),
             "level": symbol_layer.renderingPass(),
             "opacity": symbol_opacity,
         }
