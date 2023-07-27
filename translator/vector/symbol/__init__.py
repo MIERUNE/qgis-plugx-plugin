@@ -18,15 +18,13 @@ def generate_symbols_data(symbol: QgsSymbol):
     symbols = []
     for symbol_layer in symbol:
         if symbol_layer.type() == Qgis.SymbolType.Marker:
-            symbol_layer_dict = get_point_symbol_data(symbol_layer)
+            symbol_layer_dict = get_point_symbol_data(symbol_layer, symbol.opacity())
         elif symbol_layer.type() == Qgis.SymbolType.Line:
-            symbol_layer_dict = get_line_symbol_data(symbol_layer)
+            symbol_layer_dict = get_line_symbol_data(symbol_layer, symbol.opacity())
         elif symbol_layer.type() == Qgis.SymbolType.Fill:
-            symbol_layer_dict = get_polygon_symbol_data(symbol_layer)
+            symbol_layer_dict = get_polygon_symbol_data(symbol_layer, symbol.opacity())
         elif symbol_layer.type() == Qgis.SymbolType.Hybrid:
-            symbol_layer_dict = get_hybrid_symbol_data(symbol_layer)
-
-        symbol_layer_dict["opacity"] = symbol.opacity()
+            symbol_layer_dict = get_hybrid_symbol_data(symbol_layer, symbol.opacity())
 
         symbols.append(symbol_layer_dict)
 
