@@ -54,7 +54,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
         symbol_layer_dict = {
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
             "type": "raster",
-            "asset_path": "assets/raster/" + get_asset_name(symbol_layer),
+            "asset_file": get_asset_name(symbol_layer),
             "offset": [
                 convert_to_point(symbol_layer.offset().x(), symbol_layer.offsetUnit()),
                 convert_to_point(symbol_layer.offset().y(), symbol_layer.offsetUnit()),
@@ -73,7 +73,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "type": "svg",
-            "asset_path": "assets/svg/" + get_asset_name(symbol_layer),
+            "asset_file": get_asset_name(symbol_layer),
             "offset": [
                 convert_to_point(symbol_layer.offset().x(), symbol_layer.offsetUnit()),
                 convert_to_point(symbol_layer.offset().y(), symbol_layer.offsetUnit()),
