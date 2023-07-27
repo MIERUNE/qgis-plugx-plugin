@@ -26,6 +26,29 @@ def _get_brushstyle_from(brush_style: Qt.BrushStyle) -> str:
     )
 
 
+def _get_strokestyle_from(symbol_layer: QgsSymbolLayer) -> dict:
+    return {
+        "stroke": {
+            Qt.NoPen: "nopen",
+            Qt.SolidLine: "solid",
+            Qt.DashLine: "dash",
+            Qt.DotLine: "dot",
+            Qt.DashDotLine: "dashdot",
+            Qt.DashDotDotLine: "dashdotdot",
+            Qt.CustomDashLine: "customdash",
+        }.get(
+            symbol_layer.strokeStyle(), "solid"  # fallback
+        ),
+        "join": {
+            Qt.MiterJoin: "miter",
+            Qt.BevelJoin: "bevel",
+            Qt.RoundJoin: "round",
+        }.get(
+            symbol_layer.penJoinStyle(), "miter"  # fallback
+        ),
+    }
+
+
 def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
     # Case of simple fill
     if symbol_layer.layerType() == "SimpleFill":
@@ -37,6 +60,7 @@ def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
+            "outline_style": _get_strokestyle_from(symbol_layer),
             "level": symbol_layer.renderingPass(),
         }
     elif symbol_layer.layerType() == "CentroidFill":
