@@ -49,7 +49,7 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
     )
 
 
-def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
+def get_point_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) -> dict:
     if symbol_layer.layerType() == "RasterMarker":
         symbol_layer_dict = {
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
@@ -62,6 +62,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "rotation": symbol_layer.angle(),
             "level": symbol_layer.renderingPass(),  # renderingPass means symbolLevels
             # https://github.com/qgis/QGIS/blob/65d40ee0ce59e761ee2de366ca9a963f35adfcfd/src/core/vector/qgsvectorlayerrenderer.cpp#L702
+            "opacity": symbol_opacity,
         }
 
     elif symbol_layer.layerType() == "SvgMarker":
@@ -80,6 +81,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             ],
             "rotation": symbol_layer.angle(),
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
 
     elif symbol_layer.layerType() == "SimpleMarker":
@@ -98,6 +100,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             ],
             "rotation": symbol_layer.angle(),
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
 
     elif symbol_layer.layerType() == "FontMarker":
@@ -107,6 +110,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "color": to_rgba(symbol_layer.color()),
             "type": "font",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "AnimatedMarker":
         # TODO: implement
@@ -114,6 +118,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
             "type": "animated",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "EllipseMarker":
         # TODO: implement
@@ -122,6 +127,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "color": to_rgba(symbol_layer.color()),
             "type": "ellipse",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "FilledMarker":
         # TODO: implement
@@ -129,6 +135,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
             "type": "filled",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif (
         symbol_layer.layerType() == "GeometryGenerator"
@@ -141,6 +148,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "color": "#000000",
             "type": "unsupported",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     else:
         raise Exception("Unexpected symbol layer type")

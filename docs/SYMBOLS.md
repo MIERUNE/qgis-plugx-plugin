@@ -21,7 +21,8 @@
   "shape": "circle", //square | diamond | pentagon | hexagon | triangle | equilateraltriangle | star | arrow | circle | cross | crossfill | cross2 | line | arrowhead | arrowheadfilled | semicircle | thirdcircle | quartercircle | quartersquare | halfsquare | diagonalhalfsquare | righthalftriangle | lefthalftriangle | trapezoid | parallelogramleft | parallelogramright | shield | octagon | decagon | squarecorners | squarerounded | diamondstar | heart | halfarc | thirdarc | quarterarc | asteriskfill
   "offset": [0.0, 0.0],
   "rotation": 0.0, //degrees, 時計回り
-  "level": 0
+  "level": 0,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -39,7 +40,8 @@
   "asset_file": "some.svg",
   "offset": [0.0, 0.0],
   "rotation": 180.0, //degrees, 時計回り
-  "level": 0
+  "level": 0,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -54,7 +56,8 @@
   "asset_file": "some.png",
   "offset": [0.0, 0.0],
   "rotation": 0.0, // degrees, 時計回り
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -68,7 +71,8 @@
   "type": "font",
   "size": 10,
   "color": "#ff0000ff",
-  "level": 0
+  "level": 0,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -81,7 +85,8 @@
 {
   "type": "animated",
   "size": 10,
-  "level": 0
+  "level": 0,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -94,7 +99,8 @@
 {
   "type": "filled",
   "size": 10,
-  "level": 0
+  "level": 0,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -108,7 +114,8 @@
   "type": "ellipse",
   "size": 10,
   "color": "#ff0000ff",
-  "level": 0
+  "level": 0,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -120,7 +127,8 @@
   "type": "unsupported",
   "size": 10,
   "color": "#ff0000ff",
-  "level": 0
+  "level": 0,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -141,7 +149,8 @@
     "join": "bevel" // miter | bevel | round
   },
   "width": 2,
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -180,7 +189,8 @@
   "type": "interpolated",
   "color": "#ff0000ff",
   "width": 2,
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -192,7 +202,8 @@
 # 未実装: basic attributes only
 {
   "type": "hash",
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -205,7 +216,8 @@
 {
   "type": "raster",
   "width": 2,
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -218,7 +230,8 @@
 {
   "type": "arrow",
   "width": 2,
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -231,7 +244,8 @@
 {
   "type": "lineburst",
   "width": 2,
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -248,7 +262,8 @@
   "brushstyle": "solid", // nobrush | solid | dense1 | dense2 | dense3 | dense4 | dense5 | dense6 | dense7 | horizontal | vertical | cross | backwarddiagonal | forwarddiagonal | crossingdiagonal
   "outline_color": "#ff0000ff",
   "outline_width": 2,
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -260,7 +275,8 @@
 # 未実装: basic attributes only
 {
   "type": "centroid",
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -272,7 +288,8 @@
 # 未実装: basic attributes only
 {
   "type": "pointpattern",
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -284,7 +301,8 @@
 # 未実装: basic attributes only
 {
   "type": "randommarker",
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -296,7 +314,8 @@
 # 未実装: basic attributes only
 {
   "type": "linepattern",
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -311,7 +330,8 @@
   "color": "#ff0000ff",
   "outline_color": "#ff0000ff",
   "outline_width": 2,
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -326,7 +346,8 @@
   "color": "#ff0000ff",
   "outline_color": "#ff0000ff",
   "outline_width": 2,
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -338,7 +359,8 @@
 # 未実装: basic attributes only
 {
   "type": "gradient",
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
@@ -350,7 +372,8 @@
 # 未実装: basic attributes only
 {
   "type": "shapeburst",
-  "level": 1
+  "level": 1,
+  "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
 ```
 
