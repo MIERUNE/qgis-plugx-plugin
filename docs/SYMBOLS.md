@@ -37,7 +37,7 @@
   "color": "#ff0000ff",
   "outline_color": "#ff0000ff",
   "outline_width": 2,
-  "asset_path": "assets/symbol_svg/some.svg",
+  "asset_name": "some.svg",
   "offset": [0.0, 0.0],
   "rotation": 180.0, //degrees, 時計回り
   "level": 0,
@@ -53,7 +53,7 @@
 {
   "type": "raster",
   "size": 10,
-  "asset_path": "assets/symbol_raster/some.png",
+  "asset_name": "some.png",
   "offset": [0.0, 0.0],
   "rotation": 0.0, // degrees, 時計回り
   "level": 1,
@@ -169,9 +169,9 @@
       "color": "#ff0000ff",
       "outline_color": "#ff0000ff",
       "outline_width": 2,
-      "asset_path": "assets/svg/some.svg",
+      "asset_name": "some.svg",
       "level": 0,
-      "opacity": 1.0 // 透過度: 0.0 ~ 1.0
+      "opacity": 1.0
     }
   ]
   "interval": 2,
