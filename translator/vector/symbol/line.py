@@ -65,7 +65,8 @@ def get_line_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) ->
         symbol_layer_dict = {
             "type": "marker",
             "markers": [
-                get_point_symbol_data(marker) for marker in symbol_layer.subSymbol()
+                get_point_symbol_data(marker, symbol_layer.subSymbol().opacity())
+                for marker in symbol_layer.subSymbol()
             ],
             "interval": convert_to_point(
                 symbol_layer.interval(), symbol_layer.intervalUnit()
