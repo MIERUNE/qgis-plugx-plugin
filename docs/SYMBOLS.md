@@ -262,6 +262,10 @@
   "brushstyle": "solid", // nobrush | solid | dense1 | dense2 | dense3 | dense4 | dense5 | dense6 | dense7 | horizontal | vertical | cross | backwarddiagonal | forwarddiagonal | crossingdiagonal
   "outline_color": "#ff0000ff",
   "outline_width": 2,
+  "outline_penstyle": {
+    "stroke": "solid", // nopen | solid | dash | dot | dashdot | dashdotdot | customdash
+    "join": "bevel" // miter | bevel | round
+  },
   "level": 1,
   "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
