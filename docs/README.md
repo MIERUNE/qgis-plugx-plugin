@@ -108,7 +108,8 @@
           "asset_path": "assets/svg/some.svg",
           "offset": [0.0, 0.0],
           "rotation": 0.0, // degrees, 時計回り
-          "level": 0
+          "level": 0,
+          "opacity": 0.5 // 透過度: 0.0 ~ 1.0
       }
   ],
   "usingSymbolLevels": true,

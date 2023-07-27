@@ -26,7 +26,9 @@ def _get_brushstyle_from(brush_style: Qt.BrushStyle) -> str:
     )
 
 
-def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
+def get_polygon_symbol_data(
+    symbol_layer: QgsSymbolLayer, symbol_opacity: float
+) -> dict:
     # Case of simple fill
     if symbol_layer.layerType() == "SimpleFill":
         symbol_layer_dict = {
@@ -38,35 +40,41 @@ def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "CentroidFill":
         symbol_layer_dict = {
             "type": "centroid",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "PointPatternFill":
         # TODO: implement
         symbol_layer_dict = {
             "type": "pointpattern",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "RandomMarkerFill":
         # TODO: implement
         symbol_layer_dict = {
             "type": "randommarker",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "LinePatternFill":
         # TODO: implement
         symbol_layer_dict = {
             "type": "linepattern",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "RasterFill":
         # TODO: implement
         symbol_layer_dict = {
             "type": "raster",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "SVGFill":
         # TODO: implement
@@ -78,18 +86,21 @@ def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
                 symbol_layer.svgStrokeWidth(), symbol_layer.svgStrokeWidthUnit()
             ),
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "GradientFill":
         # TODO: implement
         symbol_layer_dict = {
             "type": "gradient",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "ShapeburstFill":
         # TODO: implement
         symbol_layer_dict = {
             "type": "shapeburst",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     elif symbol_layer.layerType() == "GeometryGenerator":
         # never to be supported...
@@ -97,6 +108,7 @@ def get_polygon_symbol_data(symbol_layer: QgsSymbolLayer) -> dict:
             "type": "unsupported",
             "color": "#000000",
             "level": symbol_layer.renderingPass(),
+            "opacity": symbol_opacity,
         }
     else:
         raise Exception("Unexpected symbol layer type")
