@@ -33,17 +33,16 @@ def generate_symbols_data(symbol: QgsSymbol):
 def export_assets_from(symbol: QgsSymbol, output_dir: str):
     for symbol_layer in symbol:
         if symbol_layer.type() == Qgis.SymbolType.Marker:
-            if symbol_layer.layerType() in ["RasterMarker", "SvgMarker"]:
-                asset_path = get_asset_dir(output_dir)
-            else:
+            if symbol_layer.layerType() not in ["RasterMarker", "SvgMarker"]:
                 if symbol_layer.subSymbol():
                     export_assets_from(symbol_layer.subSymbol(), output_dir)
-                continue
+                continue  # skip: extract only raster or svg marker
 
-            if not os.path.exists(asset_path):
-                os.makedirs(asset_path)
+            asset_dir = get_asset_dir(output_dir)
+            if not os.path.exists(asset_dir):
+                os.makedirs(asset_dir)
 
-            asset_path = os.path.join(asset_path, get_asset_name(symbol_layer))
+            asset_path = os.path.join(asset_dir, get_asset_name(symbol_layer))
             shutil.copy(
                 symbol_layer.path(),
                 asset_path,
