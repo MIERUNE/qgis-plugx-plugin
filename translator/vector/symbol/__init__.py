@@ -36,7 +36,9 @@ def export_assets_from(symbol: QgsSymbol, output_dir: str):
             if symbol_layer.layerType() in ["RasterMarker", "SvgMarker"]:
                 asset_path = get_asset_dir(output_dir)
             else:
-                return
+                if symbol_layer.subSymbol():
+                    export_assets_from(symbol_layer.subSymbol(), output_dir)
+                continue
 
             if not os.path.exists(asset_path):
                 os.makedirs(asset_path)
