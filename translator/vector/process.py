@@ -116,6 +116,11 @@ def _process_categorical(
         # asset
         export_assets_from(category.symbol(), output_dir)
 
+        # sub symbol asset if any
+        for symbol_layer in category.symbol():
+            if symbol_layer.subSymbol():
+                export_assets_from(symbol_layer.subSymbol(), output_dir)
+
         has_unsupported_symbol = (
             has_unsupported_symbol
             or is_included_unsupported_symbol_layer(category.symbol())
@@ -161,6 +166,11 @@ def _process_noncategorical(
 
     # asset
     export_assets_from(layer.renderer().symbol(), output_dir)
+
+    # sub symbol asset if any
+    for symbol_layer in layer.renderer().symbol():
+        if symbol_layer.subSymbol():
+            export_assets_from(symbol_layer.subSymbol(), output_dir)
 
     has_unsupported_symbol = is_included_unsupported_symbol_layer(
         layer.renderer().symbol()

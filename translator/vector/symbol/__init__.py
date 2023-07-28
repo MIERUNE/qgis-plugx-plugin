@@ -30,7 +30,7 @@ def generate_symbols_data(symbol: QgsSymbol):
     return symbols
 
 
-def export_assets_from(symbol, output_dir: str):
+def export_assets_from(symbol: QgsSymbol, output_dir: str):
     for symbol_layer in symbol:
         if symbol_layer.type() == Qgis.SymbolType.Marker:
             if symbol_layer.layerType() in ["RasterMarker", "SvgMarker"]:
