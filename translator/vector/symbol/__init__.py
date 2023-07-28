@@ -46,6 +46,8 @@ def export_assets_from(symbol: QgsSymbol, output_dir: str):
                 symbol_layer.path(),
                 asset_path,
             )
+        if symbol_layer.subSymbol():
+            export_assets_from(symbol_layer.subSymbol(), output_dir)
 
 
 def is_included_unsupported_symbol_layer(symbol: QgsSymbol):
