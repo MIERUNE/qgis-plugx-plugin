@@ -37,7 +37,7 @@
   "color": "#ff0000ff",
   "outline_color": "#ff0000ff",
   "outline_width": 2,
-  "asset_path": "assets/symbol_svg/some.svg",
+  "asset_name": "some.svg",
   "offset": [0.0, 0.0],
   "rotation": 180.0, //degrees, 時計回り
   "level": 0,
@@ -53,7 +53,7 @@
 {
   "type": "raster",
   "size": 10,
-  "asset_path": "assets/symbol_raster/some.png",
+  "asset_name": "some.png",
   "offset": [0.0, 0.0],
   "rotation": 0.0, // degrees, 時計回り
   "level": 1,
@@ -169,9 +169,9 @@
       "color": "#ff0000ff",
       "outline_color": "#ff0000ff",
       "outline_width": 2,
-      "asset_path": "assets/svg/some.svg",
+      "asset_name": "some.svg",
       "level": 0,
-      "opacity": 1.0 // 透過度: 0.0 ~ 1.0
+      "opacity": 1.0
     }
   ]
   "interval": 2,
@@ -262,6 +262,10 @@
   "brushstyle": "solid", // nobrush | solid | dense1 | dense2 | dense3 | dense4 | dense5 | dense6 | dense7 | horizontal | vertical | cross | backwarddiagonal | forwarddiagonal | crossingdiagonal
   "outline_color": "#ff0000ff",
   "outline_width": 2,
+  "outline_penstyle": {
+    "stroke": "solid", // nopen | solid | dash | dot | dashdot | dashdotdot | customdash
+    "join": "bevel" // miter | bevel | round
+  },
   "level": 1,
   "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
@@ -377,9 +381,17 @@
 }
 ```
 
-## Hybrid
+## Hybrid (GeometryGenerator)
 
-undefined
+```json
+# 未実装
+{
+  "type": "unsupported",
+  "color": "#000000",
+  "level": 0,
+  "opacity": 1.0
+}
+```
 
 ## 未分類のシンボル
 

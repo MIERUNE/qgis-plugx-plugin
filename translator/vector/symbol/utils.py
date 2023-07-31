@@ -4,12 +4,8 @@ from qgis.core import QgsSymbolLayer
 from PyQt5.QtGui import QColor
 
 
-def get_asset_raster_dir(output_dir: str):
-    return os.path.join(output_dir, "assets", "raster")
-
-
-def get_asset_svg_dir(output_dir: str):
-    return os.path.join(output_dir, "assets", "svg")
+def get_asset_dir(output_dir: str):
+    return os.path.join(output_dir, "assets")
 
 
 def get_asset_name(symbol_layer: QgsSymbolLayer):

@@ -8,8 +8,7 @@ from .marker import get_point_symbol_data
 from .fill import get_polygon_symbol_data
 from .hybrid import get_hybrid_symbol_data
 from translator.vector.symbol.utils import (
-    get_asset_raster_dir,
-    get_asset_svg_dir,
+    get_asset_dir,
     get_asset_name,
 )
 
@@ -31,20 +30,22 @@ def generate_symbols_data(symbol: QgsSymbol):
     return symbols
 
 
-def export_assets_from(symbol, output_dir: str):
+def export_assets_from(symbol: QgsSymbol, output_dir: str):
+    asset_dir = get_asset_dir(output_dir)
+    if not os.path.exists(asset_dir):
+        os.makedirs(asset_dir)
+
     for symbol_layer in symbol:
+        if symbol_layer.subSymbol():
+            # recursive: if the symbol layer has sub symbol, extract from it
+            export_assets_from(symbol_layer.subSymbol(), output_dir)
+
         if symbol_layer.type() == Qgis.SymbolType.Marker:
-            if symbol_layer.layerType() == "RasterMarker":
-                asset_path = get_asset_raster_dir(output_dir)
-            elif symbol_layer.layerType() == "SvgMarker":
-                asset_path = get_asset_svg_dir(output_dir)
-            else:
-                return
+            # extract only raster or svg marker
+            if symbol_layer.layerType() not in ["RasterMarker", "SvgMarker"]:
+                continue  # if not, skip
 
-            if not os.path.exists(asset_path):
-                os.makedirs(asset_path)
-
-            asset_path = os.path.join(asset_path, get_asset_name(symbol_layer))
+            asset_path = os.path.join(asset_dir, get_asset_name(symbol_layer))
             shutil.copy(
                 symbol_layer.path(),
                 asset_path,
