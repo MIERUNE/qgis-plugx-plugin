@@ -12,7 +12,7 @@ class ProgressDialog(QDialog):
         """_summary_
 
         Args:
-            set_abort_flag_callback (optional, method()): called when abort button clicked
+            set_abort_flag_callback (optional, method()): called when abort clicked
         """
         super().__init__()
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
@@ -39,7 +39,11 @@ class ProgressDialog(QDialog):
 
     def on_abort_click(self):
         if QMessageBox.Yes == QMessageBox.question(
-            self, "確認", "処理を中断し、以降の処理をスキップしてよろしいですか？", QMessageBox.Yes, QMessageBox.No
+            self,
+            "確認",
+            "処理を中断し、以降の処理をスキップしてよろしいですか？",
+            QMessageBox.Yes,
+            QMessageBox.No,
         ):
             if self.abortButton.isEnabled():  # 中断可能な場合のみ中断イベントを発火させる
                 self.set_abort_flag_callback()
