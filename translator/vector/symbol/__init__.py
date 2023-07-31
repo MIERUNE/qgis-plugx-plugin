@@ -31,24 +31,25 @@ def generate_symbols_data(symbol: QgsSymbol):
 
 
 def export_assets_from(symbol: QgsSymbol, output_dir: str):
-    for symbol_layer in symbol:
-        if symbol_layer.type() == Qgis.SymbolType.Marker:
-            if symbol_layer.layerType() not in ["RasterMarker", "SvgMarker"]:
-                if symbol_layer.subSymbol():
-                    export_assets_from(symbol_layer.subSymbol(), output_dir)
-                continue  # skip: extract only raster or svg marker
+    asset_dir = get_asset_dir(output_dir)
+    if not os.path.exists(asset_dir):
+        os.makedirs(asset_dir)
 
-            asset_dir = get_asset_dir(output_dir)
-            if not os.path.exists(asset_dir):
-                os.makedirs(asset_dir)
+    for symbol_layer in symbol:
+        if symbol_layer.subSymbol():
+            # recursive: if the symbol layer has sub symbol, extract from it
+            export_assets_from(symbol_layer.subSymbol(), output_dir)
+
+        if symbol_layer.type() == Qgis.SymbolType.Marker:
+            # extract only raster or svg marker
+            if symbol_layer.layerType() not in ["RasterMarker", "SvgMarker"]:
+                continue  # if not, skip
 
             asset_path = os.path.join(asset_dir, get_asset_name(symbol_layer))
             shutil.copy(
                 symbol_layer.path(),
                 asset_path,
             )
-        if symbol_layer.subSymbol():
-            export_assets_from(symbol_layer.subSymbol(), output_dir)
 
 
 def is_included_unsupported_symbol_layer(symbol: QgsSymbol):
