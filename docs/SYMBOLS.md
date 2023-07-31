@@ -381,23 +381,30 @@
 }
 ```
 
-## Hybrid (GeometryGenerator)
+## 未実装のシンボル
+
+### Polygon
+
+- outline
+  - Arrow
+  - Hashed
+  - Interpolated
+  - Lineburst
+  - Marker
+  - Raster
+  - Simple
+
+## 対応予定のないシンボル
+
+以下のシンボルは、対応予定がありません。`type=unsupported`として出力されます。
 
 ```json
-# 未実装
 {
   "type": "unsupported",
   "color": "#000000",
   "level": 0,
   "opacity": 1.0
 }
-```
-
-## 未分類のシンボル
-
-```
-💡 VectorField, Geometry Generatorは対応しない
-Outlineは未定
 ```
 
 ### Point
@@ -413,11 +420,3 @@ Outlineは未定
 ### Polygon
 
 - GeometryGenerator
-- outline
-  - Arrow
-  - Hashed
-  - Interpolated
-  - Lineburst
-  - Marker
-  - Raster
-  - Simple
