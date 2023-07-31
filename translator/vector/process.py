@@ -120,6 +120,7 @@ def _process_categorical(
             has_unsupported_symbol
             or is_included_unsupported_symbol_layer(category.symbol())
         )
+
     return {
         "idx": idx,
         "layer_name": layer.name(),
