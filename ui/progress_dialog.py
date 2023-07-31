@@ -46,14 +46,14 @@ class ProgressDialog(QDialog):
                 self.abortButton.setEnabled(False)
                 self.abortButton.setText("中断待機中...")
 
-    def set_sum_of_processes(self, value: int):
+    def set_maximum(self, value: int):
         self.progressBar.setMaximum(value)
 
     def add_progress(self, value: int):
         self.progressBar.setValue(self.progressBar.value() + value)
 
     def set_messsage(self, message: str):
-        self.label.setText(message + "...")
+        self.label.setText(message)
 
     def set_abortable(self, abortable=True):
         self.abortButton.setEnabled(abortable)

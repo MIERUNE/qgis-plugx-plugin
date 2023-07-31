@@ -8,8 +8,6 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsMapLayerModel,
     QgsProject,
-    QgsRasterLayer,
-    QgsVectorLayer,
     QgsLayerTree,
     QgsLayerTreeGroup,
     QgsLayerTreeLayer,
@@ -19,9 +17,9 @@ from qgis.core import (
 from qgis.PyQt import uic
 from qgis.utils import iface
 
-from translator.raster.process import process_raster
-from translator.vector.process import process_vector
-from translator.vector.label import generate_label_json, generate_label_vector
+from translator.vector.label import generate_label_vector
+from ui.progress_dialog import ProgressDialog
+from translator.thread import ProcessingThread
 from utils import write_json, get_tempdir
 
 
@@ -73,27 +71,25 @@ class MainDialog(QDialog):
         # generate label vector includes labels of all layers
         all_labels = generate_label_vector(params["extent"])
 
-        # process layers
-        results = []
-        for idx, layer in enumerate(layers):
-            if isinstance(layer, QgsRasterLayer):
-                result = process_raster(
-                    layer, params["extent"], idx, params["output_dir"]
-                )
-                results.append(result)
-            elif isinstance(layer, QgsVectorLayer):
-                result = process_vector(
-                    layer, params["extent"], idx, params["output_dir"]
-                )
+        # orchestrate thread and progress dialog
+        thread = ProcessingThread(layers, all_labels, params)
+        progress_dialog = ProgressDialog(thread.set_abort_flag)
+        progress_dialog.set_maximum(len(layers))
+        # connect signals
+        thread.addProgress.connect(progress_dialog.add_progress)
+        thread.postMessage.connect(progress_dialog.set_messsage)
+        thread.setAbortable.connect(progress_dialog.set_abortable)
+        thread.processFinished.connect(progress_dialog.close)
+        thread.processFailed.connect(
+            lambda error_message: QMessageBox.information(
+                self.main, "エラー", f"エラーが発生しました。\n\n{error_message}"
+            )
+        )
+        # start sub thread
+        thread.start()
+        progress_dialog.exec_()
 
-                if layer.labelsEnabled():
-                    generate_label_json(
-                        all_labels,
-                        layer.name(),
-                        idx,
-                        params["output_dir"],
-                    )
-                results.append(result)
+        results = thread.results  # results stored in thread instance
 
         # list-up layers has unsupported symbol
         layers_has_unsupported_symbol = list(

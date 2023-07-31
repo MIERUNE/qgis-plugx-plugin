@@ -10,7 +10,7 @@ class ProcessingThread(QThread):
     processStarted = pyqtSignal(int)
     addProgress = pyqtSignal(int)
     postMessage = pyqtSignal(str)
-    processFinished = pyqtSignal(dict)
+    processFinished = pyqtSignal()
     setAbortable = pyqtSignal(bool)
     processFailed = pyqtSignal(str)
 
@@ -22,15 +22,13 @@ class ProcessingThread(QThread):
         self.params = params
         self.abort_flag = False
 
+        self.results = []
+
     def set_abort_flag(self, flag=True):
         self.abort_flag = flag
 
     def run(self):
-        """ """
-
-        # 処理に成功したレイヤーの名前とインスタンスを保持する辞書
         try:
-            results = []
             for idx, layer in enumerate(self.layers):
                 if self.abort_flag:
                     break
@@ -39,7 +37,7 @@ class ProcessingThread(QThread):
                     result = process_raster(
                         layer, self.params["extent"], idx, self.params["output_dir"]
                     )
-                    results.append(result)
+                    self.results.append(result)
                 elif isinstance(layer, QgsVectorLayer):
                     result = process_vector(
                         layer, self.params["extent"], idx, self.params["output_dir"]
@@ -52,15 +50,15 @@ class ProcessingThread(QThread):
                             idx,
                             self.params["output_dir"],
                         )
-                    results.append(result)
+                    self.results.append(result)
 
                 # emit progress
-                self.postMessage.emit("message")
+                self.postMessage.emit(f"処理中: {layer.name()}")
                 self.setAbortable.emit(True)
                 self.addProgress.emit(1)
         except Exception as e:
             # エラーはまとめてキャッチして呼び出し元に報告・処理を中断
             self.processFailed.emit(str(e))
             self.abort_flag = True
-            self.processFinished.emit({})  # result
-            return
+
+        self.processFinished.emit()
