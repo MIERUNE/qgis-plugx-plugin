@@ -58,7 +58,7 @@ class ProcessingThread(QThread):
                 self.addProgress.emit(1)
         except Exception as e:
             # エラーはまとめてキャッチして呼び出し元に報告・処理を中断
-            self.processFailed.emit(str(e))
-            self.abort_flag = True
+            self.processFailed.emit(f"layer:{layer.name()} - error:{str(e)}")
+            return
 
         self.processFinished.emit()

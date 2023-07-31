@@ -13,6 +13,8 @@ from qgis.core import (
     QgsLayerTreeLayer,
     QgsApplication,
     QgsMapLayerType,
+    QgsMessageLog,
+    Qgis,
 )
 from qgis.PyQt import uic
 from qgis.utils import iface
@@ -81,9 +83,13 @@ class MainDialog(QDialog):
         thread.setAbortable.connect(progress_dialog.set_abortable)
         thread.processFinished.connect(progress_dialog.close)
         thread.processFailed.connect(
-            lambda error_message: QMessageBox.information(
-                self.main, "エラー", f"エラーが発生しました。\n\n{error_message}"
-            )
+            lambda error_message: [
+                QgsMessageLog.logMessage(error_message, "QGS2PlugX", Qgis.Critical),
+                QMessageBox.information(
+                    self, "エラー", f"エラーが発生しました。\n\n{error_message}"
+                ),  # noqa
+                progress_dialog.close(),
+            ]
         )
         # start sub thread
         thread.start()
