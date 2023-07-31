@@ -381,9 +381,17 @@
 }
 ```
 
-## Hybrid
+## Hybrid (GeometryGenerator)
 
-undefined
+```json
+# 未実装
+{
+  "type": "unsupported",
+  "color": "#000000",
+  "level": 0,
+  "opacity": 1.0
+}
+```
 
 ## 未分類のシンボル
 
