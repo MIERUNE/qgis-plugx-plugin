@@ -20,7 +20,8 @@
   "outline_width": 2,
   "outline_penstyle": {
     "stroke": "solid", // nopen | solid | dash | dot | dashdot | dashdotdot | customdash
-    "join": "bevel" // miter | bevel | round
+    "join": "bevel", // miter | bevel | round
+    "cap": "square" // flat | square | round
   },
   "shape": "circle", //square | diamond | pentagon | hexagon | triangle | equilateraltriangle | star | arrow | circle | cross | crossfill | cross2 | line | arrowhead | arrowheadfilled | semicircle | thirdcircle | quartercircle | quartersquare | halfsquare | diagonalhalfsquare | righthalftriangle | lefthalftriangle | trapezoid | parallelogramleft | parallelogramright | shield | octagon | decagon | squarecorners | squarerounded | diamondstar | heart | halfarc | thirdarc | quarterarc | asteriskfill
   "offset": [0.0, 0.0],
