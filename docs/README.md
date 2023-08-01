@@ -109,6 +109,9 @@
       }
   ],
   "usingSymbolLevels": true,
+  "legend": "1 - 20000", // 項目名 (categoricalかgraduated別の場合)
+  "opacity": 0.5,  // レイヤーの透過度: 0.0 ~ 1.0
+  "blend_mode": "normal"
 }
 ```
 
