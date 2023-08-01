@@ -69,7 +69,7 @@ def process_vector(
     elif layer.renderer().type() == "graduatedSymbol":
         result = _process_graduated(layer, extent, idx, output_dir)
     elif layer.renderer().type() == "singleSymbol":
-        result = _process_noncategorical(layer, extent, idx, output_dir)
+        result = _process_singlesymbol(layer, extent, idx, output_dir)
 
     return result
 
@@ -190,7 +190,7 @@ def _process_graduated(
     }
 
 
-def _process_noncategorical(
+def _process_singlesymbol(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
     # shp
