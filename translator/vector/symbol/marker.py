@@ -70,6 +70,13 @@ def _get_penstyle_from(symbol_layer: QgsMarkerSymbolLayer) -> dict:
         }.get(
             symbol_layer.penJoinStyle(), "miter"  # fallback
         ),
+        "cap": {
+            Qt.FlatCap: "flat",
+            Qt.SquareCap: "square",
+            Qt.RoundCap: "round",
+        }.get(
+            symbol_layer.penCapStyle(), "flat"  # fallback
+        ),
     }
 
 
