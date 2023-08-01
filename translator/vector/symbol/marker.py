@@ -1,4 +1,5 @@
-from qgis.core import QgsSymbolLayer, QgsSimpleMarkerSymbolLayerBase
+from qgis.core import QgsMarkerSymbolLayer, QgsSimpleMarkerSymbolLayerBase
+from PyQt5.QtCore import Qt
 
 
 from utils import convert_to_point
@@ -49,7 +50,32 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
     )
 
 
-def get_point_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) -> dict:
+def _get_penstyle_from(symbol_layer: QgsMarkerSymbolLayer) -> dict:
+    return {
+        "stroke": {
+            Qt.NoPen: "nopen",
+            Qt.SolidLine: "solid",
+            Qt.DashLine: "dash",
+            Qt.DotLine: "dot",
+            Qt.DashDotLine: "dashdot",
+            Qt.DashDotDotLine: "dashdotdot",
+            Qt.CustomDashLine: "customdash",
+        }.get(
+            symbol_layer.strokeStyle(), "solid"  # fallback
+        ),
+        "join": {
+            Qt.MiterJoin: "miter",
+            Qt.BevelJoin: "bevel",
+            Qt.RoundJoin: "round",
+        }.get(
+            symbol_layer.penJoinStyle(), "miter"  # fallback
+        ),
+    }
+
+
+def get_point_symbol_data(
+    symbol_layer: QgsMarkerSymbolLayer, symbol_opacity: float
+) -> dict:
     if symbol_layer.layerType() == "RasterMarker":
         symbol_layer_dict = {
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
@@ -92,6 +118,7 @@ def get_point_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) -
             "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
+            "outline_penstyle": _get_penstyle_from(symbol_layer),
             "type": "simple",
             "shape": _get_markershape_from(symbol_layer.shape()),
             "offset": [
