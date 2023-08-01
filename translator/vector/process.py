@@ -66,6 +66,8 @@ def process_vector(
 ) -> dict:
     if layer.renderer().type() == "categorizedSymbol":
         result = _process_categorical(layer, extent, idx, output_dir)
+    elif layer.renderer().type() == "graduatedSymbol":
+        result = _process_graduated(layer, extent, idx, output_dir)
     elif layer.renderer().type() == "singleSymbol":
         result = _process_noncategorical(layer, extent, idx, output_dir)
 
@@ -119,6 +121,65 @@ def _process_categorical(
         has_unsupported_symbol = (
             has_unsupported_symbol
             or is_included_unsupported_symbol_layer(category.symbol())
+        )
+
+    return {
+        "idx": idx,
+        "layer_name": layer.name(),
+        "has_unsupported_symbol": has_unsupported_symbol,
+        "completed": True,
+    }
+
+
+def _process_graduated(
+    layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
+) -> dict:
+    layer_intersected = _clip_in_projectcrs(layer, extent)
+    has_unsupported_symbol = False
+    for sub_idx, range in enumerate(layer.renderer().ranges()):
+        # shp
+        shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
+        output_layer = QgsVectorFileWriter(
+            shp_path,
+            "UTF-8",
+            layer.fields(),
+            layer.wkbType(),
+            QgsProject.instance().crs(),
+            "ESRI Shapefile",
+        )
+        # extract features by category
+        filtered_features = list(
+            filter(
+                lambda f: range.lowerValue()
+                < f[layer.renderer().classAttribute()]
+                <= range.upperValue(),
+                layer_intersected.getFeatures(),
+            )
+        )
+        output_layer.addFeatures(filtered_features)
+        del output_layer
+
+        # json
+        layer_json = {
+            "layer": layer.name(),
+            "type": _get_layer_type(layer),
+            "symbols": generate_symbols_data(range.symbol()),
+            "usingSymbolLevels": layer.renderer().usingSymbolLevels(),
+            "legend": range.label(),
+            "opacity": layer.opacity(),
+            "blend_mode": get_blend_mode_string(layer.blendMode()),
+        }
+        write_json(
+            layer_json,
+            os.path.join(output_dir, f"layer_{idx}_{sub_idx}.json"),
+        )
+
+        # asset
+        export_assets_from(range.symbol(), output_dir)
+
+        has_unsupported_symbol = (
+            has_unsupported_symbol
+            or is_included_unsupported_symbol_layer(range.symbol())
         )
 
     return {
