@@ -2,7 +2,7 @@ from qgis.core import QgsSymbolLayer
 from utils import convert_to_point
 from PyQt5.QtCore import Qt
 from translator.vector.symbol.utils import to_rgba
-from translator.vector.symbol.utils import get_penstyle_from
+from translator.vector.symbol.penstyle import get_penstyle_from
 
 
 def _get_brushstyle_from(brush_style: Qt.BrushStyle) -> str:

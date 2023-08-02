@@ -3,7 +3,7 @@ from utils import convert_to_point
 
 from .marker import get_point_symbol_data
 from translator.vector.symbol.utils import to_rgba
-from translator.vector.symbol.utils import get_penstyle_from
+from translator.vector.symbol.penstyle import get_penstyle_from
 
 
 def get_line_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) -> dict:

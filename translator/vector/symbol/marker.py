@@ -2,7 +2,8 @@ from qgis.core import QgsMarkerSymbolLayer, QgsSimpleMarkerSymbolLayerBase
 
 
 from utils import convert_to_point
-from translator.vector.symbol.utils import get_asset_name, to_rgba, get_penstyle_from
+from translator.vector.symbol.utils import get_asset_name, to_rgba
+from translator.vector.symbol.penstyle import get_penstyle_from
 
 
 def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) -> str:
