@@ -79,6 +79,26 @@ def _process_categorical(
 ) -> dict:
     layer_intersected = _clip_in_projectcrs(layer, extent)
     has_unsupported_symbol = False
+
+    # determine class attribute
+    if layer.renderer().classAttribute() in layer.fields().names():
+        target_field = layer.renderer().classAttribute()
+    else:
+        target_field = "tmp_calc"
+        calculated_layer = processing.run(
+            "native:fieldcalculator",
+            {
+                "INPUT": layer_intersected,
+                "FIELD_NAME": target_field,
+                "FIELD_TYPE": 2,  # TO DO : Auto-determine
+                "FIELD_LENGTH": 0,
+                "FIELD_PRECISION": 0,
+                "FORMULA": f"{layer.renderer().classAttribute()}",
+                "OUTPUT": "TEMPORARY_OUTPUT",
+            },
+        )["OUTPUT"]
+        layer_intersected = calculated_layer
+
     for sub_idx, category in enumerate(layer.renderer().categories()):
         # shp
         shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
@@ -93,7 +113,7 @@ def _process_categorical(
         # extract features by category
         filtered_features = list(
             filter(
-                lambda f: f[layer.renderer().classAttribute()] == category.value(),
+                lambda f: f[target_field] == category.value(),
                 layer_intersected.getFeatures(),
             )
         )
@@ -136,6 +156,26 @@ def _process_graduated(
 ) -> dict:
     layer_intersected = _clip_in_projectcrs(layer, extent)
     has_unsupported_symbol = False
+
+    # determine class attribute
+    if layer.renderer().classAttribute() in layer.fields().names():
+        target_field = layer.renderer().classAttribute()
+    else:
+        target_field = "tmp_calc"
+        calculated_layer = processing.run(
+            "native:fieldcalculator",
+            {
+                "INPUT": layer_intersected,
+                "FIELD_NAME": target_field,
+                "FIELD_TYPE": 0,  # Graduated : double
+                "FIELD_LENGTH": 0,
+                "FIELD_PRECISION": 0,
+                "FORMULA": f"{layer.renderer().classAttribute()}",
+                "OUTPUT": "TEMPORARY_OUTPUT",
+            },
+        )["OUTPUT"]
+        layer_intersected = calculated_layer
+
     for sub_idx, range in enumerate(layer.renderer().ranges()):
         # shp
         shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
@@ -147,12 +187,11 @@ def _process_graduated(
             QgsProject.instance().crs(),
             "ESRI Shapefile",
         )
-        # extract features by category
+
+        # extract features by range
         filtered_features = list(
             filter(
-                lambda f: range.lowerValue()
-                < f[layer.renderer().classAttribute()]
-                <= range.upperValue(),
+                lambda f: range.lowerValue() < f[target_field] <= range.upperValue(),
                 layer_intersected.getFeatures(),
             )
         )
