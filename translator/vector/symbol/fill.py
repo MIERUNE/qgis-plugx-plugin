@@ -2,6 +2,7 @@ from qgis.core import QgsSymbolLayer
 from utils import convert_to_point
 from PyQt5.QtCore import Qt
 from translator.vector.symbol.utils import to_rgba
+from translator.vector.symbol.utils import get_penstyle_from
 
 
 def _get_brushstyle_from(brush_style: Qt.BrushStyle) -> str:
@@ -26,29 +27,6 @@ def _get_brushstyle_from(brush_style: Qt.BrushStyle) -> str:
     )
 
 
-def _get_penstyle_from(symbol_layer: QgsSymbolLayer) -> dict:
-    return {
-        "stroke": {
-            Qt.NoPen: "nopen",
-            Qt.SolidLine: "solid",
-            Qt.DashLine: "dash",
-            Qt.DotLine: "dot",
-            Qt.DashDotLine: "dashdot",
-            Qt.DashDotDotLine: "dashdotdot",
-            Qt.CustomDashLine: "customdash",
-        }.get(
-            symbol_layer.strokeStyle(), "solid"  # fallback
-        ),
-        "join": {
-            Qt.MiterJoin: "miter",
-            Qt.BevelJoin: "bevel",
-            Qt.RoundJoin: "round",
-        }.get(
-            symbol_layer.penJoinStyle(), "miter"  # fallback
-        ),
-    }
-
-
 def get_polygon_symbol_data(
     symbol_layer: QgsSymbolLayer, symbol_opacity: float
 ) -> dict:
@@ -62,7 +40,7 @@ def get_polygon_symbol_data(
             "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
-            "outline_penstyle": _get_penstyle_from(symbol_layer),
+            "outline_penstyle": get_penstyle_from(symbol_layer),
             "level": symbol_layer.renderingPass(),
             "opacity": symbol_opacity,
         }
