@@ -1,9 +1,9 @@
 from qgis.core import QgsMarkerSymbolLayer, QgsSimpleMarkerSymbolLayerBase
-from PyQt5.QtCore import Qt
 
 
 from utils import convert_to_point
 from translator.vector.symbol.utils import get_asset_name, to_rgba
+from translator.vector.symbol.penstyle import get_penstyle_from
 
 
 def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) -> str:
@@ -48,36 +48,6 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
     }.get(
         symbol_shape, "circle"  # fallback
     )
-
-
-def _get_penstyle_from(symbol_layer: QgsMarkerSymbolLayer) -> dict:
-    return {
-        "stroke": {
-            Qt.NoPen: "nopen",
-            Qt.SolidLine: "solid",
-            Qt.DashLine: "dash",
-            Qt.DotLine: "dot",
-            Qt.DashDotLine: "dashdot",
-            Qt.DashDotDotLine: "dashdotdot",
-            Qt.CustomDashLine: "customdash",
-        }.get(
-            symbol_layer.strokeStyle(), "solid"  # fallback
-        ),
-        "join": {
-            Qt.MiterJoin: "miter",
-            Qt.BevelJoin: "bevel",
-            Qt.RoundJoin: "round",
-        }.get(
-            symbol_layer.penJoinStyle(), "miter"  # fallback
-        ),
-        "cap": {
-            Qt.FlatCap: "flat",
-            Qt.SquareCap: "square",
-            Qt.RoundCap: "round",
-        }.get(
-            symbol_layer.penCapStyle(), "flat"  # fallback
-        ),
-    }
 
 
 def get_point_symbol_data(
@@ -125,7 +95,7 @@ def get_point_symbol_data(
             "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
-            "outline_penstyle": _get_penstyle_from(symbol_layer),
+            "outline_penstyle": get_penstyle_from(symbol_layer),
             "type": "simple",
             "shape": _get_markershape_from(symbol_layer.shape()),
             "offset": [

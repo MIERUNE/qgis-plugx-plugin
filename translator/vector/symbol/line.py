@@ -1,44 +1,9 @@
 from qgis.core import QgsSymbolLayer
 from utils import convert_to_point
-from PyQt5.QtCore import Qt
 
 from .marker import get_point_symbol_data
 from translator.vector.symbol.utils import to_rgba
-
-
-def _get_penstyle_from(symbol_layer: QgsSymbolLayer) -> dict:
-    penstyle = {
-        "stroke": {
-            Qt.NoPen: "nopen",
-            Qt.SolidLine: "solid",
-            Qt.DashLine: "dash",
-            Qt.DotLine: "dot",
-            Qt.DashDotLine: "dashdot",
-            Qt.DashDotDotLine: "dashdotdot",
-            Qt.CustomDashLine: "customdash",
-        }.get(
-            symbol_layer.penStyle(), "solid"  # fallback
-        ),
-        "join": {
-            Qt.MiterJoin: "miter",
-            Qt.BevelJoin: "bevel",
-            Qt.RoundJoin: "round",
-        }.get(
-            symbol_layer.penJoinStyle(), "miter"  # fallback
-        ),
-        "cap": {Qt.FlatCap: "flat", Qt.SquareCap: "square", Qt.RoundCap: "round"}.get(
-            symbol_layer.penCapStyle(), "flat"  # fallback
-        ),
-    }
-
-    # custom dash pattern
-    if symbol_layer.useCustomDashPattern():
-        penstyle["dash_pattern"] = [
-            convert_to_point(dash_value, symbol_layer.customDashPatternUnit())
-            for dash_value in symbol_layer.customDashVector()
-        ]
-
-    return penstyle
+from translator.vector.symbol.penstyle import get_penstyle_from
 
 
 def get_line_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) -> dict:
@@ -46,7 +11,7 @@ def get_line_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) ->
         symbol_layer_dict = {
             "type": "simple",
             "color": to_rgba(symbol_layer.color()),
-            "penstyle": _get_penstyle_from(symbol_layer),
+            "penstyle": get_penstyle_from(symbol_layer),
             "width": convert_to_point(symbol_layer.width(), symbol_layer.widthUnit()),
             "level": symbol_layer.renderingPass(),
             "opacity": symbol_opacity,
