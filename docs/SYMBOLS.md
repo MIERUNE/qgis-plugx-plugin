@@ -149,9 +149,13 @@
   "type": "simple",
   "color": "#ff0000ff",
   "penstyle": {
-    "stroke": "solid", // nopen | solid | dash | dot | dashdot | dashdotdot | customdash
+    "stroke": "solid", // nopen | solid | dash
     "cap": "square", // flat | square | round
-    "join": "bevel" // miter | bevel | round
+    "join": "bevel", // miter | bevel | round
+    "dash_pattern": [2.0, 1.0, 4.0, 1.0], // stroke=dashのときのみ [実線(長さ), 間隔、実線、間隔...]
+    // 例: [2, 1]       -> --  --  --  -- ...
+    // 例: [4, 2]       -> ----  ----  ---- ...
+    // 例: [2, 1, 4, 2] -> -- ----  -- ----  -- ...
   },
   "width": 2,
   "level": 1,
