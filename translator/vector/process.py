@@ -61,6 +61,53 @@ def _get_layer_type(layer: QgsVectorLayer):
         return "unsupported"
 
 
+def _get_field_value_type(layer: QgsVectorLayer) -> int:
+    if layer.renderer().type() == "categorizedSymbol":
+        # enum for calculate field class
+        # https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectortable.html#qgisfieldcalculator
+        if type(layer.renderer().categories()[0].value()) == float:
+            return 0
+        elif type(layer.renderer().categories()[0].value()) == int:
+            return 1
+        elif type(layer.renderer().categories()[0].value()) == str:
+            return 2
+
+    elif layer.renderer().type() == "graduatedSymbol":
+        # graduated ranges are float values
+        return 0
+
+
+def _calculate_layer_expression(
+    target_layer: QgsVectorLayer, reference_layer: QgsVectorLayer, target_field: str
+) -> QgsVectorLayer:
+    """
+    add an attribute to target_layer and calculate
+    using attribute expression set in reference_layer
+
+    Args:
+        target_layer (QgsVectorLayer): layer to edit
+        reference_layer (QgsVectorLayer):
+            layer where is set attribute expression and its type
+        target_field (str): attribute to be added and calculated
+
+    Returns:
+        calculated_layer (QgsVectorLayer): target_layer with calculated attribute
+    """
+    calculated_layer = processing.run(
+        "native:fieldcalculator",
+        {
+            "INPUT": target_layer,
+            "FIELD_NAME": target_field,
+            "FIELD_TYPE": _get_field_value_type(reference_layer),
+            "FIELD_LENGTH": 0,
+            "FIELD_PRECISION": 0,
+            "FORMULA": f"{reference_layer.renderer().classAttribute()}",
+            "OUTPUT": "TEMPORARY_OUTPUT",
+        },
+    )["OUTPUT"]
+    return calculated_layer
+
+
 def process_vector(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
@@ -85,19 +132,10 @@ def _process_categorical(
         target_field = layer.renderer().classAttribute()
     else:
         target_field = "tmp_calc"
-        calculated_layer = processing.run(
-            "native:fieldcalculator",
-            {
-                "INPUT": layer_intersected,
-                "FIELD_NAME": target_field,
-                "FIELD_TYPE": 2,  # TO DO : Auto-determine
-                "FIELD_LENGTH": 0,
-                "FIELD_PRECISION": 0,
-                "FORMULA": f"{layer.renderer().classAttribute()}",
-                "OUTPUT": "TEMPORARY_OUTPUT",
-            },
-        )["OUTPUT"]
-        layer_intersected = calculated_layer
+
+        layer_intersected = _calculate_layer_expression(
+            layer_intersected, layer, target_field
+        )
 
     for sub_idx, category in enumerate(layer.renderer().categories()):
         # shp
@@ -162,19 +200,10 @@ def _process_graduated(
         target_field = layer.renderer().classAttribute()
     else:
         target_field = "tmp_calc"
-        calculated_layer = processing.run(
-            "native:fieldcalculator",
-            {
-                "INPUT": layer_intersected,
-                "FIELD_NAME": target_field,
-                "FIELD_TYPE": 0,  # Graduated : double
-                "FIELD_LENGTH": 0,
-                "FIELD_PRECISION": 0,
-                "FORMULA": f"{layer.renderer().classAttribute()}",
-                "OUTPUT": "TEMPORARY_OUTPUT",
-            },
-        )["OUTPUT"]
-        layer_intersected = calculated_layer
+
+        layer_intersected = _calculate_layer_expression(
+            layer_intersected, layer, target_field
+        )
 
     for sub_idx, range in enumerate(layer.renderer().ranges()):
         # shp
