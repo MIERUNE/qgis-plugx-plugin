@@ -193,10 +193,13 @@ def _process_graduated(
             "ESRI Shapefile",
         )
 
-        # extract features by range
+        # filter features
+        # 1: filter out null value: on-the-fly attribute may have null value
+        # 2: extract features by range
         filtered_features = list(
             filter(
-                lambda f: range.lowerValue() < f[target_field] <= range.upperValue(),
+                lambda f: f[target_field] is not None
+                and range.lowerValue() < f[target_field] <= range.upperValue(),
                 layer_normalized.getFeatures(),
             )
         )
