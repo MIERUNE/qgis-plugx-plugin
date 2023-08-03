@@ -61,6 +61,49 @@ def _get_layer_type(layer: QgsVectorLayer):
         return "unsupported"
 
 
+def _preprocess_layer(
+    layer: QgsVectorLayer, extent: QgsRectangle
+) -> (QgsVectorLayer, str):
+    """clip and calculate on-the-fly attribute
+    layer -> clip by extent -> if has on-the-fly attribute, calculate it -> return
+    """
+    layer_clipped = _clip_in_projectcrs(layer, extent)
+
+    if layer.renderer().classAttribute() in layer.fields().names():
+        return layer_clipped, layer.renderer().classAttribute()
+    else:
+        target_field = "tmp_calc"
+        calculated_layer = processing.run(
+            "native:fieldcalculator",
+            {
+                "INPUT": layer_clipped,
+                "FIELD_NAME": target_field,
+                "FIELD_TYPE": _get_field_value_type(layer),
+                "FIELD_LENGTH": 0,
+                "FIELD_PRECISION": 0,
+                "FORMULA": f"{layer.renderer().classAttribute()}",
+                "OUTPUT": "TEMPORARY_OUTPUT",
+            },
+        )["OUTPUT"]
+        return calculated_layer, target_field
+
+
+def _get_field_value_type(layer: QgsVectorLayer) -> int:
+    if layer.renderer().type() == "categorizedSymbol":
+        # enum for calculate field class
+        # https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectortable.html#qgisfieldcalculator
+        if type(layer.renderer().categories()[0].value()) == float:
+            return 0
+        elif type(layer.renderer().categories()[0].value()) == int:
+            return 1
+        elif type(layer.renderer().categories()[0].value()) == str:
+            return 2
+
+    elif layer.renderer().type() == "graduatedSymbol":
+        # graduated ranges are float values
+        return 0
+
+
 def process_vector(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
@@ -77,8 +120,9 @@ def process_vector(
 def _process_categorical(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
-    layer_intersected = _clip_in_projectcrs(layer, extent)
+    layer_normalized, target_field = _preprocess_layer(layer, extent)
     has_unsupported_symbol = False
+
     for sub_idx, category in enumerate(layer.renderer().categories()):
         # shp
         shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
@@ -93,8 +137,8 @@ def _process_categorical(
         # extract features by category
         filtered_features = list(
             filter(
-                lambda f: f[layer.renderer().classAttribute()] == category.value(),
-                layer_intersected.getFeatures(),
+                lambda f: f[target_field] == category.value(),
+                layer_normalized.getFeatures(),
             )
         )
         output_layer.addFeatures(filtered_features)
@@ -134,8 +178,9 @@ def _process_categorical(
 def _process_graduated(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
-    layer_intersected = _clip_in_projectcrs(layer, extent)
+    layer_normalized, target_field = _preprocess_layer(layer, extent)
     has_unsupported_symbol = False
+
     for sub_idx, range in enumerate(layer.renderer().ranges()):
         # shp
         shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
@@ -147,13 +192,15 @@ def _process_graduated(
             QgsProject.instance().crs(),
             "ESRI Shapefile",
         )
-        # extract features by category
+
+        # filter features
+        # 1: filter out null value: on-the-fly attribute may have null value
+        # 2: extract features by range
         filtered_features = list(
             filter(
-                lambda f: range.lowerValue()
-                < f[layer.renderer().classAttribute()]
-                <= range.upperValue(),
-                layer_intersected.getFeatures(),
+                lambda f: f[target_field] is not None
+                and range.lowerValue() < f[target_field] <= range.upperValue(),
+                layer_normalized.getFeatures(),
             )
         )
         output_layer.addFeatures(filtered_features)
