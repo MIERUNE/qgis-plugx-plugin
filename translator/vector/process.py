@@ -135,12 +135,26 @@ def _process_categorical(
             "ESRI Shapefile",
         )
         # extract features by category
-        filtered_features = list(
-            filter(
-                lambda f: f[target_field] == category.value(),
-                layer_normalized.getFeatures(),
+        if category.value() is None or category.value() == "":
+            # all other values
+            filtered_features = list(
+                filter(
+                    lambda f: f[target_field]
+                    not in list(
+                        filter(
+                            None, [cat.value() for cat in layer.renderer().categories()]
+                        )
+                    ),
+                    layer_normalized.getFeatures(),
+                )
             )
-        )
+        else:
+            filtered_features = list(
+                filter(
+                    lambda f: f[target_field] == category.value(),
+                    layer_normalized.getFeatures(),
+                )
+            )
         output_layer.addFeatures(filtered_features)
         del output_layer
 
