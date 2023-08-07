@@ -135,8 +135,20 @@ def _process_categorical(
             "ESRI Shapefile",
         )
         # extract features by category
-        if category.value() is None or category.value() == "":
-            # all other values
+        if category.dump().split("::")[0] == "":
+            """all other values
+            category.value() = '' OR category.value() == NULL
+            QGIS system considers True category.value() == NULL
+            but not category.value() is None or category.value() is NULL
+
+            use category.dump() instead
+            https://qgis.org/pyqgis/master/core/QgsRendererCategory.html#qgis.core.QgsRendererCategory.dump
+            category.dump() result:
+            '1::1::FILL SYMBOL (1 layers) color 0,0,4,95:1\n'
+            '{category.value{}}::{category.legend()}::{symbol_type} SYMBOL (1 layers) color {R},{G},{B},{A}:1\n'
+            When all other values : '::::FILL SYMBOL (1 layers) color 0,0,4,95:1\n'
+            """
+
             filtered_features = list(
                 filter(
                     lambda f: f[target_field]
