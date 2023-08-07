@@ -145,7 +145,7 @@ def _process_categorical(
             https://qgis.org/pyqgis/master/core/QgsRendererCategory.html#qgis.core.QgsRendererCategory.dump
             category.dump() result:
             '1::1::FILL SYMBOL (1 layers) color 0,0,4,95:1\n'
-            '{category.value{}}::{category.legend()}::{symbol_type} SYMBOL (1 layers) color {R},{G},{B},{A}:1\n'
+            '{category.value}::{category.legend}::{symbol_type} SYMBOL ...\n'
             When all other values : '::::FILL SYMBOL (1 layers) color 0,0,4,95:1\n'
             """
 
