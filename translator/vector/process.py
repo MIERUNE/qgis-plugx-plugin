@@ -148,15 +148,12 @@ def _process_categorical(
             '{category.value}::{category.legend}::{symbol_type} SYMBOL ...\n'
             When all other values : '::::FILL SYMBOL (1 layers) color 0,0,4,95:1\n'
             """
+            category_list = [cat.value() for cat in layer.renderer().categories()]
+            category_values = list(filter(None, category_list))
 
             filtered_features = list(
                 filter(
-                    lambda f: f[target_field]
-                    not in list(
-                        filter(
-                            None, [cat.value() for cat in layer.renderer().categories()]
-                        )
-                    ),
+                    lambda f: f[target_field] not in category_values,
                     layer_normalized.getFeatures(),
                 )
             )
