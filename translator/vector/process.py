@@ -119,7 +119,8 @@ def process_vector(
         result = _process_graduated(layer, extent, idx, output_dir)
     elif layer.renderer().type() == "singleSymbol":
         result = _process_singlesymbol(layer, extent, idx, output_dir)
-
+    else:
+        result = _process_unsupported_renderer(layer, extent, idx, output_dir)
     return result
 
 
@@ -304,5 +305,44 @@ def _process_singlesymbol(
         "idx": idx,
         "layer_name": layer.name(),
         "has_unsupported_symbol": has_unsupported_symbol,
+        "completed": True,
+    }
+
+
+def _process_unsupported_renderer(
+    layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
+) -> dict:
+    # shp
+    shp_path = os.path.join(output_dir, f"layer_{idx}.shp")
+    layer_intersected = _clip_in_projectcrs(layer, extent)
+    output_layer = QgsVectorFileWriter(
+        shp_path,
+        "UTF-8",
+        layer.fields(),
+        layer.wkbType(),
+        QgsProject.instance().crs(),
+        "ESRI Shapefile",
+    )
+    output_layer.addFeatures(layer_intersected.getFeatures())
+    del output_layer
+
+    # json
+    layer_json = {
+        "layer": layer.name(),
+        "type": _get_layer_type(layer),
+        "symbols": "unsupported",
+        "usingSymbolLevels": layer.renderer().usingSymbolLevels(),
+        "opacity": layer.opacity(),
+        "blend_mode": get_blend_mode_string(layer.blendMode()),
+    }
+    write_json(
+        layer_json,
+        os.path.join(output_dir, f"layer_{idx}.json"),
+    )
+
+    return {
+        "idx": idx,
+        "layer_name": layer.name(),
+        "has_unsupported_symbol": True,
         "completed": True,
     }
