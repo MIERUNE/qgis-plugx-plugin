@@ -1,7 +1,13 @@
 import os
 
 import processing
-from qgis.core import QgsProject, QgsVectorFileWriter, QgsVectorLayer, QgsRectangle
+from qgis.core import (
+    QgsProject,
+    QgsVectorFileWriter,
+    QgsVectorLayer,
+    QgsRectangle,
+    NULL,
+)
 from .symbol import (
     generate_symbols_data,
     export_assets_from,
@@ -135,12 +141,31 @@ def _process_categorical(
             "ESRI Shapefile",
         )
         # extract features by category
-        filtered_features = list(
-            filter(
-                lambda f: f[target_field] == category.value(),
-                layer_normalized.getFeatures(),
+        if category.value() == "" or category.value() == NULL:
+            # all other values (defined with "" or NULL value)
+
+            # get list of all defined category values
+            #  → [1, 2, 4, '', NULL]
+            category_values = [cat.value() for cat in layer.renderer().categories()]
+
+            # List unempty category values (remove NULL and '' values)
+            #  → [1, 2, 4]
+            exclude_values = list(filter(None, category_values))
+
+            # Get features excluding unempty defined category values (5, 9, '', etc.)
+            filtered_features = list(
+                filter(
+                    lambda f: f[target_field] not in exclude_values,
+                    layer_normalized.getFeatures(),
+                )
             )
-        )
+        else:
+            filtered_features = list(
+                filter(
+                    lambda f: f[target_field] == category.value(),
+                    layer_normalized.getFeatures(),
+                )
+            )
         output_layer.addFeatures(filtered_features)
         del output_layer
 
