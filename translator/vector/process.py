@@ -1,7 +1,13 @@
 import os
 
 import processing
-from qgis.core import QgsProject, QgsVectorFileWriter, QgsVectorLayer, QgsRectangle
+from qgis.core import (
+    QgsProject,
+    QgsVectorFileWriter,
+    QgsVectorLayer,
+    QgsRectangle,
+    NULL,
+)
 from .symbol import (
     generate_symbols_data,
     export_assets_from,
@@ -135,19 +141,9 @@ def _process_categorical(
             "ESRI Shapefile",
         )
         # extract features by category
-        if category.dump().split("::")[0] == "":
-            """all other values
-            category.value() = '' OR category.value() == NULL
-            QGIS system considers True category.value() == NULL
-            but not category.value() is None or category.value() is NULL
+        if category.value() == "" or category.value() == NULL:
+            # all other values
 
-            use category.dump() instead
-            https://qgis.org/pyqgis/master/core/QgsRendererCategory.html#qgis.core.QgsRendererCategory.dump
-            category.dump() result:
-            '1::1::FILL SYMBOL (1 layers) color 0,0,4,95:1\n'
-            '{category.value}::{category.legend}::{symbol_type} SYMBOL ...\n'
-            When all other values : '::::FILL SYMBOL (1 layers) color 0,0,4,95:1\n'
-            """
             category_list = [cat.value() for cat in layer.renderer().categories()]
             category_values = list(filter(None, category_list))
 
