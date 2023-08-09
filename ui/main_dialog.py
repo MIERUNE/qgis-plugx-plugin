@@ -107,10 +107,10 @@ class MainDialog(QDialog):
             )
         )
 
-        # list-up layers NOT completed
+        # list-up layers NOT completed with_reason
         layers_not_completed = list(
             map(
-                lambda r: r["layer_name"],
+                lambda r: f"{r['layer_name']} : {r['reason']}",
                 list(filter(lambda r: r["completed"] is False, results)),
             )
         )
@@ -156,7 +156,7 @@ class MainDialog(QDialog):
                 + "\n".join(layers_has_unsupported_symbol)
             )
         if len(layers_not_completed) > 0:
-            msg += "\n\n以下レイヤに対応不可。\n" + "\n".join(layers_not_completed)
+            msg += "\n\n以下レイヤに対応してませんでした。\n" + "\n".join(layers_not_completed)
         QMessageBox.information(
             None,
             "完了",
