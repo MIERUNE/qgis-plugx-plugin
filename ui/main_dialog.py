@@ -156,7 +156,7 @@ class MainDialog(QDialog):
                 + "\n".join(layers_has_unsupported_symbol)
             )
         if len(layers_not_completed) > 0:
-            msg += "\n\n以下レイヤに対応しませんでした。\n"
+            msg += "\n\n以下のレイヤーは出力できませんでした。\n"
             msg += "\n".join(layers_not_completed)
         QMessageBox.information(
             None,
