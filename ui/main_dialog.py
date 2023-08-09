@@ -107,6 +107,14 @@ class MainDialog(QDialog):
             )
         )
 
+        # list-up layers NOT completed and its reason
+        layers_not_completed = list(
+            map(
+                lambda r: f"{r['layer_name']} : {r['reason']}",
+                list(filter(lambda r: r["completed"] is False, results)),
+            )
+        )
+
         # list-up layers processed successfully: layer_0, layer_2, layer_5, ...
         layers_processed_successfully = list(
             map(
@@ -147,6 +155,9 @@ class MainDialog(QDialog):
             シンプルシンボルに変換しました。\n"
                 + "\n".join(layers_has_unsupported_symbol)
             )
+        if len(layers_not_completed) > 0:
+            msg += "\n\n以下のレイヤーは出力できませんでした。\n"
+            msg += "\n".join(layers_not_completed)
         QMessageBox.information(
             None,
             "完了",

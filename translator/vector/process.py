@@ -119,7 +119,8 @@ def process_vector(
         result = _process_graduated(layer, extent, idx, output_dir)
     elif layer.renderer().type() == "singleSymbol":
         result = _process_singlesymbol(layer, extent, idx, output_dir)
-
+    else:
+        result = _process_unsupported_renderer(layer, extent, idx, output_dir)
     return result
 
 
@@ -305,4 +306,16 @@ def _process_singlesymbol(
         "layer_name": layer.name(),
         "has_unsupported_symbol": has_unsupported_symbol,
         "completed": True,
+    }
+
+
+def _process_unsupported_renderer(
+    layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
+) -> dict:
+    return {
+        "idx": idx,
+        "layer_name": layer.name(),
+        "has_unsupported_symbol": False,
+        "reason": "unsupported renderer",
+        "completed": False,
     }
