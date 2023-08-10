@@ -51,7 +51,7 @@
      <item>
       <widget class="QPushButton" name="pushButton_run">
        <property name="text">
-        <string>処理開始</string>
+        <string>出力フォルダーを選択して実行</string>
        </property>
       </widget>
      </item>
