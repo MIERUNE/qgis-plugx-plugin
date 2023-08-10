@@ -58,21 +58,17 @@ class MainDialog(QDialog):
             self.process_node
         )
 
-    def _get_execution_params(self):
-        params = {
-            "extent": self.ui.mExtentGroupBox.outputExtent(),
-            "output_dir": QFileDialog.getExistingDirectory(self, "Select Folder"),
-        }
-
-        return params
-
     def _run(self):
         layers = self._get_checked_layers()
-        params = self._get_execution_params()
 
-        # close process when push cancel button on when select folder
-        if params["output_dir"] == "":
+        output_dir = QFileDialog.getExistingDirectory(self, "Select Folder")
+        if output_dir == "":
             return
+
+        params = {
+            "extent": self.ui.mExtentGroupBox.outputExtent(),
+            "output_dir": output_dir,
+        }
 
         # generate label vector includes labels of all layers
         all_labels = generate_label_vector(params["extent"])
