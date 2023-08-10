@@ -47,13 +47,6 @@
     <widget class="QgsExtentGroupBox" name="mExtentGroupBox"/>
    </item>
    <item>
-    <widget class="QgsFileWidget" name="outputFileWidget">
-     <property name="storageMode">
-      <enum>QgsFileWidget::GetDirectory</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pushButton_run">

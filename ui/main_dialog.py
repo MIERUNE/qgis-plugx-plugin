@@ -3,7 +3,7 @@ import shutil
 
 import sip
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QMessageBox, QTreeWidgetItem
+from PyQt5.QtWidgets import QDialog, QMessageBox, QTreeWidgetItem, QFileDialog
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsMapLayerModel,
@@ -58,17 +58,21 @@ class MainDialog(QDialog):
             self.process_node
         )
 
-    def _get_excution_params(self):
+    def _get_execution_params(self):
         params = {
             "extent": self.ui.mExtentGroupBox.outputExtent(),
-            "output_dir": self.ui.outputFileWidget.filePath(),
+            "output_dir": QFileDialog.getExistingDirectory(self, "Select Folder"),
         }
 
         return params
 
     def _run(self):
         layers = self._get_checked_layers()
-        params = self._get_excution_params()
+        params = self._get_execution_params()
+
+        # close process when push cancel button on when select folder
+        if params["output_dir"] == "":
+            return
 
         # generate label vector includes labels of all layers
         all_labels = generate_label_vector(params["extent"])
@@ -144,7 +148,7 @@ class MainDialog(QDialog):
         }
         write_json(
             project_json,
-            os.path.join(self.ui.outputFileWidget.filePath(), "project.json"),
+            os.path.join(params["output_dir"], "project.json"),
         )
 
         # messaging
