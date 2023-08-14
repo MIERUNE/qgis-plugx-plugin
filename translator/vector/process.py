@@ -94,6 +94,19 @@ def _preprocess_layer(
         return calculated_layer, target_field
 
 
+def _generate_shapefile(layer: QgsVectorLayer, features: list, shp_path: str):
+    output_layer = QgsVectorFileWriter(
+        shp_path,
+        "UTF-8",
+        layer.fields(),
+        layer.wkbType(),
+        QgsProject.instance().crs(),
+        "ESRI Shapefile",
+    )
+    output_layer.addFeatures(features)
+    del output_layer
+
+
 def _get_field_value_type(layer: QgsVectorLayer) -> int:
     if layer.renderer().type() == "categorizedSymbol":
         # enum for calculate field class
@@ -131,16 +144,6 @@ def _process_categorical(
     has_unsupported_symbol = False
 
     for sub_idx, category in enumerate(layer.renderer().categories()):
-        # shp
-        shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
-        output_layer = QgsVectorFileWriter(
-            shp_path,
-            "UTF-8",
-            layer.fields(),
-            layer.wkbType(),
-            QgsProject.instance().crs(),
-            "ESRI Shapefile",
-        )
         # extract features by category
         if category.value() == "" or category.value() == NULL:
             # all other values (defined with "" or NULL value)
@@ -167,8 +170,10 @@ def _process_categorical(
                     layer_normalized.getFeatures(),
                 )
             )
-        output_layer.addFeatures(filtered_features)
-        del output_layer
+
+        # shp
+        shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
+        _generate_shapefile(layer, filtered_features, shp_path)
 
         # json
         layer_json = {
@@ -208,17 +213,6 @@ def _process_graduated(
     has_unsupported_symbol = False
 
     for sub_idx, range in enumerate(layer.renderer().ranges()):
-        # shp
-        shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
-        output_layer = QgsVectorFileWriter(
-            shp_path,
-            "UTF-8",
-            layer.fields(),
-            layer.wkbType(),
-            QgsProject.instance().crs(),
-            "ESRI Shapefile",
-        )
-
         # filter features
         # 1: filter out null value: on-the-fly attribute may have null value
         # 2: extract features by range
@@ -229,8 +223,10 @@ def _process_graduated(
                 layer_normalized.getFeatures(),
             )
         )
-        output_layer.addFeatures(filtered_features)
-        del output_layer
+
+        # shp
+        shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
+        _generate_shapefile(layer, filtered_features, shp_path)
 
         # json
         layer_json = {
@@ -266,19 +262,11 @@ def _process_graduated(
 def _process_singlesymbol(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
+    layer_intersected = _clip_in_projectcrs(layer, extent)
+
     # shp
     shp_path = os.path.join(output_dir, f"layer_{idx}.shp")
-    layer_intersected = _clip_in_projectcrs(layer, extent)
-    output_layer = QgsVectorFileWriter(
-        shp_path,
-        "UTF-8",
-        layer.fields(),
-        layer.wkbType(),
-        QgsProject.instance().crs(),
-        "ESRI Shapefile",
-    )
-    output_layer.addFeatures(layer_intersected.getFeatures())
-    del output_layer
+    _generate_shapefile(layer, layer_intersected.getFeatures(), shp_path)
 
     # json
     layer_json = {
