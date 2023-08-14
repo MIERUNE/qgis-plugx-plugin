@@ -171,6 +171,10 @@ def _process_categorical(
                 )
             )
 
+        # no produce shp, json or asset if no feature
+        if len(filtered_features) == 0:
+            continue
+
         # shp
         shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
         _generate_shapefile(layer, filtered_features, shp_path)
@@ -224,6 +228,10 @@ def _process_graduated(
             )
         )
 
+        # no produce shp, json or asset if no feature
+        if len(filtered_features) == 0:
+            continue
+
         # shp
         shp_path = os.path.join(output_dir, f"layer_{idx}_{sub_idx}.shp")
         _generate_shapefile(layer, filtered_features, shp_path)
@@ -263,6 +271,10 @@ def _process_singlesymbol(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
     layer_intersected = _clip_in_projectcrs(layer, extent)
+
+    # no produce shp, json or asset if no feature
+    if layer_intersected.featureCount() == 0:
+        return
 
     # shp
     shp_path = os.path.join(output_dir, f"layer_{idx}.shp")
