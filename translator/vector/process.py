@@ -141,6 +141,17 @@ def _process_categorical(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
     layer_normalized, target_field = _preprocess_layer(layer, extent)
+
+    # Make uncompleted if no feature in canvas
+    if layer_normalized.featureCount() == 0:
+        return {
+            "idx": idx,
+            "layer_name": layer.name(),
+            "has_unsupported_symbol": False,
+            "reason": "no feature in canvas",
+            "completed": False,
+        }
+
     has_unsupported_symbol = False
 
     for sub_idx, category in enumerate(layer.renderer().categories()):
@@ -214,6 +225,17 @@ def _process_graduated(
     layer: QgsVectorLayer, extent: QgsRectangle, idx: int, output_dir: str
 ) -> dict:
     layer_normalized, target_field = _preprocess_layer(layer, extent)
+
+    # Make uncompleted if no feature in canvas
+    if layer_normalized.featureCount() == 0:
+        return {
+            "idx": idx,
+            "layer_name": layer.name(),
+            "has_unsupported_symbol": False,
+            "reason": "no feature in canvas",
+            "completed": False,
+        }
+
     has_unsupported_symbol = False
 
     for sub_idx, range in enumerate(layer.renderer().ranges()):
@@ -274,7 +296,13 @@ def _process_singlesymbol(
 
     # no produce shp, json or asset if no feature
     if layer_intersected.featureCount() == 0:
-        return
+        return {
+            "idx": idx,
+            "layer_name": layer.name(),
+            "has_unsupported_symbol": False,
+            "reason": "no feature in canvas",
+            "completed": False,
+        }
 
     # shp
     shp_path = os.path.join(output_dir, f"layer_{idx}.shp")
