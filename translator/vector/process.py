@@ -17,6 +17,8 @@ from .symbol import (
 from utils import write_json
 from translator.utils import get_blend_mode_string
 
+MAX_NB_SYMBOL_CLASSES = 1500
+
 
 def _clip_in_projectcrs(layer: QgsVectorLayer, extent: QgsRectangle) -> QgsVectorLayer:
     """
@@ -152,6 +154,15 @@ def _process_categorical(
             "completed": False,
         }
 
+    # Make uncompleted if more than 999 classes
+    if len(layer.renderer().categories()) > MAX_NB_SYMBOL_CLASSES:
+        return {
+            "idx": idx,
+            "layer_name": layer.name(),
+            "has_unsupported_symbol": False,
+            "reason": f"maximum of {MAX_NB_SYMBOL_CLASSES} symbol classes is required)",
+            "completed": False,
+        }
     has_unsupported_symbol = False
 
     for sub_idx, category in enumerate(layer.renderer().categories()):
@@ -233,6 +244,16 @@ def _process_graduated(
             "layer_name": layer.name(),
             "has_unsupported_symbol": False,
             "reason": "no feature in canvas",
+            "completed": False,
+        }
+
+    # Make uncompleted if more than 999 classes
+    if len(layer.renderer().ranges()) > MAX_NB_SYMBOL_CLASSES:
+        return {
+            "idx": idx,
+            "layer_name": layer.name(),
+            "has_unsupported_symbol": False,
+            "reason": f"maximum of {MAX_NB_SYMBOL_CLASSES} symbol classes is required)",
             "completed": False,
         }
 
