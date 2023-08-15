@@ -152,6 +152,15 @@ def _process_categorical(
             "completed": False,
         }
 
+    # Make uncompleted if more than 999 classes
+    if len(layer.renderer().categories()) > 999:
+        return {
+            "idx": idx,
+            "layer_name": layer.name(),
+            "has_unsupported_symbol": False,
+            "reason": "too many classes (maximum 999 is required)",
+            "completed": False,
+        }
     has_unsupported_symbol = False
 
     for sub_idx, category in enumerate(layer.renderer().categories()):
@@ -233,6 +242,16 @@ def _process_graduated(
             "layer_name": layer.name(),
             "has_unsupported_symbol": False,
             "reason": "no feature in canvas",
+            "completed": False,
+        }
+
+    # Make uncompleted if more than 999 classes
+    if len(layer.renderer().ranges()) > 999:
+        return {
+            "idx": idx,
+            "layer_name": layer.name(),
+            "has_unsupported_symbol": False,
+            "reason": "too many classes (maximum 999 is required)",
             "completed": False,
         }
 
