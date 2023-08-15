@@ -30,10 +30,19 @@ def _clip_in_projectcrs(layer: QgsVectorLayer, extent: QgsRectangle) -> QgsVecto
         QgsVectorLayer: clipped layer in Project CRS
     """
 
+    layer_cleaned = processing.run(
+        "native:fixgeometries",
+        {
+            "INPUT": layer,
+            "METHOD": 1,
+            "OUTPUT": "TEMPORARY_OUTPUT",
+        },
+    )["OUTPUT"]
+
     reprojected = processing.run(
         "native:reprojectlayer",
         {
-            "INPUT": layer,
+            "INPUT": layer_cleaned,
             "TARGET_CRS": QgsProject.instance().crs(),
             "OUTPUT": "TEMPORARY_OUTPUT",
         },
