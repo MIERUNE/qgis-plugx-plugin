@@ -36,7 +36,6 @@ def _clip_in_projectcrs(layer: QgsVectorLayer, extent: QgsRectangle) -> QgsVecto
         "native:fixgeometries",
         {
             "INPUT": layer,
-            "METHOD": 1,
             "OUTPUT": "TEMPORARY_OUTPUT",
         },
     )["OUTPUT"]
