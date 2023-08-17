@@ -50,6 +50,15 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
     )
 
 
+def _get_asset_height(symbol_layer):
+    """calculate svg/raster marker height in symbol units"""
+    if symbol_layer.fixedAspectRatio() == 0:
+        # same ratio with width
+        return symbol_layer.size()
+    else:
+        return symbol_layer.size() * symbol_layer.fixedAspectRatio()
+
+
 def get_point_symbol_data(
     symbol_layer: QgsMarkerSymbolLayer, symbol_opacity: float
 ) -> dict:
@@ -70,7 +79,11 @@ def get_point_symbol_data(
 
     elif symbol_layer.layerType() == "SvgMarker":
         symbol_layer_dict = {
-            "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
+            "width": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
+            "height": convert_to_point(
+                _get_asset_height(symbol_layer),
+                symbol_layer.sizeUnit(),
+            ),
             "color": to_rgba(symbol_layer.color()),
             "outline_color": to_rgba(symbol_layer.strokeColor()),
             "outline_width": convert_to_point(
