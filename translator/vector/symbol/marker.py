@@ -64,7 +64,11 @@ def get_point_symbol_data(
 ) -> dict:
     if symbol_layer.layerType() == "RasterMarker":
         symbol_layer_dict = {
-            "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
+            "width": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
+            "height": convert_to_point(
+                _get_asset_height(symbol_layer),
+                symbol_layer.sizeUnit(),
+            ),
             "type": "raster",
             "asset_name": get_asset_name(symbol_layer),
             "offset": [
