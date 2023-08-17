@@ -97,7 +97,8 @@
       // symbol typeに応じた辞書からなる配列。別ページにて仕様を定義
       {
           "type": "svg",
-          "size": 10,
+          "width": 10,
+          "height": 5,
           "color": "#ff0000ff",
           "outline_color": "#ff0000ff",
           "outline_width": 2,
