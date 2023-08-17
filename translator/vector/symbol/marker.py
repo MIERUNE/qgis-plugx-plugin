@@ -5,6 +5,7 @@ from qgis.core import (
     QgsSvgMarkerSymbolLayer,
 )
 from typing import Union
+import xml.etree.ElementTree as ET
 
 from utils import convert_to_point
 from translator.vector.symbol.utils import get_asset_name, to_rgba
@@ -60,7 +61,7 @@ def _is_customizable_color(svg_path: str) -> bool:
     svg_tree = ET.parse(svg_path)
     svg_root = svg_tree.getroot()
     for param in svg_root.iter():
-        if param.get("fill") == "param(fill)":
+        if type(param.get("fill")) == str and "param(fill)" in param.get("fill"):
             is_customizable_color = True
     return is_customizable_color
 
@@ -106,6 +107,7 @@ def get_point_symbol_data(
                 _get_asset_height(symbol_layer),
                 symbol_layer.sizeUnit(),
             ),
+            "customizable_color": _is_customizable_color(symbol_layer.path()),
             "color": to_rgba(symbol_layer.color()),
             "outline_color": to_rgba(symbol_layer.strokeColor()),
             "outline_width": convert_to_point(
