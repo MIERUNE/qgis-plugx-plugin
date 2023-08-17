@@ -38,7 +38,8 @@
 ```json
 {
   "type": "svg",
-  "size": 10,
+  "width": 10,
+  "height": 5,
   "color": "#ff0000ff",
   "outline_color": "#ff0000ff",
   "outline_width": 2,
@@ -57,7 +58,8 @@
 ```json
 {
   "type": "raster",
-  "size": 10,
+  "width": 10,
+  "height": 5,
   "asset_name": "some.png",
   "offset": [0.0, 0.0],
   "rotation": 0.0, // degrees, 時計回り
