@@ -57,11 +57,16 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
 
 
 def _is_customizable_color(svg_path: str) -> bool:
+    """determine if a svg fill has customizable color or not.
+    Search in SVG xml file if fill parameter is a fix color or customizable color
+    customizable color means 'fill="param(fill)"' in svg file
+    """
     is_customizable_color = False
     svg_tree = ET.parse(svg_path)
     svg_root = svg_tree.getroot()
     for param in svg_root.iter():
         if type(param.get("fill")) == str and "param(fill)" in param.get("fill"):
+            # eg: 'param(fill)', 'param(fill) #000'
             is_customizable_color = True
     return is_customizable_color
 
