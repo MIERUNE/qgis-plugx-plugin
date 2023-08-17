@@ -1,5 +1,10 @@
-from qgis.core import QgsMarkerSymbolLayer, QgsSimpleMarkerSymbolLayerBase
-
+from qgis.core import (
+    QgsMarkerSymbolLayer,
+    QgsSimpleMarkerSymbolLayerBase,
+    QgsRasterMarkerSymbolLayer,
+    QgsSvgMarkerSymbolLayer,
+)
+from typing import Union
 
 from utils import convert_to_point
 from translator.vector.symbol.utils import get_asset_name, to_rgba
@@ -50,12 +55,15 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
     )
 
 
-def _get_asset_height(symbol_layer):
+def _get_asset_height(
+    symbol_layer: Union[QgsRasterMarkerSymbolLayer, QgsSvgMarkerSymbolLayer]
+) -> float:
     """calculate svg/raster marker height in symbol units"""
-    if symbol_layer.fixedAspectRatio() == 0:
-        # default SVG width and height ratio
+    if symbol_layer.fixedAspectRatio() == 0:  # 0 means not 'Lock Aspect Ratio' in GUI
+        # defaultAspectRatio = ratio defined in svg/raster file
         return symbol_layer.size() * symbol_layer.defaultAspectRatio()
     else:
+        # fixedAspectRatio = user-defined ratio in GUI, calculated by width/height
         return symbol_layer.size() * symbol_layer.fixedAspectRatio()
 
 
