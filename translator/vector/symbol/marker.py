@@ -3,9 +3,10 @@ from qgis.core import (
     QgsSimpleMarkerSymbolLayerBase,
     QgsRasterMarkerSymbolLayer,
     QgsSvgMarkerSymbolLayer,
+    QgsApplication,
 )
+from PyQt5.QtGui import QColor
 from typing import Union
-import xml.etree.ElementTree as ET
 
 from utils import convert_to_point
 from translator.vector.symbol.utils import get_asset_name, to_rgba
@@ -56,19 +57,16 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
     )
 
 
-def _is_customizable_color(svg_path: str) -> bool:
-    """determine if a svg fill has customizable color or not.
-    Search in SVG xml file if fill parameter is a fix color or customizable color
-    customizable color means 'fill="param(fill)"' in svg file
-    """
-    is_customizable_color = False
-    svg_tree = ET.parse(svg_path)
-    svg_root = svg_tree.getroot()
-    for param in svg_root.iter():
-        if type(param.get("fill")) == str and "param(fill)" in param.get("fill"):
-            # eg: 'param(fill)', 'param(fill) #000'
-            is_customizable_color = True
-    return is_customizable_color
+def _has_fill_param(svg_path: str) -> bool:
+    """determine if a SVG marker has a fill parameter or not."""
+    default_color = QColor()
+    default_stroke_color = QColor()
+    svg_params = QgsApplication.svgCache().containsParamsV3(
+        svg_path, default_color, default_stroke_color
+    )
+    # svg_params[0] = hasFillParam -> True or False
+    # https://qgis.org/pyqgis/master/core/QgsSvgCache.html
+    return svg_params[0]
 
 
 def _get_asset_height(
@@ -112,7 +110,7 @@ def get_point_symbol_data(
                 _get_asset_height(symbol_layer),
                 symbol_layer.sizeUnit(),
             ),
-            "customizable_color": _is_customizable_color(symbol_layer.path()),
+            "customizable_color": _has_fill_param(symbol_layer.path()),
             "color": to_rgba(symbol_layer.color()),
             "outline_color": to_rgba(symbol_layer.strokeColor()),
             "outline_width": convert_to_point(
