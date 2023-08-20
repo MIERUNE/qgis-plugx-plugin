@@ -57,8 +57,9 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
     )
 
 
-def _has_fill_param(svg_path: str) -> bool:
-    """determine if a SVG marker has a fill parameter or not."""
+def _get_svg_fill_param(svg_color: QColor, svg_path: str) -> str:
+    """determine SVG marker fill parameter
+    return rgba color or null"""
     default_color = QColor()
     default_stroke_color = QColor()
     svg_params = QgsApplication.svgCache().containsParamsV3(
@@ -66,7 +67,10 @@ def _has_fill_param(svg_path: str) -> bool:
     )
     # svg_params[0] = hasFillParam -> True or False
     # https://qgis.org/pyqgis/master/core/QgsSvgCache.html
-    return svg_params[0]
+    if svg_params[0] == True:
+        return to_rgba(svg_color)
+    else:
+        return None
 
 
 def _get_asset_height(
@@ -110,8 +114,7 @@ def get_point_symbol_data(
                 _get_asset_height(symbol_layer),
                 symbol_layer.sizeUnit(),
             ),
-            "customizable_color": _has_fill_param(symbol_layer.path()),
-            "color": to_rgba(symbol_layer.color()),
+            "color": _get_svg_fill_param(symbol_layer.color(), symbol_layer.path()),
             "outline_color": to_rgba(symbol_layer.strokeColor()),
             "outline_width": convert_to_point(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
