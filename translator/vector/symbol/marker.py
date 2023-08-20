@@ -67,7 +67,7 @@ def _get_svg_fill_param(svg_color: QColor, svg_path: str) -> str:
     )
     # svg_params[0] = hasFillParam -> True or False
     # https://qgis.org/pyqgis/master/core/QgsSvgCache.html
-    if svg_params[0] == True:
+    if svg_params[0]:
         return to_rgba(svg_color)
     else:
         return None
