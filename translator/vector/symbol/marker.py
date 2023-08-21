@@ -6,7 +6,7 @@ from qgis.core import (
     QgsApplication,
 )
 from PyQt5.QtGui import QColor
-from typing import Union
+from typing import Union, Tuple
 
 from utils import convert_to_point
 from translator.vector.symbol.utils import get_asset_name, to_rgba
@@ -57,7 +57,9 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
     )
 
 
-def _get_svg_param(symbol_layer: QgsSvgMarkerSymbolLayer) -> (str, float, str):
+def _get_svg_param(
+    symbol_layer: QgsSvgMarkerSymbolLayer,
+) -> Tuple[Union[str, None], Union[float, None], Union[str, None]]:
     """determine SVG marker fill and stroke parameters
     return paramaters color/ width or null"""
     fill_color = to_rgba(symbol_layer.color())
