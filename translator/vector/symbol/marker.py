@@ -3,8 +3,10 @@ from qgis.core import (
     QgsSimpleMarkerSymbolLayerBase,
     QgsRasterMarkerSymbolLayer,
     QgsSvgMarkerSymbolLayer,
+    QgsApplication,
 )
-from typing import Union
+from PyQt5.QtGui import QColor
+from typing import Union, Tuple
 
 from utils import convert_to_point
 from translator.vector.symbol.utils import get_asset_name, to_rgba
@@ -55,6 +57,34 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
     )
 
 
+def _get_svg_param(
+    symbol_layer: QgsSvgMarkerSymbolLayer,
+) -> Tuple[Union[str, None], Union[float, None], Union[str, None]]:
+    """determine SVG marker fill and stroke parameters
+    return paramaters color/ width or null"""
+    fill_color = to_rgba(symbol_layer.color())
+    stroke_color = to_rgba(symbol_layer.strokeColor())
+    stroke_width = convert_to_point(
+        symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
+    )
+    default_color = QColor()
+    default_stroke_color = QColor()
+    svg_params = QgsApplication.svgCache().containsParamsV3(
+        symbol_layer.path(), default_color, default_stroke_color
+    )
+    # svg_params[0] = hasFillParam -> True or False
+    # svg_params[5] = hasStrokeParam -> True or False
+    # svg_params[7] = hasStrokeWidthParam -> True or False
+    # https://qgis.org/pyqgis/master/core/QgsSvgCache.html
+    if not svg_params[0]:
+        fill_color = None
+    if not svg_params[5]:
+        stroke_color = None
+    if not svg_params[7]:
+        stroke_width = None
+    return fill_color, stroke_color, stroke_width
+
+
 def _get_asset_height(
     symbol_layer: Union[QgsRasterMarkerSymbolLayer, QgsSvgMarkerSymbolLayer]
 ) -> float:
@@ -90,17 +120,16 @@ def get_point_symbol_data(
         }
 
     elif symbol_layer.layerType() == "SvgMarker":
+        fill_color, stroke_color, stroke_width = _get_svg_param(symbol_layer)
         symbol_layer_dict = {
             "width": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
             "height": convert_to_point(
                 _get_asset_height(symbol_layer),
                 symbol_layer.sizeUnit(),
             ),
-            "color": to_rgba(symbol_layer.color()),
-            "outline_color": to_rgba(symbol_layer.strokeColor()),
-            "outline_width": convert_to_point(
-                symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
-            ),
+            "color": fill_color,
+            "outline_color": stroke_color,
+            "outline_width": stroke_width,
             "type": "svg",
             "asset_name": get_asset_name(symbol_layer),
             "offset": [
