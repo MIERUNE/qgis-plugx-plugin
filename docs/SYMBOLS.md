@@ -40,7 +40,6 @@
   "type": "svg",
   "width": 10,
   "height": 5,
-  "customizable_color": true,
   "color": "#ff0000ff",
   "outline_color": "#ff0000ff",
   "outline_width": 2,
