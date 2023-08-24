@@ -74,10 +74,10 @@ def _get_vertical_anchor_from(
 ) -> str:
     return {
         QgsMarkerSymbolLayer.VerticalAnchorPoint.Top: "top",
-        QgsMarkerSymbolLayer.VerticalAnchorPoint.VCenter: "center",
+        QgsMarkerSymbolLayer.VerticalAnchorPoint.VCenter: "middle",
         QgsMarkerSymbolLayer.VerticalAnchorPoint.Bottom: "bottom",
     }.get(
-        symbol_anchor_y, "center"  # fallback
+        symbol_anchor_y, "middle"  # fallback
     )
 
 
