@@ -57,6 +57,30 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
     )
 
 
+def _get_horizontal_anchor_from(
+    symbol_anchor_x: QgsMarkerSymbolLayer.HorizontalAnchorPoint,
+) -> str:
+    return {
+        QgsMarkerSymbolLayer.HorizontalAnchorPoint.Left: "left",
+        QgsMarkerSymbolLayer.HorizontalAnchorPoint.HCenter: "center",
+        QgsMarkerSymbolLayer.HorizontalAnchorPoint.Right: "right",
+    }.get(
+        symbol_anchor_x, "center"  # fallback
+    )
+
+
+def _get_vertical_anchor_from(
+    symbol_anchor_y: QgsMarkerSymbolLayer.VerticalAnchorPoint,
+) -> str:
+    return {
+        QgsMarkerSymbolLayer.VerticalAnchorPoint.Top: "top",
+        QgsMarkerSymbolLayer.VerticalAnchorPoint.VCenter: "center",
+        QgsMarkerSymbolLayer.VerticalAnchorPoint.Bottom: "bottom",
+    }.get(
+        symbol_anchor_y, "center"  # fallback
+    )
+
+
 def _get_svg_param(
     symbol_layer: QgsSvgMarkerSymbolLayer,
 ) -> Tuple[Union[str, None], Union[float, None], Union[str, None]]:
@@ -113,6 +137,10 @@ def get_point_symbol_data(
                 convert_to_point(symbol_layer.offset().x(), symbol_layer.offsetUnit()),
                 convert_to_point(symbol_layer.offset().y(), symbol_layer.offsetUnit()),
             ],
+            "anchor_x": _get_horizontal_anchor_from(
+                symbol_layer.horizontalAnchorPoint()
+            ),
+            "anchor_y": _get_vertical_anchor_from(symbol_layer.verticalAnchorPoint()),
             "rotation": symbol_layer.angle(),
             "level": symbol_layer.renderingPass(),  # renderingPass means symbolLevels
             # https://github.com/qgis/QGIS/blob/65d40ee0ce59e761ee2de366ca9a963f35adfcfd/src/core/vector/qgsvectorlayerrenderer.cpp#L702
@@ -136,6 +164,10 @@ def get_point_symbol_data(
                 convert_to_point(symbol_layer.offset().x(), symbol_layer.offsetUnit()),
                 convert_to_point(symbol_layer.offset().y(), symbol_layer.offsetUnit()),
             ],
+            "anchor_x": _get_horizontal_anchor_from(
+                symbol_layer.horizontalAnchorPoint()
+            ),
+            "anchor_y": _get_vertical_anchor_from(symbol_layer.verticalAnchorPoint()),
             "rotation": symbol_layer.angle(),
             "level": symbol_layer.renderingPass(),
             "opacity": symbol_opacity,
@@ -156,6 +188,10 @@ def get_point_symbol_data(
                 convert_to_point(symbol_layer.offset().x(), symbol_layer.offsetUnit()),
                 convert_to_point(symbol_layer.offset().y(), symbol_layer.offsetUnit()),
             ],
+            "anchor_x": _get_horizontal_anchor_from(
+                symbol_layer.horizontalAnchorPoint()
+            ),
+            "anchor_y": _get_vertical_anchor_from(symbol_layer.verticalAnchorPoint()),
             "rotation": symbol_layer.angle(),
             "level": symbol_layer.renderingPass(),
             "opacity": symbol_opacity,
