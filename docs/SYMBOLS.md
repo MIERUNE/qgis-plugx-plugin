@@ -25,6 +25,8 @@
   },
   "shape": "circle", //square | diamond | pentagon | hexagon | triangle | equilateraltriangle | star | arrow | circle | cross | crossfill | cross2 | line | arrowhead | arrowheadfilled | semicircle | thirdcircle | quartercircle | quartersquare | halfsquare | diagonalhalfsquare | righthalftriangle | lefthalftriangle | trapezoid | parallelogramleft | parallelogramright | shield | octagon | decagon | squarecorners | squarerounded | diamondstar | heart | halfarc | thirdarc | quarterarc | asteriskfill
   "offset": [0.0, 0.0],
+  "anchor_x": "center", // 配置のX原点: left | center | right
+  "anchor_y": "middle", // 配置のY原点: top | middle | bottom 
   "rotation": 0.0, //degrees, 時計回り
   "level": 0,
   "opacity": 1.0 // 透過度: 0.0 ~ 1.0
@@ -45,6 +47,8 @@
   "outline_width": 2,
   "asset_name": "some.svg",
   "offset": [0.0, 0.0],
+  "anchor_x": "center", // 配置のX原点: left | center | right
+  "anchor_y": "middle", // 配置のY原点: top | middle | bottom 
   "rotation": 180.0, //degrees, 時計回り
   "level": 0,
   "opacity": 1.0 // 透過度: 0.0 ~ 1.0
@@ -62,6 +66,8 @@
   "height": 5,
   "asset_name": "some.png",
   "offset": [0.0, 0.0],
+  "anchor_x": "center", // 配置のX原点: left | center | right
+  "anchor_y": "middle", // 配置のY原点: top | middle | bottom 
   "rotation": 0.0, // degrees, 時計回り
   "level": 1,
   "opacity": 1.0 // 透過度: 0.0 ~ 1.0

@@ -104,6 +104,8 @@
           "outline_width": 2,
           "asset_name": "some.svg",
           "offset": [0.0, 0.0],
+          "anchor_x": "center", // 配置のX原点: left | center | right
+          "anchor_y": "middle", // 配置のY原点: top | middle | bottom 
           "rotation": 0.0, // degrees, 時計回り
           "level": 0,
           "opacity": 0.5 // 透過度: 0.0 ~ 1.0
