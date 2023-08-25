@@ -11,6 +11,8 @@ graph LR
 A[GISデータ] --本プラグインで切り出し変換--> B[出力フォルダ] --読み込み--> C[Adobe Illustrator\nwith PlugX]
 
 ```
+![qgis_ai_screencap](./imgs/qgis_ai_screencap.png)
+
 
 ## 使い方
 
