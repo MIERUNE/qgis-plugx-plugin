@@ -13,7 +13,6 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
 )
-from qgis.gui import QgsMapCanvas
 from qgis.utils import iface
 
 
