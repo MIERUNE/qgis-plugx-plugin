@@ -64,10 +64,10 @@ def get_tempdir(output_dir: str) -> str:
     return os.path.join(output_dir, temp_dir_path)
 
 
-def get_scale_from(canvas: QgsMapCanvas) -> float:
+def get_scale() -> float:
     if QgsProject.instance().crs().authid() == "EPSG:3857":
         """correct scale value according to scale factor in case of web mercator"""
-
+        canvas = iface.mapCanvas()
         # get map canvas center coordinates in geographic
         transform = QgsCoordinateTransform(
             canvas.mapSettings().destinationCrs(),
@@ -103,4 +103,4 @@ def get_scale_from(canvas: QgsMapCanvas) -> float:
         )
         return scale_calculator.calculate(corrected_extent, canvas.size().width())
     else:
-        return canvas.scale()
+        return iface.mapCanvas().scale()

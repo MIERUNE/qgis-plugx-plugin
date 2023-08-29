@@ -22,7 +22,7 @@ from qgis.utils import iface
 from translator.vector.label import generate_label_vector
 from ui.progress_dialog import ProgressDialog
 from translator.thread import ProcessingThread
-from utils import write_json, get_tempdir, get_scale_from
+from utils import write_json, get_tempdir, get_scale
 
 
 class MainDialog(QDialog):
@@ -138,7 +138,7 @@ class MainDialog(QDialog):
                 self.ui.mExtentGroupBox.outputExtent().xMaximum(),
                 self.ui.mExtentGroupBox.outputExtent().yMaximum(),
             ],
-            "scale": get_scale_from(iface.mapCanvas()),
+            "scale": get_scale(),
             "layers": layers_processed_successfully,  # layer_0,2,5..
             "assets_path": "assets",
         }
