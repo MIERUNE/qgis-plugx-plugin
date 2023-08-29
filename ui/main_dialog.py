@@ -22,7 +22,7 @@ from qgis.utils import iface
 from translator.vector.label import generate_label_vector
 from ui.progress_dialog import ProgressDialog
 from translator.thread import ProcessingThread
-from utils import write_json, get_tempdir
+from utils import write_json, get_tempdir, get_scale
 
 
 class MainDialog(QDialog):
@@ -49,6 +49,11 @@ class MainDialog(QDialog):
                 self.ui.mExtentGroupBox.setOutputExtentFromCurrent(),
             ]
         )
+
+        # calculate export scale and show to ui
+        self._update_ui_scale()
+        # update export scale shown in ui when change map extent
+        iface.mapCanvas().extentsChanged.connect(self._update_ui_scale)
 
         # close dialog when project cleared to avoid crash: Issue #55
         QgsProject.instance().cleared.connect(self.close)
@@ -138,7 +143,7 @@ class MainDialog(QDialog):
                 self.ui.mExtentGroupBox.outputExtent().xMaximum(),
                 self.ui.mExtentGroupBox.outputExtent().yMaximum(),
             ],
-            "scale": iface.mapCanvas().scale(),
+            "scale": get_scale(),
             "layers": layers_processed_successfully,  # layer_0,2,5..
             "assets_path": "assets",
         }
@@ -272,3 +277,6 @@ class MainDialog(QDialog):
 
             if child_type == "group":
                 self._process_node_recursive(child, item)
+
+    def _update_ui_scale(self):
+        self.ui.label_scale_value.setText(str(get_scale()))
