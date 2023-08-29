@@ -50,6 +50,8 @@ class MainDialog(QDialog):
             ]
         )
 
+        self.ui.label_scale_value.setText(str(get_scale()))
+
         # close dialog when project cleared to avoid crash: Issue #55
         QgsProject.instance().cleared.connect(self.close)
 
