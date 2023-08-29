@@ -64,8 +64,11 @@ def get_tempdir(output_dir: str) -> str:
 
 
 def get_scale() -> float:
+    """get scale from map canvas.
+    For web mercator projection (EPSG:3857) case,
+    calculate scale with map extent correction according to scale factor"""
+
     if QgsProject.instance().crs().authid() == "EPSG:3857":
-        """correct scale value according to scale factor in case of web mercator"""
         canvas = iface.mapCanvas()
         # get map canvas center coordinates in geographic
         transform = QgsCoordinateTransform(
