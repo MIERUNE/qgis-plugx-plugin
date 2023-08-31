@@ -63,7 +63,7 @@ def get_tempdir(output_dir: str) -> str:
     return os.path.join(output_dir, temp_dir_path)
 
 
-def get_scale() -> float:
+def get_scale_from_canvas() -> float:
     """get scale from map canvas.
     For web mercator projection (EPSG:3857) case,
     calculate scale with map extent correction according to scale factor"""
