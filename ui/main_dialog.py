@@ -285,4 +285,7 @@ class MainDialog(QDialog):
 
     def _zoom_canvas_from_scale(self):
         scale = self.ui.scale_widget.scale()
-        iface.mapCanvas().zoomScale(scale)
+        if QgsProject.instance().crs().authid() == "EPSG:3857":
+            scale = 10000
+        else:
+            iface.mapCanvas().zoomScale(scale)
