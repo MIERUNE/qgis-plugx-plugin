@@ -279,4 +279,4 @@ class MainDialog(QDialog):
                 self._process_node_recursive(child, item)
 
     def _update_ui_scale(self):
-        self.ui.label_scale_value.setText(str(get_scale()))
+        self.ui.scale_widget.setScale(get_scale())
