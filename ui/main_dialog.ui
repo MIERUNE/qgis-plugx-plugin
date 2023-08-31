@@ -43,10 +43,7 @@
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QgsExtentGroupBox" name="mExtentGroupBox"/>
-   </item>
-   <item>
+      <item>
     <layout class="QHBoxLayout" name="export_scale">
      <item>
       <widget class="QLabel" name="label_scale">
@@ -64,6 +61,10 @@
      </item>
     </layout>
    </item>
+   <item>
+    <widget class="QgsExtentGroupBox" name="mExtentGroupBox"/>
+   </item>
+
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
