@@ -22,7 +22,7 @@ from qgis.utils import iface
 from translator.vector.label import generate_label_vector
 from ui.progress_dialog import ProgressDialog
 from translator.thread import ProcessingThread
-from utils import write_json, get_tempdir, get_scale_from_canvas
+from utils import write_json, get_tempdir, get_scale_from_canvas, set_map_extent_from
 
 
 class MainDialog(QDialog):
@@ -286,6 +286,11 @@ class MainDialog(QDialog):
     def _zoom_canvas_from_scale(self):
         scale = self.ui.scale_widget.scale()
         if QgsProject.instance().crs().authid() == "EPSG:3857":
-            scale = 10000
+            # disable temporary scale auto-calculation when extent changed
+            iface.mapCanvas().extentsChanged.disconnect()
+            # update canvas
+            set_map_extent_from(scale)
+            # reactive scale auto-calculation when extent changed
+            iface.mapCanvas().extentsChanged.connect(self._update_ui_scale)
         else:
             iface.mapCanvas().zoomScale(scale)
