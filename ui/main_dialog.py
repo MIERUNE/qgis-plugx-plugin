@@ -50,12 +50,12 @@ class MainDialog(QDialog):
             ]
         )
 
+        # set canvas scale when user input scale in ui
+        self.ui.scale_widget.scaleChanged.connect(self._zoom_canvas_from_scale)
         # calculate export scale and show to ui
         self._update_ui_scale()
         # update export scale shown in ui when change map extent
         iface.mapCanvas().extentsChanged.connect(self._update_ui_scale)
-        # set canvas scale when user input scale in ui
-        self.ui.scale_widget.scaleChanged.connect(self._zoom_canvas_from_scale)
 
         # close dialog when project cleared to avoid crash: Issue #55
         QgsProject.instance().cleared.connect(self.close)
@@ -281,7 +281,12 @@ class MainDialog(QDialog):
                 self._process_node_recursive(child, item)
 
     def _update_ui_scale(self):
+        # disable auto ui scale update
+        self.ui.scale_widget.scaleChanged.disconnect()
+        # update ui scale
         self.ui.scale_widget.setScale(get_scale_from_canvas())
+        # reactivate auto ui scale update
+        self.ui.scale_widget.scaleChanged.connect(self._zoom_canvas_from_scale)
 
     def _zoom_canvas_from_scale(self):
         scale = self.ui.scale_widget.scale()
