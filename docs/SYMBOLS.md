@@ -180,7 +180,7 @@
   "type": "marker",
   "interval": 2, // 点間の距離
   "level": 1,
-  "markers" [
+  "markers": [
     // 任意の個数・種別のtype=markerの配列。これらが重なってひとつのシンボルになりライン上に表示される（後が上）。
     {
       "type": "svg",
