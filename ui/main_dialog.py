@@ -23,7 +23,7 @@ from translator.vector.label import generate_label_vector
 from ui.progress_dialog import ProgressDialog
 from translator.thread import ProcessingThread
 from utils import write_json, get_tempdir
-from scale import get_scale_from_canvas, set_map_extent_from
+from scale import get_scale_from_canvas, set_map_extent_from_webmercator
 
 
 class MainDialog(QDialog):
@@ -294,7 +294,7 @@ class MainDialog(QDialog):
             # disable temporary scale auto-calculation when extent changed
             iface.mapCanvas().extentsChanged.disconnect()
             # update canvas
-            set_map_extent_from(scale)
+            set_map_extent_from_webmercator(scale)
             # reactive scale auto-calculation when extent changed
             iface.mapCanvas().extentsChanged.connect(self._update_ui_scale)
         else:

@@ -54,7 +54,7 @@ def get_scale_from_canvas() -> float:
         return iface.mapCanvas().scale()
 
 
-def set_map_extent_from(web_mercator_scale: float):
+def set_map_extent_from_webmercator(scale: float):
     """Calculate map extent with correction according to scale factor
     related to webmercator projection
     input: web mercator scale
@@ -81,7 +81,7 @@ def set_map_extent_from(web_mercator_scale: float):
 
     # Calculate map units per pixel
     meter_per_inch = 0.0254  # 0.0254m in 1 inch
-    map_units_per_pixel = (meter_per_inch / canvas_dpi) * web_mercator_scale
+    map_units_per_pixel = (meter_per_inch / canvas_dpi) * scale
 
     # Calculate extent width and height in map units
     extent_width_map_units = canvas_width_px * map_units_per_pixel / scale_factor_x
