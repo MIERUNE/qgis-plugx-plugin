@@ -42,9 +42,9 @@
   "type": "svg",
   "width": 10,
   "height": 5,
-  "color": "#ff0000ff",
-  "outline_color": "#ff0000ff",
-  "outline_width": 2,
+  "color": "#ff0000ff", // nullable
+  "outline_color": "#ff0000ff", // nullable
+  "outline_width": 2, // nullable
   "asset_name": "some.svg",
   "offset": [0.0, 0.0],
   "anchor_x": "center", // 配置のX原点: left | center | right
@@ -178,8 +178,10 @@
 ```json
 {
   "type": "marker",
+  "interval": 2,
+  "level": 1,
   "markers" [
-    // point-svg の配列
+    // 任意の個数・種別のtype=markerの配列。これらが重なってひとつのシンボルになりライン上に表示される（後が上）。
     {
       "type": "svg",
       "size": 10,
@@ -189,10 +191,27 @@
       "asset_name": "some.svg",
       "level": 0,
       "opacity": 1.0
+    },
+    {
+      "type": "simple",
+      "size": 10,
+      "color": "#ff0000ff",
+      "outline_color": "#ff0000ff",
+      "outline_width": 2,
+      "outline_penstyle": {
+        "stroke": "solid",
+        "join": "bevel",
+        "cap": "square"
+      },
+      "shape": "circle",
+      "offset": [0.0, 0.0],
+      "anchor_x": "center",
+      "anchor_y": "middle",
+      "rotation": 0.0,
+      "level": 0,
+      "opacity": 1.0
     }
   ]
-  "interval": 2,
-  "level": 1
 }
 ```
 
