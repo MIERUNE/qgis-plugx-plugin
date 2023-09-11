@@ -282,7 +282,12 @@ class MainDialog(QDialog):
 
     def _update_ui_scale(self):
         # disable auto ui scale update
-        self.ui.scale_widget.scaleChanged.disconnect()
+        try:
+            self.ui.scale_widget.scaleChanged.disconnect()
+        except TypeError:
+            # when signal is not connected
+            pass
+
         # update ui scale
         self.ui.scale_widget.setScale(get_scale_from_canvas())
         # reactivate auto ui scale update
@@ -292,7 +297,12 @@ class MainDialog(QDialog):
         scale = self.ui.scale_widget.scale()
         if QgsProject.instance().crs().authid() == "EPSG:3857":
             # disable temporary scale auto-calculation when extent changed
-            iface.mapCanvas().extentsChanged.disconnect()
+            try:
+                iface.mapCanvas().extentsChanged.disconnect()
+            except TypeError:
+                # when signal is not connected
+                pass
+
             # update canvas
             set_map_extent_from_webmercator(scale)
             # reactive scale auto-calculation when extent changed
