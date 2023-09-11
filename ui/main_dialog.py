@@ -49,7 +49,6 @@ class MainDialog(QDialog):
                 self.ui.mExtentGroupBox.setOutputExtentFromCurrent(),
             ]
         )
-
         # set canvas scale when user input scale in ui
         self.ui.scale_widget.scaleChanged.connect(self._zoom_canvas_from_scale)
         # calculate export scale and show to ui
