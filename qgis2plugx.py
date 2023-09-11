@@ -54,7 +54,7 @@ class QGIS2PlugX:
 
     def initGui(self):
         self.add_action(
-            self.icon_path,
+            icon_path=self.icon_path,
             text="QGIS2PlugX",
             callback=self.show_dialog,
             parent=self.win,
