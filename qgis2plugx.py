@@ -15,6 +15,7 @@ class QGIS2PlugX:
         self.iface = iface
         self.win = self.iface.mainWindow()
         self.plugin_dir = os.path.dirname(__file__)
+        self.icon_path = os.path.join(self.plugin_dir, "imgs", "icon.png")
         self.actions = []
         self.menu = PLUGIN_NAME
         self.toolbar = self.iface.addToolBar(PLUGIN_NAME)
@@ -53,7 +54,7 @@ class QGIS2PlugX:
 
     def initGui(self):
         self.add_action(
-            icon_path=None,
+            self.icon_path,
             text="QGIS2PlugX",
             callback=self.show_dialog,
             parent=self.win,
