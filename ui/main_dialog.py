@@ -23,7 +23,7 @@ from translator.vector.label import generate_label_vector
 from ui.progress_dialog import ProgressDialog
 from translator.thread import ProcessingThread
 from utils import write_json, get_tempdir
-from scale import get_scale_from_canvas, set_map_extent_from_webmercator
+from scale import get_scale_from_canvas, set_map_extent_from
 
 
 class MainDialog(QDialog):
@@ -294,18 +294,17 @@ class MainDialog(QDialog):
         self.ui.scale_widget.scaleChanged.connect(self._zoom_canvas_from_scale)
 
     def _zoom_canvas_from_scale(self):
-        scale = self.ui.scale_widget.scale()
-        if QgsProject.instance().crs().authid() == "EPSG:3857":
-            # disable temporary scale auto-calculation when extent changed
-            try:
-                iface.mapCanvas().extentsChanged.disconnect()
-            except TypeError:
-                # when signal is not connected
-                pass
+        # disable temporary scale auto-calculation when extent changed
+        try:
+            iface.mapCanvas().extentsChanged.disconnect()
+        except TypeError:
+            # when signal is not connected
+            pass
 
-            # update canvas
-            set_map_extent_from_webmercator(scale)
-            # reactive scale auto-calculation when extent changed
-            iface.mapCanvas().extentsChanged.connect(self._update_ui_scale)
-        else:
-            iface.mapCanvas().zoomScale(scale)
+        # update canvas
+        set_map_extent_from(
+            scale=self.ui.scale_widget.scale(), crs=QgsProject.instance().crs().authid()
+        )
+
+        # reactive scale auto-calculation when extent changed
+        iface.mapCanvas().extentsChanged.connect(self._update_ui_scale)
