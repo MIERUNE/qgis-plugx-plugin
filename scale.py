@@ -13,7 +13,7 @@ def get_scale_from_canvas() -> float:
     """get scale from map canvas.
     For web mercator projection (EPSG:3857) case,
     calculate scale with map extent correction according to scale factor"""
-
+    print("get scale from canvas")
     if QgsProject.instance().crs().authid() == "EPSG:3857":
         canvas = iface.mapCanvas()
         # get map canvas center coordinates in geographic
@@ -61,6 +61,7 @@ def set_map_extent_from(scale: float, crs: str):
     according to scale factor
     for other cases update map canvas with zoom to scale action
     """
+    print("target", scale)
     if crs == "EPSG:3857":
         # calculate extent with scale factor correction
 
@@ -86,6 +87,7 @@ def set_map_extent_from(scale: float, crs: str):
         scale_factor_y = (
             QgsProject.instance().crs().factors(center_point).meridionalScale()
         )
+        print(scale_factor_x, scale_factor_y)
 
         # Calculate map units per pixel
         meter_per_inch = 0.0254  # 0.0254m in 1 inch
@@ -109,6 +111,7 @@ def set_map_extent_from(scale: float, crs: str):
         # update map canvas
         canvas.setExtent(corrected_extent)
         canvas.refresh()
+        print("new scale", iface.mapCanvas().scale())
     else:
         # zoom to scale for other crs
         iface.mapCanvas().zoomScale(scale)

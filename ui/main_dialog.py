@@ -50,6 +50,11 @@ class MainDialog(QDialog):
                 self.ui.mExtentGroupBox.setOutputExtentFromCurrent(),
             ]
         )
+
+        # perform update_ui_scale when it's true
+        # become false when UI scale widget is edited by user
+        self.enable_update_ui_scale = True
+
         # set canvas scale when user input scale in ui
         self.ui.scale_widget.scaleChanged.connect(self._zoom_canvas_from_scale)
         # calculate export scale and show to ui
@@ -281,6 +286,11 @@ class MainDialog(QDialog):
                 self._process_node_recursive(child, item)
 
     def _update_ui_scale(self):
+        # do not update when enable_update_ui_scale is False
+        # in case of canvas is calculated from scale widget
+        if not self.enable_update_ui_scale:
+            return
+
         # disable auto ui scale update
         try:
             self.ui.scale_widget.scaleChanged.disconnect()
@@ -295,11 +305,7 @@ class MainDialog(QDialog):
 
     def _zoom_canvas_from_scale(self):
         # disable temporary scale auto-calculation when extent changed
-        try:
-            iface.mapCanvas().extentsChanged.disconnect()
-        except TypeError:
-            # when signal is not connected
-            pass
+        self.enable_update_ui_scale = False
 
         # update canvas
         set_map_extent_from(
@@ -307,4 +313,4 @@ class MainDialog(QDialog):
         )
 
         # reactive scale auto-calculation when extent changed
-        iface.mapCanvas().extentsChanged.connect(self._update_ui_scale)
+        self.enable_update_ui_scale = True
