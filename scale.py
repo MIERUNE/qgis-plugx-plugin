@@ -110,7 +110,8 @@ def set_map_extent_from(scale: float, crs: str):
         canvas.setExtent(corrected_extent)
         canvas.refresh()
 
-        # Fix : re-set extent if canvas scale is set same as Webmercator scale
+        # Fix setExtent bug
+        # Re-set extent if canvas scale is set same as Webmercator scale
         if round(iface.mapCanvas().scale()) == scale:
             canvas.setExtent(corrected_extent)
             canvas.refresh()
