@@ -43,10 +43,7 @@
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QgsExtentGroupBox" name="mExtentGroupBox"/>
-   </item>
-   <item>
+      <item>
     <layout class="QHBoxLayout" name="export_scale">
      <item>
       <widget class="QLabel" name="label_scale">
@@ -55,22 +52,19 @@
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignRight">
-      <widget class="QLabel" name="label_scale_1">
-       <property name="text">
-        <string>1:</string>
-       </property>
-      </widget>
-     </item>
      <item>
-      <widget class="QLabel" name="label_scale_value">
-       <property name="text">
-        <string>1</string>
+      <widget class="QgsScaleWidget" name="scale_widget">
+       <property name="showCurrentScaleButton">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
     </layout>
    </item>
+   <item>
+    <widget class="QgsExtentGroupBox" name="mExtentGroupBox"/>
+   </item>
+
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -108,6 +102,11 @@
    <class>QgsFileWidget</class>
    <extends>QWidget</extends>
    <header>qgsfilewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsScaleWidget</class>
+   <extends>QWidget</extends>
+   <header>qgsscalewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

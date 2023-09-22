@@ -22,7 +22,8 @@ from qgis.utils import iface
 from translator.vector.label import generate_label_vector
 from ui.progress_dialog import ProgressDialog
 from translator.thread import ProcessingThread
-from utils import write_json, get_tempdir, get_scale
+from utils import write_json, get_tempdir
+from scale import get_scale_from_canvas, set_map_extent_from
 
 
 class MainDialog(QDialog):
@@ -50,6 +51,12 @@ class MainDialog(QDialog):
             ]
         )
 
+        # perform update_ui_scale when it's true
+        # become false when UI scale widget is edited by user
+        self.enable_update_ui_scale = True
+
+        # set canvas scale when user input scale in ui
+        self.ui.scale_widget.scaleChanged.connect(self._zoom_canvas_from_scale)
         # calculate export scale and show to ui
         self._update_ui_scale()
         # update export scale shown in ui when change map extent
@@ -143,7 +150,7 @@ class MainDialog(QDialog):
                 self.ui.mExtentGroupBox.outputExtent().xMaximum(),
                 self.ui.mExtentGroupBox.outputExtent().yMaximum(),
             ],
-            "scale": get_scale(),
+            "scale": get_scale_from_canvas(),
             "layers": layers_processed_successfully,  # layer_0,2,5..
             "assets_path": "assets",
         }
@@ -279,4 +286,31 @@ class MainDialog(QDialog):
                 self._process_node_recursive(child, item)
 
     def _update_ui_scale(self):
-        self.ui.label_scale_value.setText(str(get_scale()))
+        # do not update when enable_update_ui_scale is False
+        # in case of canvas is calculated from scale widget
+        if not self.enable_update_ui_scale:
+            return
+
+        # disable auto ui scale update
+        try:
+            self.ui.scale_widget.scaleChanged.disconnect()
+        except TypeError:
+            # when signal is not connected
+            pass
+
+        # update ui scale
+        self.ui.scale_widget.setScale(get_scale_from_canvas())
+        # reactivate auto ui scale update
+        self.ui.scale_widget.scaleChanged.connect(self._zoom_canvas_from_scale)
+
+    def _zoom_canvas_from_scale(self):
+        # disable temporary scale auto-calculation when extent changed
+        self.enable_update_ui_scale = False
+
+        # update canvas
+        set_map_extent_from(
+            scale=self.ui.scale_widget.scale(), crs=QgsProject.instance().crs().authid()
+        )
+
+        # reactive scale auto-calculation when extent changed
+        self.enable_update_ui_scale = True
