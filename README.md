@@ -13,7 +13,10 @@ A[GISデータ] --本プラグインで切り出し変換--> B[出力フォル�
 ```
 ![qgis_ai_screencap](./imgs/qgis_ai_screencap.png)
 
-<div><video controls src="./imgs/plugx_qgis_demo.mp4" ></video></div>
+
+https://github.com/MIERUNE/qgis-plugin-for-plugx/assets/26103833/c717b613-8569-4f28-9ca7-462e1b984c83
+
+
 
 ## 使い方
 
