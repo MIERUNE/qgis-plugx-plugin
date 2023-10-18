@@ -2,9 +2,9 @@
 
 
 
-このリポジトリでは、Adobe IllustratorでGISデータを読み込みためのソフトウェア`PlugX with QGIS（仮）`向けに、GISデータをエクスポートするためのQGISプラグインを管理します。
+このリポジトリでは、Adobe IllustratorでGISデータを読み込みためのソフトウェア`PlugX-QGIS`向けに、GISデータをエクスポートするためのQGISプラグインを管理します。
 
-## 本プラグインとPlugXの連携方法について
+## 本プラグインとPlugX-QGISの連携方法について
 
 ```mermaid
 graph LR
@@ -21,7 +21,7 @@ https://github.com/MIERUNE/qgis-plugin-for-plugx/assets/26103833/c717b613-8569-4
 ## 使い方
 
 ```planetext
-本プラグインで出力した結果を読み込むには、別途「PlugX with QGIS（仮）」の導入・インストールが必要です。
+本プラグインで出力した結果を読み込むには、別途「PlugX-QGIS」の導入・インストールが必要です。
 ```
 
 1. QGISで本プラグインをインストール
@@ -34,7 +34,7 @@ https://github.com/MIERUNE/qgis-plugin-for-plugx/assets/26103833/c717b613-8569-4
 
 5. 処理を実行する
 
-6. 出力フォルダをPlugX with QGIS（仮）で読み込む
+6. 出力フォルダをPlugX-QGISで読み込む
 
 <!-- PlugXの操作画面 -->
 
