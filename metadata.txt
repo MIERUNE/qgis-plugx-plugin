@@ -1,8 +1,8 @@
 [general]
-name=PlugX
+name=QGIS to Illustrator with PlugX
 qgisMinimumVersion=3.0
-about=
-description=
+about=Let's transfer your maps to Illustrator!
+description=The plugin to convert QGIS maps to import from Illustrator. With PlugiX-QGIS, you can transfer maps designed in QGIS to Illustrator!
 version={{PLUGIN_VERSION}}
 
 #Plugin main icon
@@ -10,8 +10,8 @@ icon=imgs/icon.png
 
 author=MIERUNE Inc.
 email=info@mierune.co.jp
-homepage=
-tracker=
-repository=
-tags=
+homepage=https://www.mierune.co.jp/
+tracker=https://github.com/MIERUNE/qgis-plugx-plugin/issues
+repository=https://github.com/MIERUNE/qgis-plugx-plugin
+tags=style, Illustrator, map
 category=
