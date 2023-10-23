@@ -10,7 +10,7 @@ icon=imgs/icon.png
 
 author=MIERUNE Inc.
 email=info@mierune.co.jp
-homepage=https://github.com/MIERUNE/qgis-plugx-plugin/blob/main/README.md
+homepage=https://github.com/MIERUNE/qgis-plugx-plugin
 tracker=https://github.com/MIERUNE/qgis-plugx-plugin/issues
 repository=https://github.com/MIERUNE/qgis-plugx-plugin
 tags=style, Illustrator, map
