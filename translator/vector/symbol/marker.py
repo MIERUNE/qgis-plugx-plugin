@@ -8,7 +8,7 @@ from qgis.core import (
 from PyQt5.QtGui import QColor
 from typing import Union, Tuple
 
-from utils import convert_to_point
+from plugx_utils import convert_to_point
 from translator.vector.symbol.utils import get_asset_name, to_rgba
 from translator.vector.symbol.penstyle import get_penstyle_from
 

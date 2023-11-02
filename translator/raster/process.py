@@ -12,7 +12,7 @@ from qgis.utils import iface
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QColor
 
-from utils import write_json
+from plugx_utils import write_json
 from translator.utils import get_blend_mode_string
 
 

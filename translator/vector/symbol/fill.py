@@ -1,5 +1,5 @@
 from qgis.core import QgsSymbolLayer
-from utils import convert_to_point
+from plugx_utils import convert_to_point
 from PyQt5.QtCore import Qt
 from translator.vector.symbol.utils import to_rgba
 from translator.vector.symbol.penstyle import get_penstyle_from

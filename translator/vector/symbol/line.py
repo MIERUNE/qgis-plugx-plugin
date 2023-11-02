@@ -1,5 +1,5 @@
 from qgis.core import QgsSymbolLayer
-from utils import convert_to_point
+from plugx_utils import convert_to_point
 
 from .marker import get_point_symbol_data
 from translator.vector.symbol.utils import to_rgba

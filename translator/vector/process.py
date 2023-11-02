@@ -14,7 +14,7 @@ from .symbol import (
     is_included_unsupported_symbol_layer,
 )
 
-from utils import write_json
+from plugx_utils import write_json
 from translator.utils import get_blend_mode_string
 
 MAX_NB_SYMBOL_CLASSES = 1500
