@@ -22,7 +22,7 @@ from qgis.utils import iface
 from translator.vector.label import generate_label_vector
 from ui.progress_dialog import ProgressDialog
 from translator.thread import ProcessingThread
-from utils import write_json, get_tempdir
+from plugx_utils import write_json, get_tempdir
 from scale import get_scale_from_canvas, set_map_extent_from
 
 

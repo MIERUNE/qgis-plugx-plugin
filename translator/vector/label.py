@@ -4,7 +4,7 @@ import processing
 from qgis.core import QgsVectorLayer, QgsRectangle
 from qgis.utils import iface
 
-from utils import write_json
+from plugx_utils import write_json
 
 
 def generate_label_json(

@@ -6,7 +6,7 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import Qt
 
-from utils import convert_to_point
+from plugx_utils import convert_to_point
 
 PRESET_DASHPATTERN_MULTIPLIER = {
     Qt.DashLine: [4, 2],  # ----  ----  ----...
