@@ -1,7 +1,6 @@
 from qgis.core import QgsSymbolLayer
-from plugx_utils import convert_to_point
 from PyQt5.QtCore import Qt
-from translator.vector.symbol.utils import to_rgba
+from translator.vector.symbol.utils import to_rgba, get_stroke_width_pt
 from translator.vector.symbol.penstyle import get_penstyle_from
 
 
@@ -37,7 +36,7 @@ def get_polygon_symbol_data(
             "color": to_rgba(symbol_layer.fillColor()),
             "brushstyle": _get_brushstyle_from(symbol_layer.brushStyle()),
             "outline_color": to_rgba(symbol_layer.strokeColor()),
-            "outline_width": convert_to_point(
+            "outline_width": get_stroke_width_pt(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "outline_penstyle": get_penstyle_from(symbol_layer),
@@ -84,7 +83,7 @@ def get_polygon_symbol_data(
             "type": "svg",
             "color": to_rgba(symbol_layer.color()),
             "outline_color": to_rgba(symbol_layer.svgStrokeColor()),
-            "outline_width": convert_to_point(
+            "outline_width": get_stroke_width_pt(
                 symbol_layer.svgStrokeWidth(), symbol_layer.svgStrokeWidthUnit()
             ),
             "level": symbol_layer.renderingPass(),
