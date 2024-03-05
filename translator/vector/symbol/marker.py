@@ -9,7 +9,7 @@ from PyQt5.QtGui import QColor
 from typing import Union, Tuple
 
 from plugx_utils import convert_to_point
-from translator.vector.symbol.utils import get_asset_name, to_rgba
+from translator.vector.symbol.utils import get_asset_name, to_rgba, get_stroke_width_pt
 from translator.vector.symbol.penstyle import get_penstyle_from
 
 
@@ -174,7 +174,7 @@ def get_point_symbol_data(
             "size": convert_to_point(symbol_layer.size(), symbol_layer.sizeUnit()),
             "color": to_rgba(symbol_layer.color()),
             "outline_color": to_rgba(symbol_layer.strokeColor()),
-            "outline_width": convert_to_point(
+            "outline_width": get_stroke_width_pt(
                 symbol_layer.strokeWidth(), symbol_layer.strokeWidthUnit()
             ),
             "outline_penstyle": get_penstyle_from(symbol_layer),
