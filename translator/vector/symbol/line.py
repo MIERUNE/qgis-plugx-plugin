@@ -12,7 +12,9 @@ def get_line_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) ->
             "type": "simple",
             "color": to_rgba(symbol_layer.color()),
             "penstyle": get_penstyle_from(symbol_layer),
-            "width": get_stroke_width_pt(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": get_stroke_width_pt(
+                symbol_layer.width(), symbol_layer.widthUnit()
+            ),
             "level": symbol_layer.renderingPass(),
             "opacity": symbol_opacity,
         }
@@ -22,7 +24,9 @@ def get_line_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) ->
         symbol_layer_dict = {
             "type": "interpolated",
             "color": to_rgba(symbol_layer.color()),
-            "width": get_stroke_width_pt(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": get_stroke_width_pt(
+                symbol_layer.width(), symbol_layer.widthUnit()
+            ),
             "level": symbol_layer.renderingPass(),
             "opacity": symbol_opacity,
         }
@@ -50,7 +54,9 @@ def get_line_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) ->
         # TODO: implement
         symbol_layer_dict = {
             "type": "raster",
-            "width": get_stroke_width_pt(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": get_stroke_width_pt(
+                symbol_layer.width(), symbol_layer.widthUnit()
+            ),
             "level": symbol_layer.renderingPass(),
             "opacity": symbol_opacity,
         }
@@ -58,7 +64,9 @@ def get_line_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) ->
         # TODO: implement
         symbol_layer_dict = {
             "type": "lineburst",
-            "width": get_stroke_width_pt(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": get_stroke_width_pt(
+                symbol_layer.width(), symbol_layer.widthUnit()
+            ),
             "level": symbol_layer.renderingPass(),
             "opacity": symbol_opacity,
         }
@@ -66,7 +74,9 @@ def get_line_symbol_data(symbol_layer: QgsSymbolLayer, symbol_opacity: float) ->
         # TODO: implement
         symbol_layer_dict = {
             "type": "arrow",
-            "width": get_stroke_width_pt(symbol_layer.width(), symbol_layer.widthUnit()),
+            "width": get_stroke_width_pt(
+                symbol_layer.width(), symbol_layer.widthUnit()
+            ),
             "level": symbol_layer.renderingPass(),
             "opacity": symbol_opacity,
         }
