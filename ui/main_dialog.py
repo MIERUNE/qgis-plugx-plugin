@@ -260,6 +260,9 @@ class MainDialog(QDialog):
                 ):
                     # Unsupported QgsMapLayerType
                     continue
+                if not child.layer().isSpatial():
+                    # exclude no geometry layers such as CSV files
+                    continue
 
             else:
                 raise Exception("Unknown child type")
