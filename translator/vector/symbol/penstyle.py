@@ -124,6 +124,7 @@ def _get_penstyle_from_line(symbol_layer: QgsLineSymbolLayer) -> dict:
                 convert_to_point(dash_value, symbol_layer.customDashPatternUnit())
                 for dash_value in symbol_layer.customDashVector()
             ]
+
         else:
             # preset dash pattern: each value is multiplier to width
             dash_pattern_mul = PRESET_DASHPATTERN_MULTIPLIER.get(
@@ -136,6 +137,15 @@ def _get_penstyle_from_line(symbol_layer: QgsLineSymbolLayer) -> dict:
                 * convert_to_point(symbol_layer.width(), symbol_layer.widthUnit())
                 for dash_value in dash_pattern_mul
             ]
+        penstyle["dash_pattern"] = dash_pattern
+
+    elif penstyle["stroke"] == "solid" and symbol_layer.useCustomDashPattern():
+        # customized patterns occurs NOT with dash strole but solid stroke
+        penstyle["stroke"] = "dash"
+        dash_pattern = [
+            convert_to_point(dash_value, symbol_layer.customDashPatternUnit())
+            for dash_value in symbol_layer.customDashVector()
+        ]
 
         penstyle["dash_pattern"] = dash_pattern
 
