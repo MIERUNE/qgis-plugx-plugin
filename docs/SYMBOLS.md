@@ -1,10 +1,11 @@
-# Symbol Specification
-
+# シンボル仕様 / Symbol Specification
+日本語
 - QGIS Symbol -> JSON への変換仕様を定義します
 - QGISの1レイヤーには1個以上のSymbolLayerが含まれます
 - 通常は1SymbolLayer=1Symbolですが、一部特殊なSymbolLayerは複数のSymbolを含むことがあります（例：FilledMarker）
 - ひとつのSymbolLayerは、ひとつのシェープファイルに対応します
 
+English
 - Defines the conversion rules from QGIS Symbols to JSON.
 - Each QGIS layer contains one or more SymbolLayers.
 - Usually, 1 SymbolLayer = 1 Symbol, but some special SymbolLayers may include multiple Symbols (e.g., FilledMarker).
@@ -168,9 +169,10 @@
     "dash_pattern": [2.0, 1.0, 4.0, 1.0], 
     // stroke=dashのときのみ [実線(長さ), 間隔、実線、間隔...]
     // For stroke=dash only: [solid line length, gap, solid line, gap...]
-    // 例: [2, 1]       -> --  --  --  -- ...
-    // 例: [4, 2]       -> ----  ----  ---- ...
-    // 例: [2, 1, 4, 2] -> -- ----  -- ----  -- ...
+    // 例 / e.g.:
+    // [2, 1]       -> --  --  --  -- ...
+    // [4, 2]       -> ----  ----  ---- ...
+    // [2, 1, 4, 2] -> -- ----  -- ----  -- ...
   },
   "width": 2,
   "level": 1,
