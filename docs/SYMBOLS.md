@@ -5,6 +5,11 @@
 - 通常は1SymbolLayer=1Symbolですが、一部特殊なSymbolLayerは複数のSymbolを含むことがあります（例：FilledMarker）
 - ひとつのSymbolLayerは、ひとつのシェープファイルに対応します
 
+- Defines the conversion rules from QGIS Symbols to JSON.
+- Each QGIS layer contains one or more SymbolLayers.
+- Usually, 1 SymbolLayer = 1 Symbol, but some special SymbolLayers may include multiple Symbols (e.g., FilledMarker).
+- Each SymbolLayer corresponds to one shapefile.
+
 ## Point
 
 ### simple (SimpleMarker)
@@ -27,7 +32,7 @@
   "offset": [0.0, 0.0],
   "anchor_x": "center", // 配置のX原点: left | center | right
   "anchor_y": "middle", // 配置のY原点: top | middle | bottom 
-  "rotation": 0.0, //degrees, 時計回り
+  "rotation": 0.0, //degrees, clockwise 時計回り
   "level": 0,
   "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
@@ -49,7 +54,7 @@
   "offset": [0.0, 0.0],
   "anchor_x": "center", // 配置のX原点: left | center | right
   "anchor_y": "middle", // 配置のY原点: top | middle | bottom 
-  "rotation": 180.0, //degrees, 時計回り
+  "rotation": 180.0, //degrees, clockwise 時計回り
   "level": 0,
   "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
@@ -68,7 +73,7 @@
   "offset": [0.0, 0.0],
   "anchor_x": "center", // 配置のX原点: left | center | right
   "anchor_y": "middle", // 配置のY原点: top | middle | bottom 
-  "rotation": 0.0, // degrees, 時計回り
+  "rotation": 0.0, // degrees, clockwise 時計回り
   "level": 1,
   "opacity": 1.0 // 透過度: 0.0 ~ 1.0
 }
@@ -79,7 +84,7 @@
 ![](./imgs/marker_font.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "font",
   "size": 10,
@@ -94,7 +99,7 @@
 ![](./imgs/marker_animated.gif)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "animated",
   "size": 10,
@@ -108,7 +113,7 @@
 ![](./imgs/marker_filled.png) 
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "filled",
   "size": 10,
@@ -122,7 +127,7 @@
 ![](./imgs/marker_ellipse.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "ellipse",
   "size": 10,
@@ -135,7 +140,7 @@
 ### mask (MaskMarker)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "unsupported",
   "size": 10,
@@ -160,7 +165,9 @@
     "stroke": "solid", // nopen | solid | dash
     "cap": "square", // flat | square | round
     "join": "bevel", // miter | bevel | round
-    "dash_pattern": [2.0, 1.0, 4.0, 1.0], // stroke=dashのときのみ [実線(長さ), 間隔、実線、間隔...]
+    "dash_pattern": [2.0, 1.0, 4.0, 1.0], 
+    // stroke=dashのときのみ [実線(長さ), 間隔、実線、間隔...]
+    // For stroke=dash only: [solid line length, gap, solid line, gap...]
     // 例: [2, 1]       -> --  --  --  -- ...
     // 例: [4, 2]       -> ----  ----  ---- ...
     // 例: [2, 1, 4, 2] -> -- ----  -- ----  -- ...
@@ -183,6 +190,8 @@
   "opacity": 1.0,
   "markers": [
     // 任意の個数・種別のtype=markerの配列。これらが重なってひとつのシンボルになりライン上に表示される（後が上）。
+    // A list of markers (type=marker) that can be of any number and type. 
+    // These markers stack on top of each other to create one symbol on the line (the last one is on top).
     {
       "type": "svg",
       "size": 10,
@@ -221,7 +230,7 @@
 ![](./imgs/line_interpolated.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "interpolated",
   "color": "#ff0000ff",
@@ -236,7 +245,7 @@
 ![](./imgs/line_hashed.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "hash",
   "level": 1,
@@ -249,7 +258,7 @@
 ![](./imgs/line_raster.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "raster",
   "width": 2,
@@ -263,7 +272,7 @@
 ![](./imgs/line_arrow.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "arrow",
   "width": 2,
@@ -277,7 +286,7 @@
 ![](./imgs/lineburst.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "lineburst",
   "width": 2,
@@ -313,7 +322,7 @@
 ![](./imgs/fill_centroid.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "centroid",
   "level": 1,
@@ -326,7 +335,7 @@
 ![](./imgs/fill_pointpattern.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "pointpattern",
   "level": 1,
@@ -339,7 +348,7 @@
 ![](./imgs/fill_randommarker.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "randommarker",
   "level": 1,
@@ -352,7 +361,7 @@
 ![](./imgs/fill_linepattern.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "linepattern",
   "level": 1,
@@ -365,7 +374,7 @@
 ![](./imgs/fill_svg.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "svg",
   "color": "#ff0000ff",
@@ -381,7 +390,7 @@
 ![](./imgs/fill_raster.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "raster",
   "color": "#ff0000ff",
@@ -397,7 +406,7 @@
 ![](./imgs/fill_gradient.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "gradient",
   "level": 1,
@@ -410,7 +419,7 @@
 ![](./imgs/fill_shapeburst.png)
 
 ```json
-# 未実装: basic attributes only
+# Not implemented / 未実装: basic attributes only
 {
   "type": "shapeburst",
   "level": 1,
@@ -418,7 +427,7 @@
 }
 ```
 
-## 未実装のシンボル
+## 未実装のシンボル / Not supported symbols
 
 ### Polygon
 
@@ -431,9 +440,10 @@
   - Raster
   - Simple
 
-## 対応予定のないシンボル
+## 対応予定のないシンボル / Symbols that are not planned to be supported
 
 以下のシンボルは、対応予定がありません。`type=unsupported`として出力されます。
+The following symbols are not planned to be implemented and are exported as `type=unsupported`.
 
 ```json
 {
