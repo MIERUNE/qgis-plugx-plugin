@@ -1,7 +1,8 @@
 # QGIS Plugin for PlugX - Design Documents
 
-## 概要
+## 概要 / Overview
 
+日本語
 - 出力ファイルの形式
   - ベクター：ESRI Shapefile
   - ラスター：PNG
@@ -9,6 +10,15 @@
 - 全てのベクターレイヤーは、シンボルの数だけ出力される
 - JSONの全ての座標は、プロジェクトCRSの座標である
 - JSONの全てのサイズは、ポイント単位である
+
+English
+- Output File Formats:
+  - Vector: ESRI Shapefile
+  - Raster: PNG
+- All layers are converted to the project CRS before being exported.
+- Each vector layer is exported for every symbol it contains.
+- All coordinates in the exported JSON files are in the project CRS.
+- All sizes in the exported JSON files are in points.
 
 ## 出力フォルダの構成
 
@@ -19,11 +29,11 @@
 │   ├── someicon.svg
 │   ├── somepic.png
 │   ├── someanimation.gif
-├── layer_0_0.shp # layer_n_mという命名規則: n=レイヤーの順序、m=シンボルの順序。辞書順で降順＝数字が大きいほど手前。mは省略可能。
+├── layer_0_0.shp *1
 ├── layer_0_0.json
-├── layer_0_1.shp # ベクターレイヤーの場合、シンボルの数だけ出力される
+├── layer_0_1.shp *2
 ├── layer_0_1.json
-├── layer_2.shp # データが空のレイヤーはスキップされる（必ずしも連番ではない）
+├── layer_2.shp *3
 ├── layer_2.json
 ├── layer_5.png
 ├── layer_5.json
@@ -32,7 +42,20 @@
 ├── label_1.json
 ├── label_2.json
 └── label_n.json
+
+*1: 
+- layer_n_mという命名規則: n=レイヤーの順序、m=シンボルの順序。辞書順で降順＝数字が大きいほど手前。mは省略可能。
+- naming convention: layer_n_m, where n is the layer order and m is the symbol order. Sorted in descending order (higher numbers appear in front). m can be omitted.
+
+*2: 
+- ベクターレイヤーの場合、シンボルの数だけ出力される.
+- *2: For vector layers, the output is generated for each symbol.
+
+*3: 
+- データが空のレイヤーはスキップされる（必ずしも連番ではない）
+- Layers with no data are skipped (not necessarily sequential numbers).
 ```
+
 
 ### project.json
 
@@ -49,7 +72,7 @@
   ],
   "scale": 23031.837306501773,
   "layers": [
-    "layer_0", // 出力されたレイヤー一覧: layer_n_mに対応する
+    "layer_0", // 出力されたレイヤー一覧: layer_n_mに対応する. List of exported layers corresponds to: layer_n_m.
     "layer_2",
     "layer_5",
     "layer_n"
@@ -95,6 +118,7 @@
   "blend_mode": "normal", // normal | lighten | screen | dogde | addition | darken | multiply | burn | overlay | soft_light | hard_light | difference | subtract
   "symbols": [
       // symbol typeに応じた辞書からなる配列。別ページにて仕様を定義
+      // Array of dictionaries corresponding to the symbol type. Specifications are defined on a separate page.
       {
           "type": "svg",
           "width": 10,
@@ -112,7 +136,7 @@
       }
   ],
   "usingSymbolLevels": true,
-  "legend": "1 - 20000", // 凡例名 (categoricalかグラデーションの場合のみ)
+  "legend": "1 - 20000", // 凡例名 (categoricalかグラデーションの場合のみ). Legend name (only for categorical or gradient symbolization)
 }
 ```
 
