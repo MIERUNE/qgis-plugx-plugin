@@ -20,7 +20,7 @@ English
 - All coordinates in the exported JSON files are in the project CRS.
 - All sizes in the exported JSON files are in points.
 
-## 出力フォルダの構成
+## 出力フォルダの構成 / Output folder structure
 
 ```planetext
 .
