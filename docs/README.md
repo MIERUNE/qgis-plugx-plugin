@@ -42,6 +42,7 @@ English
 ├── label_1.json
 ├── label_2.json
 └── label_n.json
+```
 
 *1: 
 - layer_n_mという命名規則: n=レイヤーの順序、m=シンボルの順序。辞書順で降順＝数字が大きいほど手前。mは省略可能。
@@ -54,7 +55,7 @@ English
 *3: 
 - データが空のレイヤーはスキップされる（必ずしも連番ではない）
 - Layers with no data are skipped (not necessarily sequential numbers).
-```
+
 
 
 ### project.json
