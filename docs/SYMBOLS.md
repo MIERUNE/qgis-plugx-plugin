@@ -445,6 +445,7 @@ English
 ## 対応予定のないシンボル / Symbols that are not planned to be supported
 
 以下のシンボルは、対応予定がありません。`type=unsupported`として出力されます。
+
 The following symbols are not planned to be implemented and are exported as `type=unsupported`.
 
 ```json
