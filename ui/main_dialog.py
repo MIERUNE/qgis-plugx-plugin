@@ -2,6 +2,8 @@ import os
 import shutil
 
 import sip
+import webbrowser
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QMessageBox, QTreeWidgetItem, QFileDialog
 from qgis.PyQt.QtGui import QIcon
@@ -39,6 +41,7 @@ class MainDialog(QDialog):
         # connect signals
         self.ui.pushButton_run.clicked.connect(self._run)
         self.ui.pushButton_cancel.clicked.connect(self.close)
+        self.ui.pushButton_help.clicked.connect(self._on_help_button_clicked)
 
         # QgsExtentGroupBox
         self.ui.mExtentGroupBox.setMapCanvas(iface.mapCanvas())
@@ -317,3 +320,8 @@ class MainDialog(QDialog):
 
         # reactive scale auto-calculation when extent changed
         self.enable_update_ui_scale = True
+
+    def _on_help_button_clicked(self):
+        # show readme page
+        webbrowser.open("https://github.com/MIERUNE/qgis-plugx-plugin")
+        return
