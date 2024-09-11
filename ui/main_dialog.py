@@ -166,7 +166,7 @@ class MainDialog(QDialog):
 
         # messaging
         msg = self.tr("Process completed")
-        msg += f"\n\n"
+        msg += "\n\n"
         msg += self.tr("Output folder")
         msg += f":\n{params['output_dir']}"
 
