@@ -41,7 +41,7 @@ class ProgressDialog(QDialog):
         if QMessageBox.Yes == QMessageBox.question(
             self,
             self.tr("Check"),
-            self.tr("Are you sure to abort the process?")",
+            self.tr("Are you sure to abort the process?"),
             QMessageBox.Yes,
             QMessageBox.No,
         ):
@@ -62,7 +62,7 @@ class ProgressDialog(QDialog):
     def set_abortable(self, abortable=True):
         self.abortButton.setEnabled(abortable)
 
-    def translate(self, message):
+    def translate(self, message: str):
         """translate messages coming from outside UI"""
         message_dic = {
             "Processing: ": self.tr("Processing: "),

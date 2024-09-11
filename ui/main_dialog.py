@@ -103,7 +103,7 @@ class MainDialog(QDialog):
                 QMessageBox.information(
                     self,
                     self.tr("Error"),
-                    f"{self.tr("An error occured.")}\n\n{error_message}",
+                    self.tr("An error occured.") + f"\n\n{error_message}",
                 ),  # noqa
                 progress_dialog.close(),
             ]
@@ -166,7 +166,9 @@ class MainDialog(QDialog):
 
         # messaging
         msg = self.tr("Process completed")
-        msg += f"\n\n{self.tr("Output folder")}:\n{params['output_dir']}"
+        msg += f"\n\n"
+        msg += self.tr("Output folder")
+        msg += f":\n{params['output_dir']}"
 
         if len(layers_has_unsupported_symbol) > 0:
             msg += "\n\n"
