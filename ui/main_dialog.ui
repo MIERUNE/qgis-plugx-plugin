@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>レイヤー設定</string>
+      <string>Layers to export</string>
      </property>
     </widget>
    </item>
@@ -39,7 +39,7 @@
    <item>
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>マップ設定</string>
+      <string>Map parameters</string>
      </property>
     </widget>
    </item>
@@ -48,7 +48,7 @@
      <item>
       <widget class="QLabel" name="label_scale">
        <property name="text">
-        <string>出力縮尺</string>
+        <string>Output Scale</string>
        </property>
       </widget>
      </item>
@@ -70,14 +70,14 @@
      <item>
       <widget class="QPushButton" name="pushButton_run">
        <property name="text">
-        <string>出力フォルダーを選択して実行</string>
+        <string>Select the output folder and execute</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_cancel">
        <property name="text">
-        <string>キャンセル</string>
+        <string>Cancel</string>
        </property>
       </widget>
      </item>
