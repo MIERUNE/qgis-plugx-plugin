@@ -101,7 +101,9 @@ class MainDialog(QDialog):
             lambda error_message: [
                 QgsMessageLog.logMessage(error_message, "QGS2PlugX", Qgis.Critical),
                 QMessageBox.information(
-                    self, "エラー", f"エラーが発生しました。\n\n{error_message}"
+                    self,
+                    self.tr("Error"),
+                    f"{self.tr("An error occured.")}\n\n{error_message}",
                 ),  # noqa
                 progress_dialog.close(),
             ]
@@ -163,19 +165,22 @@ class MainDialog(QDialog):
         )
 
         # messaging
-        msg = f"処理が完了しました。\n\n出力先:\n{params['output_dir']}"
+        msg = self.tr("Process completed")
+        msg += f"\n\n{self.tr("Output folder")}:\n{params['output_dir']}"
+
         if len(layers_has_unsupported_symbol) > 0:
-            msg += (
-                "\n\n以下レイヤに対応不可なシンボロジがあるため、\n\
-            シンプルシンボルに変換しました。\n"
-                + "\n".join(layers_has_unsupported_symbol)
-            )
+            msg += "\n\n"
+            msg += self.tr("The following layers contains unsupported symbols")
+            msg += self.tr("and have been converted to simple symbols.")
+            msg += "\n\n".join(layers_has_unsupported_symbol)
+
         if len(layers_not_completed) > 0:
-            msg += "\n\n以下のレイヤーは出力できませんでした。\n"
-            msg += "\n".join(layers_not_completed)
+            msg += "\n\n"
+            msg += self.tr("Failed to export the following layers.")
+            msg += "\n\n".join(layers_not_completed)
         QMessageBox.information(
             None,
-            "完了",
+            self.tr("Completed"),
             msg,
         )
 
@@ -186,8 +191,10 @@ class MainDialog(QDialog):
         except PermissionError:
             QMessageBox.warning(
                 self,
-                "エラー",
-                "一時フォルダの削除に失敗しました。\n手動で削除してください。",
+                self.tr("Error"),
+                self.tr(
+                    "Failed to delete the temporary folder. Please delete it manually."
+                ),
             )
 
     def _get_checked_layers(self):

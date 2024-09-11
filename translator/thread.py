@@ -5,6 +5,8 @@ from translator.raster.process import process_raster
 from translator.vector.process import process_vector
 from translator.vector.label import generate_label_json
 
+from ui.progress_dialog import ProgressDialog
+
 
 class ProcessingThread(QThread):
     processStarted = pyqtSignal(int)
@@ -53,7 +55,9 @@ class ProcessingThread(QThread):
                     self.results.append(result)
 
                 # emit progress
-                self.postMessage.emit(f"処理中: {layer.name()}")
+                self.postMessage.emit(
+                    f"{ProgressDialog.translate("Processing: ")} {layer.name()}"
+                )
                 self.setAbortable.emit(True)
                 self.addProgress.emit(1)
         except Exception as e:
