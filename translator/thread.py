@@ -53,7 +53,7 @@ class ProcessingThread(QThread):
                     self.results.append(result)
 
                 # emit progress
-                self.postMessage.emit(f"処理中: {layer.name()}")
+                self.postMessage.emit("Processing: " + layer.name())
                 self.setAbortable.emit(True)
                 self.addProgress.emit(1)
         except Exception as e:

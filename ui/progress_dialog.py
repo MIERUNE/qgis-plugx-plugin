@@ -25,11 +25,11 @@ class ProgressDialog(QDialog):
         self.init_ui()
 
     def init_ui(self):
-        self.label.setText("処理開始中...")
+        self.label.setText(self.tr("Initializing process..."))
         self.progressBar.setValue(0)
         self.progressBar.setMaximum(0)
         self.abortButton.setEnabled(True)
-        self.abortButton.setText("中断")
+        self.abortButton.setText(self.tr("Cancel"))
         self.abortButton.clicked.connect(self.on_abort_click)
 
     def keyPressEvent(self, event: QKeyEvent):
@@ -40,15 +40,15 @@ class ProgressDialog(QDialog):
     def on_abort_click(self):
         if QMessageBox.Yes == QMessageBox.question(
             self,
-            "確認",
-            "処理を中断し、以降の処理をスキップしてよろしいですか？",
+            self.tr("Check"),
+            self.tr("Are you sure to abort the process?"),
             QMessageBox.Yes,
             QMessageBox.No,
         ):
             if self.abortButton.isEnabled():  # abort if possible
                 self.set_abort_flag_callback()
                 self.abortButton.setEnabled(False)
-                self.abortButton.setText("中断待機中...")
+                self.abortButton.setText(self.tr("Aborting..."))
 
     def set_maximum(self, value: int):
         self.progressBar.setMaximum(value)
@@ -61,3 +61,14 @@ class ProgressDialog(QDialog):
 
     def set_abortable(self, abortable=True):
         self.abortButton.setEnabled(abortable)
+
+    def translate(self, message: str):
+        """translate messages coming from outside UI"""
+        message_dic = {
+            "Processing: ": self.tr("Processing: "),
+        }
+        translated_message = message_dic.get(
+            message, message
+        )  # fallback is self message
+
+        return translated_message

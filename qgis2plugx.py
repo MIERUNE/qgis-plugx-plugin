@@ -2,6 +2,7 @@ import os
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
+from PyQt5.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.gui import QgisInterface
 
 from ui.main_dialog import MainDialog
@@ -24,6 +25,19 @@ class QGIS2PlugX:
         # QDialogを保存するためのクラス変数
         self.main_dialog = None
         self.about_dialog = None
+
+        locale = QSettings().value("locale/userLocale")[0:2]
+        locale_path = os.path.join(
+            self.plugin_dir, "i18n", "QGIS2PlugX_{}.qm".format(locale)
+        )
+
+        if os.path.exists(locale_path):
+            self.translator = QTranslator()
+            self.translator.load(locale_path)
+            QCoreApplication.installTranslator(self.translator)
+
+    def tr(self, message):
+        return QCoreApplication.translate("QGIS2PlugX", message)
 
     def add_action(
         self,
