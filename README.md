@@ -2,8 +2,8 @@
 
 
 
-このリポジトリでは、Adobe IllustratorでGISデータを読み込みためのソフトウェア`PlugX-QGIS`向けに、GISデータをエクスポートするためのQGISプラグインを管理します。<br><br>
-This plugin exports GIS data in a folder, which can be read and imported into Adobe Illustrator using an add-on called `PlugX-QGIS`.
+このリポジトリでは、Adobe IllustratorでGISデータを読み込みためのソフトウェア[`PlugX-QGIS`](https://chiri.com/products/plugx/qgisai)向けに、GISデータをエクスポートするためのQGISプラグインを管理します。<br><br>
+This plugin exports GIS data in a folder, which can be read and imported into Adobe Illustrator using an add-on called [`PlugX-QGIS`](https://chiri.com/products/plugx/qgisai).
 
 ## 本プラグインとPlugX-QGISの連携方法について / How to use this plugin with PlugX-QGIS
 
