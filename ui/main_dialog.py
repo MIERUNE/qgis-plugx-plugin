@@ -120,7 +120,7 @@ class MainDialog(QDialog):
         )
         # start sub thread
         thread.start()
-        progress_dialog.exec_()
+        progress_dialog.exec()
 
         results = thread.results  # results stored in thread instance
 
