@@ -9,33 +9,33 @@ from qgis.PyQt.QtCore import Qt
 from plugx_utils import convert_to_point
 
 PRESET_DASHPATTERN_MULTIPLIER = {
-    Qt.DashLine: [4, 2],  # ----  ----  ----...
-    Qt.DotLine: [1, 2],  # -  -  -  -  -...
-    Qt.DashDotLine: [4, 2, 1, 2],  # ----  -  ----  -  ----...
-    Qt.DashDotDotLine: [4, 2, 1, 2, 1, 2],  # ----  -  -  ----  -  -  ----...
+    Qt.PenStyle.DashLine: [4, 2],  # ----  ----  ----...
+    Qt.PenStyle.DotLine: [1, 2],  # -  -  -  -  -...
+    Qt.PenStyle.DashDotLine: [4, 2, 1, 2],  # ----  -  ----  -  ----...
+    Qt.PenStyle.DashDotDotLine: [4, 2, 1, 2, 1, 2],  # ----  -  -  ----  -  -  ----...
 }
 
 STROKE_STYLE_DICT = {
-    Qt.NoPen: "nopen",
-    Qt.SolidLine: "solid",
-    Qt.DashLine: "dash",
-    Qt.DotLine: "dash",
-    Qt.DashDotLine: "dash",
-    Qt.DashDotDotLine: "dash",
-    Qt.CustomDashLine: "dash",
+    Qt.PenStyle.NoPen: "nopen",
+    Qt.PenStyle.SolidLine: "solid",
+    Qt.PenStyle.DashLine: "dash",
+    Qt.PenStyle.DotLine: "dash",
+    Qt.PenStyle.DashDotLine: "dash",
+    Qt.PenStyle.DashDotDotLine: "dash",
+    Qt.PenStyle.CustomDashLine: "dash",
     # treat preset dashes as "dash" for more generic: Issue #114
 }
 
 JOIN_STYLE_DICT = {
-    Qt.MiterJoin: "miter",
-    Qt.BevelJoin: "bevel",
-    Qt.RoundJoin: "round",
+    Qt.PenJoinStyle.MiterJoin: "miter",
+    Qt.PenJoinStyle.BevelJoin: "bevel",
+    Qt.PenJoinStyle.RoundJoin: "round",
 }
 
 CAP_STYLE_DICT = {
-    Qt.FlatCap: "flat",
-    Qt.SquareCap: "square",
-    Qt.RoundCap: "round",
+    Qt.PenCapStyle.FlatCap: "flat",
+    Qt.PenCapStyle.SquareCap: "square",
+    Qt.PenCapStyle.RoundCap: "round",
 }
 
 
@@ -71,10 +71,12 @@ def get_penstyle_from(symbol_layer: QgsSymbolLayer) -> dict:
 def _get_penstyle_from_marker(symbol_layer: QgsMarkerSymbolLayer) -> dict:
     penstyle = {
         "stroke": STROKE_STYLE_DICT.get(
-            symbol_layer.strokeStyle(), STROKE_STYLE_DICT[Qt.SolidLine]  # fallback
+            symbol_layer.strokeStyle(),
+            STROKE_STYLE_DICT[Qt.PenStyle.SolidLine],  # fallback
         ),
         "join": JOIN_STYLE_DICT.get(
-            symbol_layer.penJoinStyle(), JOIN_STYLE_DICT[Qt.MiterJoin]  # fallback
+            symbol_layer.penJoinStyle(),
+            JOIN_STYLE_DICT[Qt.PenJoinStyle.MiterJoin],  # fallback
         ),
     }
 
@@ -83,7 +85,7 @@ def _get_penstyle_from_marker(symbol_layer: QgsMarkerSymbolLayer) -> dict:
         # preset dash pattern: each value is multiplier to width
         dash_pattern_mul = PRESET_DASHPATTERN_MULTIPLIER.get(
             symbol_layer.strokeStyle(),
-            PRESET_DASHPATTERN_MULTIPLIER[Qt.DashLine],  # fallback
+            PRESET_DASHPATTERN_MULTIPLIER[Qt.PenStyle.DashLine],  # fallback
         )
         # as real length, in point
         dash_pattern = [
@@ -107,13 +109,16 @@ def _get_penstyle_from_fill(symbol_layer: QgsFillSymbolLayer) -> dict:
 def _get_penstyle_from_line(symbol_layer: QgsLineSymbolLayer) -> dict:
     penstyle = {
         "stroke": STROKE_STYLE_DICT.get(
-            symbol_layer.penStyle(), STROKE_STYLE_DICT[Qt.SolidLine]  # fallback
+            symbol_layer.penStyle(),
+            STROKE_STYLE_DICT[Qt.PenStyle.SolidLine],  # fallback
         ),
         "join": JOIN_STYLE_DICT.get(
-            symbol_layer.penJoinStyle(), JOIN_STYLE_DICT[Qt.MiterJoin]  # fallback
+            symbol_layer.penJoinStyle(),
+            JOIN_STYLE_DICT[Qt.PenJoinStyle.MiterJoin],  # fallback
         ),
         "cap": CAP_STYLE_DICT.get(
-            symbol_layer.penCapStyle(), CAP_STYLE_DICT[Qt.FlatCap]  # fallback
+            symbol_layer.penCapStyle(),
+            CAP_STYLE_DICT[Qt.PenCapStyle.FlatCap],  # fallback
         ),
     }
 
@@ -129,7 +134,7 @@ def _get_penstyle_from_line(symbol_layer: QgsLineSymbolLayer) -> dict:
             # preset dash pattern: each value is multiplier to width
             dash_pattern_mul = PRESET_DASHPATTERN_MULTIPLIER.get(
                 symbol_layer.penStyle(),
-                PRESET_DASHPATTERN_MULTIPLIER[Qt.DashLine],  # fallback
+                PRESET_DASHPATTERN_MULTIPLIER[Qt.PenStyle.DashLine],  # fallback
             )
             # as real length, in point
             dash_pattern = [
