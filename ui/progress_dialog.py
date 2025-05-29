@@ -15,8 +15,8 @@ class ProgressDialog(QDialog):
             set_abort_flag_callback (optional, method()): called when abort clicked
         """
         super().__init__()
-        self.setWindowFlag(Qt.WindowCloseButtonHint, False)
-        self.setWindowFlag(Qt.WindowStaysOnTopHint)
+        self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
+        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
         self.ui = uic.loadUi(
             os.path.join(os.path.dirname(__file__), "progress_dialog.ui"), self
         )
