@@ -121,11 +121,13 @@ def _get_field_value_type(layer: QgsVectorLayer) -> int:
     if layer.renderer().type() == "categorizedSymbol":
         # enum for calculate field class
         # https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectortable.html#qgisfieldcalculator
-        if type(layer.renderer().categories()[0].value()) == float:
+        category_value = layer.renderer().categories()[0].value()
+
+        if isinstance(category_value, float):
             return 0
-        elif type(layer.renderer().categories()[0].value()) == int:
+        elif isinstance(category_value, int):
             return 1
-        elif type(layer.renderer().categories()[0].value()) == str:
+        elif isinstance(category_value, str):
             return 2
 
     elif layer.renderer().type() == "graduatedSymbol":
