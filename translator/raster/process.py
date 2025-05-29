@@ -9,8 +9,8 @@ from qgis.core import (
     QgsCoordinateTransform,
 )
 from qgis.utils import iface
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtCore import QSize
+from qgis.PyQt.QtGui import QColor
 
 from plugx_utils import write_json
 from translator.utils import get_blend_mode_string

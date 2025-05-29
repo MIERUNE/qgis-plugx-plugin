@@ -5,7 +5,7 @@ from qgis.core import (
     QgsSvgMarkerSymbolLayer,
     QgsApplication,
 )
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 from typing import Union, Tuple
 
 from plugx_utils import convert_to_point
@@ -53,7 +53,8 @@ def _get_markershape_from(symbol_shape: QgsSimpleMarkerSymbolLayerBase.Shape) ->
         QgsSimpleMarkerSymbolLayerBase.Shape.QuarterArc: "quarterarc",
         QgsSimpleMarkerSymbolLayerBase.Shape.AsteriskFill: "asteriskfill",
     }.get(
-        symbol_shape, "circle"  # fallback
+        symbol_shape,
+        "circle",  # fallback
     )
 
 
@@ -65,7 +66,8 @@ def _get_x_position_from(
         QgsMarkerSymbolLayer.HorizontalAnchorPoint.HCenter: "center",
         QgsMarkerSymbolLayer.HorizontalAnchorPoint.Right: "right",
     }.get(
-        symbol_anchor_x, "center"  # fallback
+        symbol_anchor_x,
+        "center",  # fallback
     )
 
 
@@ -77,7 +79,8 @@ def _get_y_position_from(
         QgsMarkerSymbolLayer.VerticalAnchorPoint.VCenter: "middle",
         QgsMarkerSymbolLayer.VerticalAnchorPoint.Bottom: "bottom",
     }.get(
-        symbol_anchor_y, "middle"  # fallback
+        symbol_anchor_y,
+        "middle",  # fallback
     )
 
 
@@ -110,7 +113,7 @@ def _get_svg_param(
 
 
 def _get_asset_height(
-    symbol_layer: Union[QgsRasterMarkerSymbolLayer, QgsSvgMarkerSymbolLayer]
+    symbol_layer: Union[QgsRasterMarkerSymbolLayer, QgsSvgMarkerSymbolLayer],
 ) -> float:
     """calculate svg/raster marker height in symbol units"""
     if symbol_layer.fixedAspectRatio() == 0:  # 0 means not 'Lock Aspect Ratio' in GUI

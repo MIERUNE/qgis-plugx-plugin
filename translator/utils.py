@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QPainter
+from qgis.PyQt.QtGui import QPainter
 
 
 def get_blend_mode_string(blend_mode: QPainter.CompositionMode) -> str:
@@ -18,5 +18,6 @@ def get_blend_mode_string(blend_mode: QPainter.CompositionMode) -> str:
         QPainter.CompositionMode_Difference: "difference",
         QPainter.CompositionMode_Exclusion: "subtract",
     }.get(
-        blend_mode, "normal"  # fallback
+        blend_mode,
+        "normal",  # fallback
     )

@@ -1,5 +1,5 @@
 from qgis.core import QgsSymbolLayer
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 from translator.vector.symbol.utils import to_rgba, get_stroke_width_pt
 from translator.vector.symbol.penstyle import get_penstyle_from
 
@@ -22,7 +22,8 @@ def _get_brushstyle_from(brush_style: Qt.BrushStyle) -> str:
         Qt.FDiagPattern: "forwarddiagonal",
         Qt.DiagCrossPattern: "crossingdiagonal",
     }.get(
-        brush_style, "solid"  # fallback
+        brush_style,
+        "solid",  # fallback
     )
 
 

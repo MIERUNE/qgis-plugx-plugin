@@ -2,9 +2,9 @@ import os
 
 # QGIS-API
 from qgis.PyQt import uic
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QDialog, QMessageBox
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QKeyEvent
+from qgis.PyQt.QtWidgets import QDialog, QMessageBox
 
 
 class ProgressDialog(QDialog):
