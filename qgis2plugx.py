@@ -1,9 +1,9 @@
 import os
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
-from PyQt5.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.gui import QgisInterface
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 
 from ui.main_dialog import MainDialog
 from ui.about_dialog import AboutDialog

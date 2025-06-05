@@ -1,5 +1,5 @@
-from PyQt5.QtCore import QThread, pyqtSignal
 from qgis.core import QgsRasterLayer, QgsVectorLayer
+from qgis.PyQt.QtCore import QThread, pyqtSignal
 
 from translator.raster.process import process_raster
 from translator.vector.process import process_vector

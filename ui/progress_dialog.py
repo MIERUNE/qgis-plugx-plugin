@@ -2,9 +2,9 @@ import os
 
 # QGIS-API
 from qgis.PyQt import uic
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QDialog, QMessageBox
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QKeyEvent
+from qgis.PyQt.QtWidgets import QDialog, QMessageBox
 
 
 class ProgressDialog(QDialog):
@@ -15,8 +15,8 @@ class ProgressDialog(QDialog):
             set_abort_flag_callback (optional, method()): called when abort clicked
         """
         super().__init__()
-        self.setWindowFlag(Qt.WindowCloseButtonHint, False)
-        self.setWindowFlag(Qt.WindowStaysOnTopHint)
+        self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
+        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
         self.ui = uic.loadUi(
             os.path.join(os.path.dirname(__file__), "progress_dialog.ui"), self
         )

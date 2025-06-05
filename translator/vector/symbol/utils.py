@@ -1,7 +1,7 @@
 import os
 
 from qgis.core import QgsSymbolLayer, QgsUnitTypes
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 from plugx_utils import convert_to_point
 
 

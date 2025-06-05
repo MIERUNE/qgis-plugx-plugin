@@ -1,12 +1,8 @@
 import os
 import shutil
 
-import sip
 import webbrowser
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QMessageBox, QTreeWidgetItem, QFileDialog
-from qgis.PyQt.QtGui import QIcon
 from qgis.core import (
     QgsMapLayerModel,
     QgsProject,
@@ -18,14 +14,28 @@ from qgis.core import (
     QgsMessageLog,
     Qgis,
 )
-from qgis.PyQt import uic
 from qgis.utils import iface
+
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QDialog, QMessageBox, QTreeWidgetItem, QFileDialog
+from qgis.PyQt.QtGui import QIcon
 
 from translator.vector.label import generate_label_vector
 from ui.progress_dialog import ProgressDialog
 from translator.thread import ProcessingThread
 from plugx_utils import write_json, get_tempdir
 from scale import get_scale_from_canvas, set_map_extent_from
+
+from qgis.PyQt.QtCore import QT_VERSION_STR
+
+QT_VERSION_INT = int(QT_VERSION_STR.split(".")[0])
+
+if QT_VERSION_INT <= 5:
+    import sip
+else:
+    # Handle Qt6 package
+    from PyQt6 import sip
 
 
 class MainDialog(QDialog):
@@ -110,7 +120,7 @@ class MainDialog(QDialog):
         )
         # start sub thread
         thread.start()
-        progress_dialog.exec_()
+        progress_dialog.exec()
 
         results = thread.results  # results stored in thread instance
 
