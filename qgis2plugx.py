@@ -19,8 +19,6 @@ class QGIS2PlugX:
         self.icon_path = os.path.join(self.plugin_dir, "imgs", "icon.png")
         self.actions = []
         self.menu = PLUGIN_NAME
-        self.toolbar = self.iface.addToolBar(PLUGIN_NAME)
-        self.toolbar.setObjectName(PLUGIN_NAME)
 
         # QDialogを保存するためのクラス変数
         self.main_dialog = None
@@ -46,7 +44,7 @@ class QGIS2PlugX:
         callback,
         enabled_flag=True,
         add_to_menu=True,
-        add_to_toolbar=True,
+        add_to_plugin_toolbar=True,
         status_tip=None,
         whats_this=None,
         parent=None,
@@ -59,8 +57,8 @@ class QGIS2PlugX:
             action.setStatusTip(status_tip)
         if whats_this is not None:
             action.setWhatsThis(whats_this)
-        if add_to_toolbar:
-            self.toolbar.addAction(action)
+        if add_to_plugin_toolbar:
+            self.iface.addToolBarIcon(action)
         if add_to_menu:
             self.iface.addPluginToMenu(self.menu, action)
         self.actions.append(action)
@@ -80,7 +78,7 @@ class QGIS2PlugX:
             text="Export",
             callback=self.show_dialog,
             parent=self.win,
-            add_to_toolbar=False,
+            add_to_plugin_toolbar=False,
         )
 
         self.add_action(
@@ -88,14 +86,13 @@ class QGIS2PlugX:
             text="About",
             callback=self.show_about,
             parent=self.win,
-            add_to_toolbar=False,
+            add_to_plugin_toolbar=False,
         )
 
     def unload(self):
         for action in self.actions:
             self.iface.removePluginMenu(PLUGIN_NAME, action)
             self.iface.removeToolBarIcon(action)
-        del self.toolbar
 
     def show_dialog(self):
         if self.main_dialog is None:
