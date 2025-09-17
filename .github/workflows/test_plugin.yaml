@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+env:
+  # Docker settings
+  DOCKER_IMAGE: qgis/qgis
+
 jobs:
   Test-plugin:
     runs-on: ubuntu-latest
