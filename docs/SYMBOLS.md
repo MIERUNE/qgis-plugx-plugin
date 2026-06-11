@@ -433,14 +433,13 @@ English
 
 ### Polygon
 
-- outline
+- outline style
   - Arrow
   - Hashed
   - Interpolated
   - Lineburst
   - Marker
   - Raster
-  - Simple
 
 ## 対応予定のないシンボル / Symbols that are not planned to be supported
 
